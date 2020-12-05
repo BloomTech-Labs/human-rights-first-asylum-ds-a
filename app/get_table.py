@@ -1,5 +1,3 @@
-import os
-
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends
 import sqlalchemy
@@ -11,8 +9,8 @@ router = APIRouter()
 
 async def get_db() -> sqlalchemy.engine.base.Connection:
     """Get a SQLAlchemy database connection.
-    
-    Uses this environment variable if it exists:  
+
+    Uses this environment variable if it exists:
     DATABASE_URL=dialect://user:password@host/dbname
 
     """
@@ -27,11 +25,12 @@ async def get_db() -> sqlalchemy.engine.base.Connection:
 
 @router.get('/req')
 async def make_req(connection=Depends(get_db)):
-    """Returns a json object with the entire cases table.
-    Right now there's nothing in that table so it's just the headers but there will be
+    """Returns a json object with the entire pdfs table.
+    Right now there's nothing in that table so it's just the
+    headers but there will be
     """
-    sql="""
+    sql = """
         SELECT *
-        FROM tester
+        FROM pdfs
         """
     return pd.read_sql(sql, con=connection)
