@@ -11,6 +11,10 @@ pytest = "*"
 fastapi = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 sqlalchemy = "*"
+pytesseract = "*"
+pdf2image = "*"
+pillow = "*"
+cmake = "*"
 
 [requires]
 python_version = "3"
