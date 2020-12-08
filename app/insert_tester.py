@@ -1,12 +1,10 @@
 from dotenv import load_dotenv
-from fastapi import APIRouter, Depends
 import sqlalchemy
 from sqlalchemy import create_engine
-import pandas as pd
-import os
+from fastapi import APIRouter, File, Depends
+import psycopg2
 
 router = APIRouter()
-
 
 async def get_db() -> sqlalchemy.engine.base.Connection:
     """Get a SQLAlchemy database connection.
@@ -16,7 +14,9 @@ async def get_db() -> sqlalchemy.engine.base.Connection:
 
     """
     load_dotenv()
-    database_url = os.getenv('DATABASE_URL')
+    database_url = "asylum.catpmmwmrkhp.us-east-1.rds.amazonaws.com"
+  
+    os.getenv('DATABASE_URL', default='sqlite:///temporary.db')
     engine = sqlalchemy.create_engine(database_url)
     connection = engine.connect()
     try:
@@ -25,17 +25,15 @@ async def get_db() -> sqlalchemy.engine.base.Connection:
         connection.close()
 
 
-@router.get('/req')
-async def make_req(connection=Depends(get_db)):
-    """Returns a json object with the entire pdfs table.
-    """
-    sql = """
-        SELECT *
-        FROM pdfs
-        """
+@router.post('/insert_tester')
+async def insert_pdf(file: bytes = File(...), connection=Depends(get_db)):
+    testup = file
 
-    var = pd.read_sql(sql, con=connection)
+    cursor.execute("""INSERT INTO pdfs (pdf) VALUES (%s);""", (testup,))
 
-    print(var)
+    connection.commit()
 
-    return var
+    cursor.close()
+    connection.close()
+
+    return 'all done'
