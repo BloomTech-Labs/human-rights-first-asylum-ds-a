@@ -12,7 +12,7 @@ def ocr_func(pdf):
     '''
     pdf_file = pdf
 
-    pages = convert_from_path(pdf_file, dpi=300)
+    pages = convert_from_path(pdf_file, dpi=300, poppler_path='./bin/poppler/bin/')
 
     num_pages = 0
 
@@ -28,6 +28,7 @@ def ocr_func(pdf):
     for i in range(num_pages):
         filename = 'page_' + str(i) + '.jpg'
         text = str(((pytesseract.image_to_string(Image.open(filename)))))
+        os.remove(filename)
         text = text.replace('-\n', '')
         f.write(text)
 
