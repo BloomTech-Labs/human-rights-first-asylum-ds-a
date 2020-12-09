@@ -12,6 +12,8 @@ def ocr_func(pdf):
     '''
     pdf_file = pdf
 
+    pytesseract.pytesseract.tesseract_cmd = './bin/Tesseract-OCR/tesseract.exe'
+
     pages = convert_from_path(pdf_file, dpi=300, poppler_path='./bin/poppler/bin/')
 
     num_pages = 0
@@ -35,3 +37,5 @@ def ocr_func(pdf):
     f.close()
 
     return outfile
+
+ocr_func('Asylum.pdf')
