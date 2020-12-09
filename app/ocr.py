@@ -28,6 +28,7 @@ def ocr_func(pdf):
     for i in range(num_pages):
         filename = 'page_' + str(i) + '.jpg'
         text = str(((pytesseract.image_to_string(Image.open(filename)))))
+        os.remove(filename) # This line deletes the image
         text = text.replace('-\n', '')
         f.write(text)
 
