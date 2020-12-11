@@ -1,4 +1,6 @@
 import re
+import spacy
+
 
 class textScraper:
     '''
@@ -10,23 +12,25 @@ class textScraper:
         self.textList = text
         self.Judge = self.getJudge(text)
     
-    def getJudge(self, text: list) -> str:
+    def getJudge(self, text: list) -> tuple:
         '''
         In an appeal document, finds the name of the judge on the appeal
-        returns the name of the judge if it is found
-        otherwise returns 'Unknown'
+        returns a tuple of 'high confidence' or 'low confidence' 
+        and the name of the judge
+        If the word 'judge' is near the token, high confidence is returned
+        This is because the judge name is followed or preceded by their title
         '''
-        patterns = [
-        # Judge name is above the phrase 'immigration judge'
-        re.compile(r'([a-zA-Z-.]+\s){2,3}(I\w+n|Immigration) Judge$'),
-        # Judge name is on the line before title
-        re.compile(r'(^U.S. )?I\w+n Judge$'),
-        # Judge name is in a certification page
-        re.compile(r'JUDGE ([a-zA-Z-.]+([\s, ])){2,3}$'),
-        ]
-        for idx, line in enumerate(text):
-            # All lines should contain a first, last name and title
-            if (any([pattern.search(line) for pattern in patterns]) and 
-                len(line.split()) >= 4):
-                return line
-        return 'Unknown'
+        nlp = spacy.load('en_core_web_sm')
+
+
+        spaceSepText = ' '.join(text)
+        doc = nlp(spaceSepText)
+        people = [ent for ent in doc.ents if ent.label_ == 'PERSON'
+                        and len(ent.text.split(' ')) in (2,3)][-5:]
+        # print(people)
+        possibleJudges = [doc[person.start-4:person.end+4] for person in people]
+        # print(possibleJudges)
+        for idx, tokens in enumerate(possibleJudges):
+            if 'judge' in str(tokens).lower():
+            return ('High confidence', people[idx])
+        return ('low confidence', max(sorted(people, key = len)))
