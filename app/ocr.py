@@ -1,41 +1,37 @@
 from PIL import Image
 import pytesseract
-import sys
-from pdf2image import convert_from_path
+from pdf2image import convert_from_bytes
 import os
+from fastapi import APIRouter, File
+
+router = APIRouter()
 
 
-def ocr_func(pdf):
+@router.post('/convert')
+async def ocr_func(file: bytes = File(...)):
     '''
     Takes an uploaded .pdf file, converts it to plain text, and saves it as a
     .txt file
     '''
-    pdf_file = pdf
+    pages = convert_from_bytes(file, dpi=300, fmt='jpg')
 
-    pytesseract.pytesseract.tesseract_cmd = './bin/Tesseract-OCR/tesseract.exe'
-
-    pages = convert_from_path(pdf_file, dpi=300, poppler_path='./bin/poppler/bin/')
-
-    num_pages = 0
-
+    num_images = 0
     for image_counter, page in enumerate(pages):
-        filename = 'page_' + str(image_counter) + '.jpg'
+        filename = "page_"+str(image_counter)+".jpg"
         page.save(filename, 'JPEG')
-        num_pages += 1
+        num_images += 1
 
-    outfile = ''.join([pdf_file.split('.')[0], '.txt'])
+    f = []
 
-    f = open(outfile, 'a')
-
-    for i in range(num_pages):
-        filename = 'page_' + str(i) + '.jpg'
+    for i in range(num_images):
+        filename = "page_"+str(i)+".jpg"
         text = str(((pytesseract.image_to_string(Image.open(filename)))))
         os.remove(filename)
         text = text.replace('-\n', '')
-        f.write(text)
+        f.append(text)
 
-    f.close()
+    with open('plaintext.txt', 'w') as plaintext:
+        for item in f:
+            plaintext.write("%s\n" % item)
 
-    return outfile
-
-ocr_func('Asylum.pdf')
+    return plaintext
