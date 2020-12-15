@@ -2,10 +2,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
-import db, get_table, ocr
+import grandoldfunction
 
 description = """
-Right now this just connects to the database on AWS. It'll do more later!
+Takes in a PDF, converts it to plaintext, inserts PDF and plaintext to database
 """
 
 app = FastAPI(
@@ -14,9 +14,7 @@ app = FastAPI(
     docs_url='/',
 )
 
-app.include_router(db.router, tags=['Database'])
-app.include_router(get_table.router, tags=['Get a Table'])
-app.include_router(ocr.router, tags=['PDF Converter'])
+app.include_router(grandoldfunction.router, tags=['Inserter'])
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],
