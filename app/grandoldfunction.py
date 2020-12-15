@@ -1,12 +1,3 @@
-#ait so what the fuck we doin here
-
-#first, insert the pdf
-
-#then, convert pdf to txt
-
-#then, insert txt
-
-#figure out how to insert other values once we figure out how to extract them
 
 from dotenv import load_dotenv
 import sqlalchemy
