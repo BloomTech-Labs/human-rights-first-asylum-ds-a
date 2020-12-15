@@ -16,6 +16,7 @@ load_dotenv()
 database_url = os.getenv('DATABASE_URL')
 engine = sqlalchemy.create_engine(database_url)
 
+
 @router.post('/insert')
 async def insertDoc(file: bytes = File(...)):
     '''
