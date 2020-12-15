@@ -14,7 +14,7 @@ app = FastAPI(
     docs_url='/',
 )
 
-app.include_router(ocr.router, tags=['PDF Converter'])
+app.include_router(app.ocr.router, tags=['PDF Converter'])
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],
