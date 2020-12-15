@@ -3,8 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
 import app.ocr
-from relative.testpy import testfunc
-
 
 description = """
 Right now this just connects to the database on AWS. It'll do more later!
@@ -26,6 +24,4 @@ app.add_middleware(
 )
 
 if __name__ == '__main__':
-    ocr.test()
-    testfunc()
     uvicorn.run(app)
