@@ -19,6 +19,7 @@ cmake = "*"
 psycopg2 = "*"
 pandas = "*"
 python-multipart = "*"
+dataclasses = "*"
 
 [requires]
 python_version = "3"
