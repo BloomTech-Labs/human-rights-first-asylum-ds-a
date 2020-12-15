@@ -38,7 +38,7 @@ def ocr_func(file: bytes = File(...)):
     .txt file
     '''
     print('IN OCR FUNC')
-    print(os.cwd())
+    print(os.getcwd())
     print('\nlist dir')
     print(os.listdir())
     pytesseract.pytesseract.tesseract_cmd = '/app/bin/Tesseract-OCR/tesseract.exe'
