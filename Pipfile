@@ -9,12 +9,16 @@ pytest = "*"
 
 [packages]
 fastapi = "*"
+fastapi-utils = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 sqlalchemy = "*"
 pytesseract = "*"
 pdf2image = "*"
 pillow = "*"
 cmake = "*"
+psycopg2 = "*"
+pandas = "*"
+python-multipart = "*"
 
 [requires]
 python_version = "3"
