@@ -57,6 +57,7 @@ def ocr_func(file: bytes = File(...)):
     pytesseract.pytesseract.tesseract_cmd = '/app/app/bin/Tesseract-OCR/tesseract.exe'
 
     popplerPath = '/app/app/bin/poppler/bin/'
+    print('poppler bin dir: ', popplerPath)
 
     pages = convert_from_bytes(file, dpi=300, fmt='jpg', poppler_path=popplerPath)
 
