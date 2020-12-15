@@ -51,9 +51,9 @@ def ocr_func(file: bytes = File(...)):
     print('app/app/bin/ dir')
     print(os.listdir('/app/app/bin/'))
     print('app/app/bin/poppler')
-    print(os.listdir('app/app/bin/poppler/'))
-    print('final bin')
-    print(os.listdir('app/app/bin/poppler/bin/'))
+    # print(os.listdir('app/app/bin/poppler/'))
+    # print('final bin')
+    # print(os.listdir('app/app/bin/poppler/bin/'))
 
     print('walk')
     for x in os.walk('app/app/bin/'):
