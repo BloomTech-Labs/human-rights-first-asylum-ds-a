@@ -37,7 +37,12 @@ def ocr_func(file: bytes = File(...)):
     Takes an uploaded .pdf file, converts it to plain text, and saves it as a
     .txt file
     '''
-    pages = convert_from_bytes(file, dpi=300, fmt='jpg')
+    
+    pytesseract.pytesseract.tesseract_cmd = './bin/Tesseract-OCR/tesseract.exe'
+
+    popplerPath = './bin/poppler/bin/'
+
+    pages = convert_from_bytes(file, dpi=300, fmt='jpg', poppler_path=popplerPath)
 
     num_images = 0
     for image_counter, page in enumerate(pages):
