@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
-import app.ocr
+import app.ocr as ocr
 
 description = """
 Right now this just connects to the database on AWS. It'll do more later!
@@ -14,7 +14,7 @@ app = FastAPI(
     docs_url='/',
 )
 
-app.include_router(app.ocr.router, tags=['PDF Converter'])
+app.include_router(ocr.router, tags=['PDF Converter'])
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],
