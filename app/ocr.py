@@ -67,6 +67,4 @@ def ocr_func(pdfBytes: bytes = File(...), txt_folder: str = './temp/'):
         os.remove(filename)
         text = text.replace('-\n', '')
         fulltext.append(text)
-
     return (''.join(fulltext).split('\n\n'))
-
