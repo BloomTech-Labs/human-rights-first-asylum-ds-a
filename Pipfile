@@ -15,6 +15,9 @@ pytesseract = "*"
 pdf2image = "*"
 pillow = "*"
 cmake = "*"
+notebook = "*"
+jupyter = "*"
+pdfminer = "*"
 
 [requires]
 python_version = "3"
