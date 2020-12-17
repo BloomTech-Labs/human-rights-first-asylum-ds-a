@@ -1,16 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-
+import os
+import app.test
 import app.ocr as ocr
-
-description = """
-Right now this just connects to the database on AWS. It'll do more later!
-"""
+exit
 
 app = FastAPI(
     title='HRF Aslyum B API',
-    description=description,
     docs_url='/',
 )
 
