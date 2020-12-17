@@ -17,12 +17,14 @@ async def get_db() -> sqlalchemy.engine.base.Connection:
 
     """
     load_dotenv()
-    engine = create_engine('postgresql://master:gNh1GB4hW5MFqJvmthF2@asylum.catpmmwmrkhp.us-east-1.rds.amazonaws.com/asylum')
+    database_url = os.getenv('DATABASE_URL', default='sqlite:///temporary.db')
+    engine = sqlalchemy.create_engine(database_url)
     connection = engine.connect()
     try:
         yield connection
     finally:
         connection.close()
+
 
 
 @router.get('/req')

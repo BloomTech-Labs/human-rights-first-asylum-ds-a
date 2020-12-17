@@ -9,15 +9,14 @@ pytest = "*"
 
 [packages]
 fastapi = "*"
+fastapi-utils = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 sqlalchemy = "*"
 pytesseract = "*"
 pdf2image = "*"
 pillow = "*"
 cmake = "*"
-notebook = "*"
-jupyter = "*"
-pdfminer = "*"
+
 
 [requires]
-python_version = "3"
+python_version = "3.7 "
