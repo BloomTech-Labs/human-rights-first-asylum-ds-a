@@ -13,12 +13,9 @@ from io import StringIO
 
 import app.test
 
-# os.environ['DATABASE_URL'] = 'postgresql://master:LMGaJr77nyC353V@asylum.catpmmwmrkhp.us-east-1.rds.amazonaws.com/asylum'
 router = APIRouter()
-print('dir ', os.listdir('..'))
 load_dotenv(find_dotenv())
 database_url = os.getenv('DATABASE_URL')
-print('test db?',database_url)
 
 if database_url == None:
     print('first pass failed')
@@ -67,4 +64,6 @@ def ocr_func(pdfBytes: bytes = File(...), txt_folder: str = './temp/'):
         os.remove(filename)
         text = text.replace('-\n', '')
         fulltext.append(text)
+    # Show what is being converted
+    print(fulltext[:2])
     return (''.join(fulltext).split('\n\n'))
