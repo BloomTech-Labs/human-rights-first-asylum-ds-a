@@ -16,10 +16,11 @@ pytesseract = "*"
 pdf2image = "*"
 pillow = "*"
 cmake = "*"
-psycopg2 = "*"
 pandas = "*"
 python-multipart = "*"
 dataclasses = "*"
+psycopg2-binary = "*"
+python-dotenv = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.7.9"
