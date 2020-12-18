@@ -25,7 +25,8 @@ async def insertDoc(file: bytes = File(...)):
 
     '''
     # Convert bytes from POST to list of strings
-    text = ocr_func(file)
+    # text = ocr_func(file)
+    text = ":D"
     scraper = textScraper(text)
     judge = scraper.Judge
     print('judge ', judge)
