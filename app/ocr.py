@@ -20,7 +20,7 @@ async def insertDoc(file: bytes, background_tasks: BackgroundTasks):
     '''
     This function inserts a PDF and the OCR converted text into a database
     '''
-    background_tasks.add_task(processAndInsert, file)
+    # background_tasks.add_task(processAndInsert, file)
     return {"message": "Successfully received file. Starting OCR and posting to database"}
 
 
