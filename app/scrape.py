@@ -19,23 +19,23 @@ class textScraper:
     .txt file
     '''
 
-    pages = convert_from_bytes(pdfBytes, dpi=300)
-    num_pages = 0
+        pages = convert_from_bytes(pdfBytes, dpi=300)
+        num_pages = 0
+        
+        for image_counter, page in enumerate(pages):
+            filename = 'page_' + str(image_counter) + '.jpg'
+            page.save(filename, 'JPEG')
+            num_pages += 1
+        
+        fulltext = []
     
-    for image_counter, page in enumerate(pages):
-        filename = 'page_' + str(image_counter) + '.jpg'
-        page.save(filename, 'JPEG')
-        num_pages += 1
-    
-    fulltext = []
- 
-    for i in range(num_pages):
-        filename = 'page_' + str(i) + '.jpg'
-        text = str(((pytesseract.image_to_string(Image.open(filename)))))
-        os.remove(filename)
-        text = text.replace('-\n', '')
-        fulltext.append(text)
-    return ''.join(fulltext).split('\n\n')
+        for i in range(num_pages):
+            filename = 'page_' + str(i) + '.jpg'
+            text = str(((pytesseract.image_to_string(Image.open(filename)))))
+            os.remove(filename)
+            text = text.replace('-\n', '')
+            fulltext.append(text)
+        return ''.join(fulltext).split('\n\n')
 
     def getJudge(self, text: list) -> str:
         '''
