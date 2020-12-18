@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import os
 import app.ocr as ocr
-exit
 
 app = FastAPI(
     title='HRF Aslyum B API',
