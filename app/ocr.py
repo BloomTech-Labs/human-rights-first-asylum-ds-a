@@ -14,7 +14,7 @@ database_url = os.getenv('DATABASE_URL')
 engine = create_engine(database_url)
 
 @router.post('/insert')
-async def insertDoc(file: bytes):
+async def insertDoc(file: bytes = File(...)):
     '''
     This function inserts a PDF and the OCR converted text into a database
     '''
