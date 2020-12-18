@@ -1,7 +1,5 @@
 import os
 
-
-
 from fastapi import APIRouter, BackgroundTasks, File
 from dotenv import load_dotenv, find_dotenv
 from sqlalchemy import create_engine
@@ -32,8 +30,8 @@ def processAndInsert(file: bytes = File(...)) -> None:
     returns nothing
     '''
     scraper = textScraper(file)
-    text = scraper.text
+    plainText = scraper.text
     judge = scraper.judge
-    query = """INSERT INTO pdfs(text, judge) VALUES (%s, %s)""" 
+    query = """INSERT INTO pdfs(plainText, judge) VALUES (%s, %s)""" 
     vals = (text, judge)
     engine.execute(query, vals)
