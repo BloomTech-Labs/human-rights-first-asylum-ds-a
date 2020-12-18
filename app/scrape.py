@@ -14,10 +14,10 @@ class textScraper:
         return ''.join(self.textList)
 
     def pdfOCR(pdfBytes: bytes = File(...), txt_folder: str = './temp/') -> list:
-    '''
-    Takes an uploaded .pdf file, converts it to plain text, and saves it as a
-    .txt file
-    '''
+        '''
+        Takes an uploaded .pdf file, converts it to plain text, and saves it as a
+        .txt file
+        '''
 
         pages = convert_from_bytes(pdfBytes, dpi=300)
         num_pages = 0
