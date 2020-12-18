@@ -1,59 +1,30 @@
-
-import os
-
-
-
-
-
-
-
-
-
-from dotenv import load_dotenv
-
-
-from fastapi import APIRouter, File
-
-
-from pdf2image import convert_from_bytes
-
-
-from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
-
-
-from pdfminer.converter import TextConverter
-
-
-from pdfminer.layout import LAParams
-
-
-from pdfminer.pdfpage import PDFPage
-
-
-from PIL import Image
-
-
-import pytesseract
-
-
 import sqlalchemy
-
-
 from sqlalchemy import create_engine
-
-
-
-
-
-
-
-router = APIRouter()
-
-
+import os
+from dotenv import load_dotenv, find_dotenv
 load_dotenv()
-
 
 database_url = os.getenv('DATABASE_URL')
 
-
 print('db url name', database_url)
+
+
+engine = create_engine(database_url)
+
+query = """SELECT * FROM pdfs""" 
+truncateQuery = """TRUNCATE TABLE pdfs"""
+# engine.execute(truncateQuery)
+
+infoQuery = '''select *
+from INFORMATION_SCHEMA.COLUMNS
+where TABLE_NAME='pdfs'
+'''
+dropQuery = '''DROP TABLE pdfs'''
+createQuery = '''CREATE TABLE pdfs (
+                plainText   text,
+                judge       varchar(30),
+                description text
+);'''
+# engine.execute(dropQuery)
+# engine.execute(createQuery)
+print(engine.execute(query).fetchall())

@@ -1,11 +1,8 @@
 import os
 
 
-from PIL import Image
-import pytesseract
-from pdf2image import convert_from_bytes
+
 from fastapi import APIRouter, BackgroundTasks, File
-import sqlalchemy
 from dotenv import load_dotenv, find_dotenv
 from sqlalchemy import create_engine
 
@@ -16,7 +13,7 @@ router = APIRouter()
 load_dotenv(find_dotenv())
 database_url = os.getenv('DATABASE_URL')
 
-engine = sqlalchemy.create_engine(database_url)
+engine = create_engine(database_url)
 
 @router.post('/insert')
 async def insertDoc(file: bytes, background_tasks: BackgroundTasks):
@@ -25,8 +22,6 @@ async def insertDoc(file: bytes, background_tasks: BackgroundTasks):
     '''
     background_tasks.add_task(processAndInsert, file)
     return {"message": "Successfully received file. Starting OCR and posting to database"}
-    # Convert bytes from POST to list of strings
-    return {"message":"File received"}
 
 
 def processAndInsert(file: bytes = File(...)) -> None:
@@ -37,8 +32,8 @@ def processAndInsert(file: bytes = File(...)) -> None:
     returns nothing
     '''
     scraper = textScraper(file)
-    judge = scraper.Judge
-    text = scraper.getText()
-    query = """INSERT INTO pdfs(pdf, plaintext) VALUES (%s, %s)""" 
-    vals = (file, text)
+    text = scraper.text
+    judge = scraper.judge
+    query = """INSERT INTO pdfs(text, judge) VALUES (%s, %s)""" 
+    vals = (text, judge)
     engine.execute(query, vals)

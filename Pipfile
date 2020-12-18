@@ -21,6 +21,7 @@ python-multipart = "*"
 dataclasses = "*"
 psycopg2-binary = "*"
 python-dotenv = "*"
+flask-sqlalchemy = "*"
 
 [requires]
 python_version = "3.7.9"

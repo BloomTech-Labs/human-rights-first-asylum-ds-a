@@ -1,4 +1,9 @@
+from fastapi import APIRouter, BackgroundTasks, File
+from pdf2image import convert_from_bytes
+from PIL import Image
+import pytesseract
 import re
+import os
 
 class textScraper:
     '''
@@ -7,13 +12,11 @@ class textScraper:
 
     '''
     def __init__(self, file: bytes = File(...)):
-        self.textList = pdfOCR(file)
-        self.judge = self.getJudge(text)
+        self.textList = self.pdfOCR(file)
+        self.text = ''.join(self.textList)
+        self.judge = self.getJudge(self.text)
     
-    def getText(self) -> str:
-        return ''.join(self.textList)
-
-    def pdfOCR(pdfBytes: bytes = File(...), txt_folder: str = './temp/') -> list:
+    def pdfOCR(self, pdfBytes: bytes = File(...), txt_folder: str = './temp/') -> list:
         '''
         Takes an uploaded .pdf file, converts it to plain text, and saves it as a
         .txt file
