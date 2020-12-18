@@ -9,23 +9,12 @@ import sqlalchemy
 from dotenv import load_dotenv, find_dotenv
 from sqlalchemy import create_engine
 
-from io import StringIO
 
-import app.test
+from app.scrape import textScraper
 
 router = APIRouter()
 load_dotenv(find_dotenv())
 database_url = os.getenv('DATABASE_URL')
-
-if database_url == None:
-    print('first pass failed')
-    load_dotenv('.env')
-    database_url = os.getenv('DATABASE_URL')
-
-if database_url == None:
-    print('second pass failed')
-    load_dotenv()
-    database_url = os.getenv('DATABASE_URL')
 
 engine = sqlalchemy.create_engine(database_url)
 
@@ -35,14 +24,18 @@ async def insertDoc(file: bytes = File(...)):
     This function inserts a PDF and the OCR converted text into a database
 
     '''
+    # Convert bytes from POST to list of strings
     text = ocr_func(file)
+    scraper = textScraper(text)
+    judge = scraper.Judge
+    print('judge ', judge)
     query = """INSERT INTO pdfs(pdf, plaintext) VALUES (%s, %s)""" 
     vals = (file, text)
     engine.execute(query, vals)
     return
 
 
-def ocr_func(pdfBytes: bytes = File(...), txt_folder: str = './temp/'):
+def ocr_func(pdfBytes: bytes = File(...), txt_folder: str = './temp/') -> list:
     '''
     Takes an uploaded .pdf file, converts it to plain text, and saves it as a
     .txt file
@@ -66,4 +59,4 @@ def ocr_func(pdfBytes: bytes = File(...), txt_folder: str = './temp/'):
         fulltext.append(text)
     # Show what is being converted
     print(fulltext[:2])
-    return (''.join(fulltext).split('\n\n'))
+    return ''.join(fulltext).split('\n\n')

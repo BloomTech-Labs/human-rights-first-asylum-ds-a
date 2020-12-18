@@ -1,6 +1,6 @@
 FROM python:3.8-slim-buster
-RUN apt-get update 
-RUN apt-get -y install poppler-utils --fix-missing
+RUN apt-get update && apt-get -y install sudo
+RUN sudo apt-get -y install poppler-utils && apt-get clean
 RUN apt-get -y install tesseract-ocr
 RUN python -m pip install --upgrade pip && pip install pipenv
 COPY Pipfile* ./
