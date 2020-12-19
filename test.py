@@ -11,9 +11,9 @@ print('db url name', database_url)
 
 engine = create_engine(database_url)
 
-query = """SELECT * FROM pdfs""" 
+query = """SELECT COUNT(*) FROM pdfs""" 
 truncateQuery = """TRUNCATE TABLE pdfs"""
-# engine.execute(truncateQuery)
+engine.execute(truncateQuery)
 
 infoQuery = '''select *
 from INFORMATION_SCHEMA.COLUMNS
