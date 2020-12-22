@@ -13,8 +13,12 @@ database_url = os.getenv('DATABASE_URL')
 print('db url name', database_url)
 engine = create_engine(database_url)
 selQuery = """SELECT COUNT(*) from pdfs;"""
+plainTextQuery = """SELECT plainText from pdfs;"""
 truncateQuery = """TRUNCATE TABLE pdfs"""
-# print(engine.execute(selQuery))
+results = engine.execute(plainTextQuery)
 print('initial values prior to wipe', engine.execute(selQuery).fetchall())
-# engine.execute(truncateQuery)
-print(engine.execute(selQuery).fetchall())
+engine.execute(truncateQuery)
+# print(engine.execute(selQuery).fetchall())
+print(f'show plain text values')
+for x in results:
+    print(x[0][:10])
