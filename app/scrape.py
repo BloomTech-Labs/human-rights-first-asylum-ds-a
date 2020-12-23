@@ -13,6 +13,8 @@ class textScraper:
     '''
     def __init__(self, file: bytes = File(...)):
         self.textList = self.pdfOCR(file)
+        if len(self.textList) == 1:
+            print(self.textList)
         self.text = ''.join(self.textList)
         self.judge = self.getJudge(self.text)
     
