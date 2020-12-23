@@ -41,7 +41,7 @@ class textScraper:
                 text = text.replace('-\n', '')
                 fulltext.append(text)
             except:
-                return i
+                return ['Error on page '+str(i)]
         return ''.join(fulltext).split('\n\n')
 
     def getJudge(self, text: list) -> str:
