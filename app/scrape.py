@@ -33,11 +33,15 @@ class textScraper:
         fulltext = []
     
         for i in range(num_pages):
-            filename = 'page_' + str(i) + '.jpg'
-            text = str(((pytesseract.image_to_string(Image.open(filename)))))
-            os.remove(filename)
-            text = text.replace('-\n', '')
-            fulltext.append(text)
+            try:
+                filename = 'page_' + str(i) + '.jpg'
+                fileReader = Image.open(filename)
+                text = str(((pytesseract.image_to_string(fileReader))))
+                os.remove(filename)
+                text = text.replace('-\n', '')
+                fulltext.append(text)
+            except:
+                return i
         return ''.join(fulltext).split('\n\n')
 
     def getJudge(self, text: list) -> str:
