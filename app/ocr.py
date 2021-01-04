@@ -14,20 +14,10 @@ from io import StringIO
 import app.test
 
 router = APIRouter()
-print('dir ', os.listdir('..'))
+# print('dir ', os.listdir('..'))
 load_dotenv(find_dotenv())
 database_url = os.getenv('DATABASE_URL')
-print('test db?',database_url)
-
-if database_url == None:
-    print('first pass failed')
-    load_dotenv('.env')
-    database_url = os.getenv('DATABASE_URL')
-
-if database_url == None:
-    print('second pass failed')
-    load_dotenv()
-    database_url = os.getenv('DATABASE_URL')
+# print('test db?',database_url)
 
 engine = sqlalchemy.create_engine(database_url)
 
@@ -52,18 +42,11 @@ def ocr_func(pdfBytes: bytes = File(...), txt_folder: str = './temp/'):
     '''
 
     pages = convert_from_bytes(pdfBytes, dpi=300)
-    num_pages = 0
-    
+    # num_pages = 0
+    fulltext = []
     for image_counter, page in enumerate(pages):
         filename = 'page_' + str(image_counter) + '.jpg'
         page.save(filename, 'JPEG')
-        num_pages += 1
-    
-    fulltext = []
- 
-    for i in range(num_pages):
-        filename = 'page_' + str(i) + '.jpg'
-        print('fileName')
         img = Image.open(filename)
         result = (pytesseract.image_to_string(img))
         text = str(result)
@@ -71,3 +54,9 @@ def ocr_func(pdfBytes: bytes = File(...), txt_folder: str = './temp/'):
         text = text.replace('-\n', '')
         fulltext.append(text)
     return (''.join(fulltext).split('\n\n'))
+    
+    # print('num pages', list(range(num_pages)))
+    # for i in range(num_pages):
+    #     filename = 'page_' + str(i) + '.jpg'
+    #     print('fileName', filename)
+        
