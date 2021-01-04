@@ -1,4 +1,11 @@
 import os
+os.environ["OMP_NUM_THREADS"]= '1'
+os.environ["OMP_THREAD_LIMIT"] = '1'
+os.environ["MKL_NUM_THREADS"] = '1'
+os.environ["NUMEXPR_NUM_THREADS"] = '1'
+os.environ["OMP_NUM_THREADS"] = '1'
+os.environ["PAPERLESS_AVX2_AVAILABLE"]="false"
+os.environ["OCR_THREADS"] = '1'
 
 
 from PIL import Image
@@ -43,7 +50,7 @@ def ocr_func(pdfBytes: bytes = File(...), txt_folder: str = './temp/'):
 
     pages = convert_from_bytes(pdfBytes, dpi=300)
     # num_pages = 0
-    print('num pages ',list(range(pages)))
+    print('num pages ', pages)
     fulltext = []
     for image_counter, page in enumerate(pages):
         filename = 'page_' + str(image_counter) + '.jpg'
@@ -52,7 +59,8 @@ def ocr_func(pdfBytes: bytes = File(...), txt_folder: str = './temp/'):
         print('file name ', filename)
         result = (pytesseract.image_to_string(img))
         text = str(result)
-        os.remove(filename)
+        img.destroy()
+        # os.remove(filename)
         text = text.replace('-\n', '')
         fulltext.append(text)
     return (''.join(fulltext).split('\n\n'))
