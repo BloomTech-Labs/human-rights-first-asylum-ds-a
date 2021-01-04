@@ -64,7 +64,7 @@ def ocr_func(pdfBytes: bytes = File(...), txt_folder: str = './temp/'):
     for i in range(num_pages):
         filename = 'page_' + str(i) + '.jpg'
         print('fileName')
-        img = Image.open(filename).resize((10,10), Image.ANTIALIAS)
+        img = Image.open(filename)
         result = (pytesseract.image_to_string(img))
         text = str(result)
         os.remove(filename)
