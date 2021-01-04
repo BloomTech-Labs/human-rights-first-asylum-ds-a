@@ -13,7 +13,6 @@ from io import StringIO
 
 import app.test
 
-# os.environ['DATABASE_URL'] = 'postgresql://master:LMGaJr77nyC353V@asylum.catpmmwmrkhp.us-east-1.rds.amazonaws.com/asylum'
 router = APIRouter()
 print('dir ', os.listdir('..'))
 load_dotenv(find_dotenv())
@@ -39,10 +38,11 @@ async def insertDoc(file: bytes = File(...)):
 
     '''
     text = ocr_func(file)
-    query = """INSERT INTO pdfs(pdf, plaintext) VALUES (%s, %s)""" 
-    vals = (file, text)
-    engine.execute(query, vals)
-    return
+    # query = """INSERT INTO pdfs(pdf, plaintext) VALUES (%s, %s)""" 
+    # vals = (file, text)
+    # engine.execute(query, vals)
+    # Return text as response
+    return {'Text': text}
 
 
 def ocr_func(pdfBytes: bytes = File(...), txt_folder: str = './temp/'):
