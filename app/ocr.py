@@ -15,6 +15,7 @@ from fastapi import APIRouter, File
 import sqlalchemy
 from dotenv import load_dotenv, find_dotenv
 from sqlalchemy import create_engine
+from PyPDF2 import PdfFileReader
 
 from io import StringIO
 
@@ -46,22 +47,20 @@ def ocr_func(pdfBytes: bytes = File(...), txt_folder: str = './temp/'):
     '''
     Takes an uploaded .pdf file, converts it to plain text, and saves it as a
     .txt file
+    range slice size can be changed to put more images in memory, but provides 
+    no speed boost, as the bottleneck is pytesseract.image_to_string
     '''
-
-    pages = convert_from_bytes(pdfBytes, dpi=300)
-    # num_pages = 0
-    print('num pages ', pages)
+    fileReader = PdfFileReader(pdfBytes)
+    maxPages = fileReader.numPages
+    del fileReader
     fulltext = []
-    for image_counter, page in enumerate(pages):
-        filename = 'page_' + str(image_counter) + '.jpg'
-        page.save(filename, 'JPEG')
-        img = Image.open(filename)
-        print('file name ', filename)
-        result = (pytesseract.image_to_string(img))
-        text = str(result)
-        os.remove(filename)
-        text = text.replace('-\n', '')
-        fulltext.append(text)
+    for page in range(1, maxPages+1):
+        pil_image = convert_from_bytes(open(example, 'rb').read(), dpi=300, first_page=page,
+                                            last_page=page, 
+                                            fmt= 'jpg',
+                                            thread_count=1, grayscale=True)
+        fulltext += [str(pytesseract.image_to_string(image)) for image in pil_image]
+        pil_image.clear()
     return (''.join(fulltext).split('\n\n'))
     
     # print('num pages', list(range(num_pages)))
