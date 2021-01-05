@@ -50,7 +50,6 @@ def ocr_func(pdfBytes: bytes = File(...), txt_folder: str = './temp/'):
     range slice size can be changed to put more images in memory, but provides 
     no speed boost, as the bottleneck is pytesseract.image_to_string
     '''
-    print('type ', type(pdfBytes))
     fileReader = PdfFileReader(BytesIO(pdfBytes))
     maxPages = fileReader.numPages
     del fileReader
