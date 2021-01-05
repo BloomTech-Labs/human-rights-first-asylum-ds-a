@@ -42,4 +42,4 @@ load_dotenv()
 database_url = os.getenv('DATABASE_URL')
 
 
-print('db url name', database_url)
+# print('db url name', database_url)
