@@ -17,7 +17,7 @@ from dotenv import load_dotenv, find_dotenv
 from sqlalchemy import create_engine
 from PyPDF2 import PdfFileReader
 
-from io import StringIO
+from io import BytesIO
 
 import app.test
 
@@ -51,7 +51,7 @@ def ocr_func(pdfBytes: bytes = File(...), txt_folder: str = './temp/'):
     no speed boost, as the bottleneck is pytesseract.image_to_string
     '''
     print('type ', type(pdfBytes))
-    fileReader = PdfFileReader(pdfBytes)
+    fileReader = PdfFileReader(BytesIO(pdfBytes))
     maxPages = fileReader.numPages
     del fileReader
     fulltext = []
