@@ -21,6 +21,7 @@ python-multipart = "*"
 dataclasses = "*"
 psycopg2-binary = "*"
 python-dotenv = "*"
+pypdf2 = "*"
 
 [requires]
 python_version = "3.7.9"
