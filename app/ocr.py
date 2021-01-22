@@ -19,7 +19,7 @@ from PyPDF2 import PdfFileReader
 
 from io import BytesIO
 
-import app.test
+import test
 
 router = APIRouter()
 # print('dir ', os.listdir('..'))
