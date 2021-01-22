@@ -2,14 +2,40 @@
 
 import os
 import pandas as pd
+from typing import Optional
 
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends
 import sqlalchemy
+from pydantic import BaseModel
+
+metadata = sqlalchemy.MetaData()
+
+new = sqlalchemy.Table(
+    "case",
+    metadata,
+    sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column('name', sqlalchemy.String(500)),
+    sqlalchemy.Column('date_created', sqlalchemy.DateTime())
+)
+
+
+class CaseObject(BaseModel):
+    case_id: int
+    user_id: int
+    public: Optional[bool]
+    case_title: Optional[str] = "Felicia v. B.I.A."
+    case_number: Optional[int] = 4321
+    judge_name: Optional[str] = "Dorothy Day"
+    outcome: Optional[str] = "Granted"
+    country_of_origin: Optional[str] = "Kazakhstan"
+    pdf_file: Optional[str] = 'C://file/some/where'
+
+
 
 router = APIRouter()
 
-
+    
 async def get_db() -> sqlalchemy.engine.base.Connection:
     """Get a SQLAlchemy database connection.
     
@@ -28,6 +54,26 @@ async def get_db() -> sqlalchemy.engine.base.Connection:
         connection.close()
 
 
+@router.post('/new', response_model=CaseObject)
+async def add_case(case: CaseObject, connection=Depends(get_db)):
+    """
+    add a new case file
+    """
+    query = new.insert().values(
+        case_id=case.case_id,
+        public=case.public,
+        case_title=case.case_title,
+        case_number=case.case_number,
+        judge_name=case.judge_name,
+        outcome=case.outcome,
+        country_of_origin=case.country_of_origin,
+        pdf_file=case.pdf_file
+    )
+    def write_data(case):
+        tablename = "case"
+        case.to_sql(tablename, connection, if_exists='append', index=False, method='multi')
+    return case
+
 @router.get('/info')
 async def get_url(connection=Depends(get_db)):
     """Verify we can connect to the database, 
@@ -39,3 +85,4 @@ async def get_url(connection=Depends(get_db)):
     """
     url_without_password = repr(connection.engine.url)
     return {'database_url': url_without_password}
+
