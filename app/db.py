@@ -30,8 +30,28 @@ class CaseObject(BaseModel):
     outcome: Optional[str] = "Granted"
     country_of_origin: Optional[str] = "Kazakhstan"
     pdf_file: Optional[str] = 'C://file/some/where'
+    tags: list[TagObject.main_category_id,
+               TagObject.sub_category_id,
+               TagObject.tag_name] = []
 
+class TagObject(BaseModel):
+    main_category_id: int
+    sub_category_id: int
+    tag_name: str
 
+class tags_by_case(BaseModel):
+    case_id: CaseObject.case_id
+    tag_id: int
+
+class main_categories(BaseModel):
+    id: int
+    main_category_name: str
+
+class sub_categories(BaseModel):
+    id: main_categories.id
+    main_category_name: main_categories.main_category_name
+    sub_category_name: str
+    
 
 router = APIRouter()
 
