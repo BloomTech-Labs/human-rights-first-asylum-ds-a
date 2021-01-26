@@ -25,4 +25,4 @@ async def worldviz(metric, country):
     """
     subset = dataframe[dataframe.country == country]
     fig = px.line(subset, x='Year', y=metric, title=f'{metric} in {country}')
-    return fig
+    return fig.to_json()

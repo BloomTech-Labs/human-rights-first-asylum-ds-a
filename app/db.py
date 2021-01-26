@@ -2,60 +2,21 @@
 
 import os
 import pandas as pd
-from typing import Optional
+from typing import Optional, List
 
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends
 import sqlalchemy
-from pydantic import BaseModel
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
-metadata = sqlalchemy.MetaData()
-
-new = sqlalchemy.Table(
-    "case",
-    metadata,
-    sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column('name', sqlalchemy.String(500)),
-    sqlalchemy.Column('date_created', sqlalchemy.DateTime())
-)
-
-
-class CaseObject(BaseModel):
-    case_id: int
-    user_id: int
-    public: Optional[bool]
-    case_title: Optional[str] = "Felicia v. B.I.A."
-    case_number: Optional[int] = 4321
-    judge_name: Optional[str] = "Dorothy Day"
-    outcome: Optional[str] = "Granted"
-    country_of_origin: Optional[str] = "Kazakhstan"
-    pdf_file: Optional[str] = 'C://file/some/where'
-    tags: list[TagObject.main_category_id,
-               TagObject.sub_category_id,
-               TagObject.tag_name] = []
-
-class TagObject(BaseModel):
-    main_category_id: int
-    sub_category_id: int
-    tag_name: str
-
-class tags_by_case(BaseModel):
-    case_id: CaseObject.case_id
-    tag_id: int
-
-class main_categories(BaseModel):
-    id: int
-    main_category_name: str
-
-class sub_categories(BaseModel):
-    id: main_categories.id
-    main_category_name: main_categories.main_category_name
-    sub_category_name: str
-    
+import model, schemas
 
 router = APIRouter()
 
-    
+
+Base = declarative_base()
+
 async def get_db() -> sqlalchemy.engine.base.Connection:
     """Get a SQLAlchemy database connection.
     
@@ -67,6 +28,8 @@ async def get_db() -> sqlalchemy.engine.base.Connection:
     load_dotenv()
     database_url = os.getenv('DATABASE_URL')
     engine = sqlalchemy.create_engine(database_url)
+    model.Base.metadata.create_all(bind=engine)
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     connection = engine.connect()
     try:
         yield connection
