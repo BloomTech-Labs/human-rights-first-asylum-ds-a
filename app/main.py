@@ -5,7 +5,7 @@ import os
 import test
 import ocr
 import db
-exit
+#exit
 
 app = FastAPI(
     title='HRF Aslyum B API',
