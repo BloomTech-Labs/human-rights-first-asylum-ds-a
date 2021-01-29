@@ -2,16 +2,20 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import os
-import app.test
-import app.ocr as ocr
-exit
+import test
+import ocr
+import db
+#exit
 
 app = FastAPI(
     title='HRF Aslyum B API',
-    docs_url='/',
+    description='Asylum Case Hearing Analysis',
+    docs_url='/'
 )
 
+app.include_router(db.router, tags=['DataBase'])
 app.include_router(ocr.router, tags=['PDF Converter'])
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],
