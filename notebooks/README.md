@@ -1,9 +1,9 @@
 ## Task Description
-*  Text classification
-*  Represent text in meaningful way
+1.  Text classification
+2.  Represent text in meaningful way
   *  labelled inputs (supervised learning)
   *  multi-classification model (unsupervised learning)
-*  Prediction and descriptive statistical analysis based on classification patterns
+3.  Prediction and descriptive statistical analysis based on classification patterns
 
 There are many different approaches to text mining: data mining, machine learning, information retrieval and knowledge management.  Each seeks to extract, identify and use information from large collections of textual data.  
 
