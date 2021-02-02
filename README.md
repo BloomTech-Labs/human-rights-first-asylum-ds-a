@@ -16,6 +16,23 @@ We participated in the building of an application for human rights first, a 501(
 
 *  We created a model that, once the database has persiting data and the model is adjusted to the specificity of that data, will predict a posible outcome of an individual judge's or panels of judges decision(s) based on his/her/their past rulings of similar cases.  This model will also render results that display easy to interpret and use (from UX perspective) visualizations on micro-patterns within the data
 
+## Time structures
+Each team worked in weekly sprints with a total time contraint of one month for the total project.  Teams met with stakholder(s) during each sprint to present progress, ask questions, recieve feedback and explore evolving stakholder expectations.  The structure of each sprint was set:
+  *  Week 1 - Planning
+  *  Weeks 2 - 3 Working the Plan (coding and revising the plan according to evolving stakeholder needs and new understandings of the business problem)
+  *  Week 4 - Documentation and Presenting Work
+
+Team 1 chose to work together on all tasks and accomplished:
+  *  create an empty database with no schema
+  *  create a PDF scraper using OCR that converted PDF images to text
+
+Team 2 chose to work asynchronously, yet supporting one another through pair-coding sessions and peer reviews and acomplished:
+  *  creating a relational database with [schema](assets/HRF_DS_DB_schema_diagram_SeanB.png)
+  *  adapting Team 1's PDF scraper to filter out only asylum cases and then convert PDF images to text and then to json
+  * create a PDF scraper for search terms in all categories except social groups (time constraints)
+  *  explore alternative scraping methods for PDFs and keywords in search of effieciencies
+  *  create a pathway for data processing, model and visualization completion once there is persitent data
+
 ## Tools
 
  * [Pytesseract](https://github.com/madmaze/pytesseract)
@@ -34,23 +51,23 @@ We participated in the building of an application for human rights first, a 501(
 
  ## Contributors
 
- [Tristan Brown](https://github.com/Tristan-Brown1096)
+ [Tristan Brown, Team 1](https://github.com/Tristan-Brown1096)
 
- [Sean Byrne](https://github.com/ssbyrne89)
+ [Sean Byrne, Team 2](https://github.com/ssbyrne89)
 
- [Henry Gultom](https://github.com/henrygp)
+ [Henry Gultom, Team 2](https://github.com/henrygp)
  
- [Liam Cloud Hogan](https://github.com/liam-cloud-hogan)
+ [Liam Cloud Hogan, Team 1](https://github.com/liam-cloud-hogan)
  
- [Steven Lee](https://github.com/StevenBryceLee)
+ [Steven Lee, Team 1](https://github.com/StevenBryceLee)
 
- [Edwina Palmer](https://github.com/edwinapalmer)
+ [Edwina Palmer, Team 1](https://github.com/edwinapalmer)
 
- [Tomas Phillips](https://github.com/tomashphill)
+ [Tomas Phillips, Team 2](https://github.com/tomashphill)
 
- [RJ Proctor](https://github.com/jproctor-rebecca)
+ [RJ Proctor, Team 2](https://github.com/jproctor-rebecca)
 
-![Team2_cross_functional_team](assets/HRF_cross_functional_product_dev_team_rjproctor.png)
+![Team2 Cross-functional Whole Team Structure](assets/HRF_cross_functional_product_dev_team_rjproctor.png)
 
  ## License
 
