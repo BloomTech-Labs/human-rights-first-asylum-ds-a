@@ -6,9 +6,9 @@ An application to assist immigration advocates in winning asylum cases
 ## Description
 We built an application for human rights first, a 501(c)3 organization. Our application uses optical character recognition to scan input court decisions for such values as the name of the presiding judge, the decision, and the asylum seeker's country of origin, and inserts these values into a database. The hope is that advocates for asylum seekers can use these data to better tailor their arguments before a particular judge and maximize their client's chances of receiving asylum. Based on our stakeholder meeting HRF wants to know the trend and exploratory of the judge's decision, for example:
 
- *How many percent is the case rejected with certain nationality or gender?
- *Is there any trend based on religion or social group?
- *Is certain judge in favor of an applicant from a certain case? or country?
+ *How many percent is the case rejected with certain nationality or gender?  
+ *Is there any trend based on religion or social group?  
+ *Is certain judge in favor of an applicant from a certain case? or country?  
 
 In order to answer those questions, we need to extract those keywords (using NER and regex) and put them into dataframe, and from there we store them
 in our database in order for the web team to use the to be published.
