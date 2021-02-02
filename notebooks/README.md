@@ -170,3 +170,4 @@ The purpose of the model is to classify the legal documents containing judicial 
 ![image](assets/HRF_predictive_descriptive_analysis_model_methodology_RJProctor.png)
 
 ---
+

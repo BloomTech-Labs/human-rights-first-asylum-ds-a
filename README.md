@@ -22,12 +22,14 @@ Each team worked in weekly sprints with a total time contraint of one month for 
   *  Weeks 2 - 3 Working the Plan (coding and revising the plan according to evolving stakeholder needs and new understandings of the business problem)
   *  Week 4 - Documentation and Presenting Work
 
-Team 1 chose to work together on all tasks and accomplished:
+Labs 29 chose to work together on all tasks and accomplished:
   *  create an empty database with no schema
   *  create a PDF scraper using OCR that converted PDF images to text
+  *  create a pathway to completion of FASTAPI
 
-Team 2 chose to work asynchronously, yet supporting one another through pair-coding sessions and peer reviews and acomplished:
-  *  creating a relational database with [schema](assets/HRF_DS_DB_schema_diagram_SeanB.png)
+Labs 30 chose to work asynchronously, yet supporting one another through pair-coding sessions and peer reviews and acomplished:
+  *  creating a relational database with schema [schema](assets/HRF_DS_DB_schema_diagram_SeanB.png)
+  *  completed connections between FASTAPI and the back-end of the web application
   *  adapting Team 1's PDF scraper to filter out only asylum cases and then convert PDF images to text and then to json
   * create a PDF scraper for search terms in all categories except social groups (time constraints)
   *  explore alternative scraping methods for PDFs and keywords in search of effieciencies
@@ -51,21 +53,21 @@ Team 2 chose to work asynchronously, yet supporting one another through pair-cod
 
  ## Contributors
 
- [Tristan Brown, Team 1](https://github.com/Tristan-Brown1096)
+ [Tristan Brown, Labs29](https://github.com/Tristan-Brown1096)
 
- [Sean Byrne, Team 2](https://github.com/ssbyrne89)
+ [Sean Byrne, Labs30](https://github.com/ssbyrne89)
 
- [Henry Gultom, Team 2](https://github.com/henrygp)
+ [Henry Gultom, Labs30](https://github.com/henryspg)
  
- [Liam Cloud Hogan, Team 1](https://github.com/liam-cloud-hogan)
+ [Liam Cloud Hogan, Labs29](https://github.com/liam-cloud-hogan)
  
- [Steven Lee, Team 1](https://github.com/StevenBryceLee)
+ [Steven Lee, Labs29](https://github.com/StevenBryceLee)
 
- [Edwina Palmer, Team 1](https://github.com/edwinapalmer)
+ [Edwina Palmer, Labs29](https://github.com/edwinapalmer)
 
- [Tomas Phillips, Team 2](https://github.com/tomashphill)
+ [Tomas Phillips, Labs30](https://github.com/tomashphill)
 
- [RJ Proctor, Team 2](https://github.com/jproctor-rebecca)
+ [RJ Proctor, Labs30](https://github.com/jproctor-rebecca)
 
 ![Team2 Cross-functional Whole Team Structure](assets/HRF_cross_functional_product_dev_team_rjproctor.png)
 
