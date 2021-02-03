@@ -1,10 +1,7 @@
 import streamlit as st
 
 import numpy as np
-import plotly.graph_objects as go
 import pandas as pd
-import time
-import seaborn as sns
 
 # SETUP
 st.set_page_config(layout="wide")
