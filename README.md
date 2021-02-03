@@ -28,7 +28,7 @@ Labs 29 chose to work together on all tasks and accomplished:
   *  create a pathway to completion of FASTAPI
 
 Labs 30 chose to work asynchronously, yet supporting one another through pair-coding sessions and peer reviews and acomplished:
-  *  creating a relational database with schema [schema](assets/HRF_DS_DB_schema_diagram_SeanB.png)
+  *  creating a relational database with [schema](assets/HRF_DS_DB_schema_diagram_SeanB.png)
   *  completed connections between FASTAPI and the back-end of the web application
   *  adapting Team 1's PDF scraper to filter out only asylum cases and then convert PDF images to text and then to json
   * create a PDF scraper for search terms in all categories except social groups (time constraints)
