@@ -199,18 +199,12 @@ BIA - Board of Immigration Appeals  Usually there’s multiple BIA judges per ap
 
 --As of 2/1/2021, there are 25 BIA judges.
 --Their location is always “Virginia Falls”
-</dl>
 
 To get an idea of how Web incorporates the information we collect:
 
+![Case Seed](https://human-rights-first-asylum-ds-b/assets/HRF_case_seeds_2020_0114_DavidH.png)
 
-![image](human-rights-first-asylum-ds-b/assets/HRF_case_seeds_2020_0114_DavidH.png)
-
-![image](human-rights-first-asylum-ds-b/assets/HRF_case_table_2020_0114_DavidH.png)
-
-![Case Seed](assets/HRF_case_seeds_2020_0114_DavidH.png)
-
-![Case Table](assets/HRF_case_table_2020_0114_DavidH.png)
+![Case Table](https://human-rights-first-asylum-ds-b/assets/HRF_case_table_2020_0114_DavidH.png)
 
 
 ---
@@ -228,11 +222,12 @@ The purpose of the model is to classify the legal documents containing judicial 
 2.   Insights from patterns in data of individual judges (IJ cases only - initial hearings)
 3.   Insights from patterns in data of appellate (panel) judges (BIA cases only - appellate hearings)
 4.   Insights from patterns in all data (IJ and BIA cases - combined initial and appellate hearings)
+**5.   to collect and connect these insights you will need to use the Alien Number found on each document**
 
+  <dd> this is an item that will have to be added to the scraper, database and taken into consideration during the preprocessing of data for the model</dd>
+  </dl>
 
-![image](human-rights-first-asylum-ds-b/assets/HRF_predictive_descriptive_analysis_model_methodology_RJProctor.png)
-
-![Model Methodology](assets/HRF_predictive_descriptive_analysis_model_methodology_RJProctor.png)
+![Model Methodology](https://human-rights-first-asylum-ds-b/assets/HRF_predictive_descriptive_analysis_model_methodology_RJProctor.png)
 
 
 ---
