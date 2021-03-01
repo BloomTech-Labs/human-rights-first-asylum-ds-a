@@ -6,6 +6,7 @@ verify_ssl = true
 [dev-packages]
 jupyter = "*"
 pytest = "*"
+pylint = "*"
 
 [packages]
 fastapi = "*"
@@ -14,15 +15,29 @@ uvicorn = {extras = ["standard"], version = "*"}
 sqlalchemy = "*"
 pytesseract = "*"
 pdf2image = "*"
-pillow = "*"
+Pillow = "*"
 cmake = "*"
+pylint = "*"
 pandas = "*"
 python-multipart = "*"
 dataclasses = "*"
+databases = "*"
 psycopg2-binary = "*"
 python-dotenv = "*"
 pypdf2 = "*"
 streamlit = "*"
+pdfminer = "*"
+pillow = "*"
+pdfplumber = "*"
+pypdf4 = "*"
+slate3k = "*"
+tesseract = "*"
+bs4 = "*"
+poppler-utils = "*"
+geonamescache = "*"
+spacy = "==2.2.4"
+en-core-web-sm = {file = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.2.5/en_core_web_sm-2.2.5.tar.gz"}
+typing-extensions = "*"
 
 [requires]
-python_version = "3.7.9"
+python_version = "3.8"
