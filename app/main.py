@@ -2,9 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import os
-import test
-import ocr
-import db
+from app import ocr
+from app import db
 #exit
 
 app = FastAPI(
