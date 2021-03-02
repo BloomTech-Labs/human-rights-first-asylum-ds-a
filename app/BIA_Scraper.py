@@ -602,4 +602,21 @@ class BIACase:
             if s == 'indigenous group':
                 prev_wrds = self.doc[[token.i-1, token.i-2]].text.lower()
                 # return the name of the specific group/nation
-                return prev_wrds    
+                return prev_wrds   
+
+   def get_applicant_language(self) -> str:
+
+        for token in self.doc:
+
+            sent: str
+            sent = token.sent.text.lower()
+
+            s: Union[str, None]
+            s = similar_pg(token.text.lower(), 0.9)
+
+            if s == 'native speaker' or s == 'native speakers':
+                next_wrds = self.doc[[token.i+1, token.i+2]].text.lower()
+                return next_wrds
+        
+        return 'Ability to testify in English' 
+
