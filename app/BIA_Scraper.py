@@ -605,7 +605,12 @@ class BIACase:
                 return prev_wrds   
 
    def get_applicant_language(self) -> str:
-
+        '''
+        • If the term "native speaker" appears in the document, the field will return 
+        the asylum seeker's stated native language. Cuurently, the field will return 
+        the two tokens that precede "native speaker;" this method needs to be fine-tuned and 
+        validated.
+        '''
         for token in self.doc:
 
             sent: str
