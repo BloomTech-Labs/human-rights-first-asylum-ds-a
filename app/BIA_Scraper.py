@@ -658,3 +658,37 @@ class BIACase:
                 elif 'requested' in surrounding.text.lower() \
                     and 'was present' in surrounding.text.lower(): 
                     return 'No'
+
+    def get_applicant_determined_credibility(self) -> str:
+        '''
+        • Returns the judge's decision on whether the applicant is a credible witness.
+        Curently, the field's output is dependent on occurance of specific tokens 
+        in the document; this method needs to be fine-tuned and validated.
+        '''
+
+        credibility = [
+            'credible'
+        ]
+
+        similar_cred: Callable[[str, float], Union[str, None]]
+        similar_cred = similar_in_list(credibility)
+
+         for token in self.doc:
+
+            sent: str
+            sent = token.sent.text.lower()
+
+            s: Union[str, None]
+            s = similar_cred(token.text.lower(), 0.9)
+
+            if s == 'credible':
+                prev_word = self.doc[token.i-1].text.lower()
+                next_word = self.doc[token.i+1].text.lower()
+                if not similar(prev_word, 'not', 0.95) \
+                    and not similar(next_word, 'witness', 0.95): 
+                    return 'Yes'
+                else:
+                    return 'No'
+                if s not in self.doc:
+                    return 'N/A to case'
+    
