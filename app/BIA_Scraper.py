@@ -625,3 +625,36 @@ class BIACase:
         
         return 'Ability to testify in English' 
 
+    def get_applicant_access_interpeter(self) -> str
+        '''
+        • If the terms "interpreter" or "translator" appear in the document, 
+        the field will return whether the asylum seeker had access to an 
+        interpreter during their hearings. Curently, the field's output is 
+        dependent on occurance of specific tokens in the document; this method 
+        needs to be fine-tuned and validated.
+        '''
+        for token in self.doc:
+
+            sent: str
+            sent = token.sent.text.lower()
+
+            s: Union[str, None]
+            s = similar_pg(token.text.lower(), 0.9)
+
+            if s == 'interpreter' or s == 'translator':
+                surrounding: Span
+                surrounding = self.get_surrounding_sents(token)
+
+                next_word = self.doc[token.i+1].text.lower()
+                if 'requested' in surrounding.text.lower() \
+                    and 'granted' in surrounding.text.lower(): 
+                    return 'Had access'
+                elif 'requested' in surrounding.text.lower() \
+                    and 'was present' in surrounding.text.lower(): 
+                    return 'Yes'
+                elif 'requested' in surrounding.text.lower() \
+                    and 'granted' not in surrounding.text.lower(): 
+                    return 'No'
+                elif 'requested' in surrounding.text.lower() \
+                    and 'was present' in surrounding.text.lower(): 
+                    return 'No'
