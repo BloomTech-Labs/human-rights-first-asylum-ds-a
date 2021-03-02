@@ -203,6 +203,11 @@ BIA - Board of Immigration Appeals  Usually there’s multiple BIA judges per ap
 
 To get an idea of how Web incorporates the information we collect:
 
+
+![image](human-rights-first-asylum-ds-b/assets/HRF_case_seeds_2020_0114_DavidH.png)
+
+![image](human-rights-first-asylum-ds-b/assets/HRF_case_table_2020_0114_DavidH.png)
+
 ![Case Seed](assets/HRF_case_seeds_2020_0114_DavidH.png)
 
 ![Case Table](assets/HRF_case_table_2020_0114_DavidH.png)
@@ -223,6 +228,9 @@ The purpose of the model is to classify the legal documents containing judicial 
 2.   Insights from patterns in data of individual judges (IJ cases only - initial hearings)
 3.   Insights from patterns in data of appellate (panel) judges (BIA cases only - appellate hearings)
 4.   Insights from patterns in all data (IJ and BIA cases - combined initial and appellate hearings)
+
+
+![image](human-rights-first-asylum-ds-b/assets/HRF_predictive_descriptive_analysis_model_methodology_RJProctor.png)
 
 ![Model Methodology](assets/HRF_predictive_descriptive_analysis_model_methodology_RJProctor.png)
 

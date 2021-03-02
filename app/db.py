@@ -83,14 +83,14 @@ def get_db() -> sqlalchemy.engine.base.Connection:
 
 router = APIRouter()
 
-@router.get("/cases/{case_id}")
+@router.get("/cases/get_case/{case_id}")
 async def get_case(case_id: int, q: Optional[str] = None):
     s = select([cases]).where(cases.columns.case_id == case_id)
     result= engine.execute(s)
     print(cases.exists(bind=engine))
     return result.fetchall()
 
-@router.put("/cases/{case_id}", response_model=CaseObject)
+@router.put("/cases/create_case/{case_id}", response_model=CaseObject)
 async def create_case(case_id: int, case: CaseObject):
     s = engine.connect().execute(cases.insert(), case_id=case_id)
     s.close()
