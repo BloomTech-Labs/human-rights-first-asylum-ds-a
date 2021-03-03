@@ -575,3 +575,53 @@ class BIACase:
         return 'male' if male > female \
                 else 'female' if female > male \
                 else 'unkown'
+
+    def get_applicant_indigenous_status(self) -> str:
+        '''
+        • If the term "indigenous" appears in the document, the field will return 
+        the name of asylum seeker's tribe/nation/group. Cuurently, the field will return 
+        the two tokens that precede "indigenous;" this method needs to be fine-tuned and 
+        validated.
+        '''
+        indigenous: List[str]
+        indigenous = [
+            'indigenous'
+        ]
+
+        similar_indig: Callable[[str, float], Union[str, None]]
+        similar_indig = similar_in_list(indigenous)
+
+        for token in self.doc:
+
+            sent: str
+            sent = token.sent.text.lower()
+
+            s: Union[str, None]
+            s = similar_indig(token.text.lower(), 0.9)
+
+            if s == 'indigenous group':
+                prev_wrds = self.doc[[token.i-1, token.i-2]].text.lower()
+                # return the name of the specific group/nation
+                return prev_wrds   
+
+   def get_applicant_language(self) -> str:
+        '''
+        • If the term "native speaker" appears in the document, the field will return 
+        the asylum seeker's stated native language. Cuurently, the field will return 
+        the two tokens that precede "native speaker;" this method needs to be fine-tuned and 
+        validated.
+        '''
+        for token in self.doc:
+
+            sent: str
+            sent = token.sent.text.lower()
+
+            s: Union[str, None]
+            s = similar_pg(token.text.lower(), 0.9)
+
+            if s == 'native speaker' or s == 'native speakers':
+                next_wrds = self.doc[[token.i+1, token.i+2]].text.lower()
+                return next_wrds
+        
+        return 'Ability to testify in English' 
+
