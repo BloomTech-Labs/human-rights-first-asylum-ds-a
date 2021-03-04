@@ -67,7 +67,7 @@ NOTE: An error may be thrown when running trying to run the app if you have not 
 
  ## Contributors
 
- [Rebecca Wiesenberg, Labs31](https://github.com/rdukewiesenb)
+ [Rebecca Duke Wiesenberg, Labs31](https://github.com/rdukewiesenb)
 
  [Reid Harris, Labs31](https://github.com/codealamode)
 
