@@ -136,4 +136,8 @@ async def create_upload_file_get_fields(file: bytes = File(...)):
 
     case_data['determined_applicant_credibility'] = determined_applicant_credibility
     
+    ### Getting whether case argues against one-year guideline
+    one_year_guideline = f'{case.check_for_one_year()}'
+
+
     return case_data
