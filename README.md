@@ -35,11 +35,20 @@ Labs 30 chose to work asynchronously, yet supporting one another through pair-co
   *  explore alternative scraping methods for PDFs and keywords in search of effieciencies
   *  create a pathway for data processing, model and visualization completion once there is persitent data
 
+Labs 31 chose to work asynchronously, yet supporting one another through pair-coding sessions and peer reviews and acomplished:
+  * created a scraper class for use in an API
+  * created an API hook implementing the scraper and OCR that returns a json object of fields the scraper finds in a PDF
+  * created new fields for the scraper to search for
+  * started the process of deploying the API (currently on heroku but may be on AWS and has known issues)
+  * refined the dockerfile for fixing dependancy issues
+  * started refining the scraper class
+
 ## Tools
 
  * [Pytesseract](https://github.com/madmaze/pytesseract)
  * [FastAPI](https://github.com/tiangolo/fastapi)
  * [AWS Elastic Beanstalk](https://aws.amazon.com/elasticbeanstalk/)
+ * [Heroku](https://www.heroku.com/about)
 
 ## Installation
 
@@ -47,12 +56,24 @@ Labs 30 chose to work asynchronously, yet supporting one another through pair-co
  ```
 pipenv install --dev
 pipenv shell
-docker build -t ds-asylum-app .
-docker run -p 8000:8000 ds-asylum-app
+sudo apt-get install tesseract-ocr
+sudo apt-get install poppler-utils --fix-missing
+python(3) -m spacy download en_core_web_sm
+uvicorn app.main:app --reload
+
+NOTE: An error may be thrown when running trying to run the app if you have not added a .env file including the Database URL
  ```
  Then open localhost:8000 in your browser. The application should be running. 
 
  ## Contributors
+
+ [Rebecca Wiesenberg, Labs31](https://github.com/rdukewiesenb)
+
+ [Reid Harris, Labs31](https://github.com/codealamode)
+
+ [Lucas Petrus, Labs31]()
+
+ [Noah Caldwell, Labs31](https://github.com/noahnisbet)
 
  [Tristan Brown, Labs29](https://github.com/Tristan-Brown1096)
 
