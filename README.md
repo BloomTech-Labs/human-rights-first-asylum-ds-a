@@ -43,6 +43,13 @@ Labs 31 chose to work asynchronously, yet supporting one another through pair-co
   * refined the dockerfile for fixing dependancy issues
   * started refining the scraper class
 
+## Next Steps
+Inside of our team’s Google Drive you will find two important documents. A screenshot of a Product Road Map and a description of tasks associated with the road map. Please reference that for additional user stories such as:
+  * Additional field of Criminal Record, return a paragraph of crime associated if so
+  * Interactive World and USA map to check statistics on who is approved or denied
+  * Heat Map showing where majority of asylum seekers are coming from
+If you have any questions regarding the Product Road Map or Tasks please contact Lucas Petrus via Slack. Description is much longer in google drive, please make sure to reference.
+
 ## Tools
 
  * [Pytesseract](https://github.com/madmaze/pytesseract)
