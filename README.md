@@ -71,7 +71,7 @@ NOTE: An error may be thrown when running trying to run the app if you have not 
 
  [Reid Harris, Labs31](https://github.com/codealamode)
 
- [Lucas Petrus, Labs31]()
+ [Lucas Petrus, Labs31](https://github.com/lucaspetrus)
 
  [Noah Caldwell, Labs31](https://github.com/noahnisbet)
 
