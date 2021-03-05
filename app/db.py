@@ -30,7 +30,8 @@ cases = Table('cases', meta,
     Column('judge_name', String),
     Column('outcome', String),
     Column('country_of_origin', String),
-    Column('pdf_file', String)
+    Column('pdf_file', String),
+    Column('one_year_guideline', String)
 )
 meta.create_all(engine, checkfirst=True)
 
