@@ -576,7 +576,8 @@ class BIACase:
                 else 'female' if female > male \
                 else 'unkown'
 
-#     def get_applicant_indigenous_status(self) -> str:
+    def get_applicant_indigenous_status(self) -> str:
+        return "test"
 #         '''
 #         • If the term "indigenous" appears in the document, the field will return 
 #         the name of asylum seeker's tribe/nation/group. Cuurently, the field will return 
@@ -604,7 +605,8 @@ class BIACase:
 #                 # return the name of the specific group/nation
 #                 return prev_wrds   
 
-#    def get_applicant_language(self) -> str:
+    def get_applicant_language(self) -> str:
+        return "test"
 #         '''
 #         • If the term "native speaker" appears in the document, the field will return 
 #         the asylum seeker's stated native language. Cuurently, the field will return 
@@ -625,7 +627,8 @@ class BIACase:
         
 #         return 'Ability to testify in English' 
 
-#     def get_applicant_access_interpeter(self) -> str
+    def get_applicant_access_interpeter(self) -> str:
+        return "test"
 #         '''
 #         • If the terms "interpreter" or "translator" appear in the document, 
 #         the field will return whether the asylum seeker had access to an 
@@ -659,7 +662,8 @@ class BIACase:
 #                     and 'was present' in surrounding.text.lower(): 
 #                     return 'No'
 
-#     def get_applicant_determined_credibility(self) -> str:
+    def get_applicant_determined_credibility(self) -> str:
+        return "test"
 #         '''
 #         • Returns the judge's decision on whether the applicant is a credible witness.
 #         Curently, the field's output is dependent on occurance of specific tokens 
@@ -692,7 +696,8 @@ class BIACase:
 #                 if s not in self.doc:
 #                     return 'N/A to case'
     
-    # def check_for_one_year(self) -> bool:
+    def check_for_one_year(self) -> bool:
+        return True
     #     """
     #     Checks whether or not the asylum-seeker argued to be exempt from the
     #     one-year guideline.  Specifically, it checks to see if the document

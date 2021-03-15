@@ -117,25 +117,25 @@ async def create_upload_file_get_fields(file: bytes = File(...)):
     case_data['references'] = '; '.join([r for r in references if r])
     case_data['sex_of_applicant'] = case.get_seeker_sex()
     
-    ### Getting applicant's indigenous status
-    # indigenous_status = case.get_applicant_indigenous_status()
-    # case_data['is_applicant_indigenous'] = indigenous_status
+    ## Getting applicant's indigenous status
+    indigenous_status = case.get_applicant_indigenous_status()
+    case_data['is_applicant_indigenous'] = indigenous_status
 
-    ### Getting applicant's native language
-    # applicant_lang = case.get_applicant_language()
+    ## Getting applicant's native language
+    applicant_lang = case.get_applicant_language()
 
-    # case_data['applicant_language'] = applicant_lang
+    case_data['applicant_language'] = applicant_lang
 
-    # ### Getting ability to access interpreter
-    # access_to_interpreter = case.get_applicant_access_interpeter()
-    # case_data['applicant_access_to_interpreter'] = access_to_interpreter
+    ### Getting ability to access interpreter
+    access_to_interpreter = case.get_applicant_access_interpeter()
+    case_data['applicant_access_to_interpreter'] = access_to_interpreter
     
-    # ### Getting applicant's credibility status
-    # determined_applicant_credibility = case.get_applicant_determined_credibility()
+    ### Getting applicant's credibility status
+    determined_applicant_credibility = case.get_applicant_determined_credibility()
 
-    # case_data['determined_applicant_credibility'] = determined_applicant_credibility
+    case_data['determined_applicant_credibility'] = determined_applicant_credibility
     
-    # ## Getting whether the case argued against the one-year guideline
-    # case_data['one_year_guideline'] = f'{case.check_for_one_year}'
+    ## Getting whether the case argued against the one-year guideline
+    case_data['one_year_guideline'] = f'{case.check_for_one_year}'
 
     return case_data
