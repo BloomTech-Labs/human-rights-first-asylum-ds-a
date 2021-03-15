@@ -15,7 +15,7 @@ database_url = os.getenv('DATABASE_URL')
 engine = sqlalchemy.create_engine(database_url) # to use with Postgres
 
 # use the two lines below to use the sqlite test database
-# #DATABASE_URL = "sqlite:///./test.db"
+# DATABASE_URL = "sqlite:///./test.db"
 # engine = sqlalchemy.create_engine(DATABASE_URL, connect_args={"check_same_thread": False}) # to use with sqlite change back `database_url` when switching back to postgres DB
 
 # the block below creates the database table
