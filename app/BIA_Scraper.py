@@ -13,7 +13,7 @@ from pathlib import Path
 import re
 import os
 import spacy
-import poppler
+#import poppler
 from spacy.tokens.doc import Doc
 from spacy.tokens.span import Span
 from spacy.tokens.token import Token
@@ -692,37 +692,37 @@ class BIACase:
 #                 if s not in self.doc:
 #                     return 'N/A to case'
     
-    def check_for_one_year(self) -> bool:
-        """
-        Checks whether or not the asylum-seeker argued to be exempt from the
-        one-year guideline.  Specifically, it checks to see if the document
-        contains either "changed circumstance" or "extraordinary circumstance". 
-        If it does, and one of the five terms ("year", "delay", "time",
-        "period", "deadline") is within 10 lemmas, then the function
-        returns True.  Otherwise, it returns False.
-        """
-        # If one of the four context words are w/in 100 characters of the
-        # phrase, we conclude that it is related to the one-year rule
-        lemma_list = [token.lemma_.lower() for token in self.doc]
-        for idx in range(0,len(lemma_list)):
-            if (lemma_list[idx] == 'change') \
-                & (lemma_list[idx + 1] == 'circumstance'):
-                idx_start = lemma_list.index('change')
-                idx_end  = idx_start + 1
-                search_list = [lemma for lemma in \
-                    lemma_list[idx_start - 10: idx_end + 10]]
-                if any(term in search_list \
-                    for term in ('year','delay','time','period','deadline')):
-                    return True
-        # Do the same for "extraordinary circumstance"
-        for idx in range(0,len(lemma_list)):
-            if (lemma_list[idx] == 'extraordinary') \
-                & (lemma_list[idx + 1] == 'circumstance'):
-                idx_start = lemma_list.index('change')
-                idx_end  = idx_start + 1
-                search_list = [lemma for lemma in \
-                    lemma_list[idx_start - 10: idx_end + 10]]
-                if any(term in search_list for term in \
-                    ('year','delay','time','period','deadline')):
-                    return True
-        return False
+    # def check_for_one_year(self) -> bool:
+    #     """
+    #     Checks whether or not the asylum-seeker argued to be exempt from the
+    #     one-year guideline.  Specifically, it checks to see if the document
+    #     contains either "changed circumstance" or "extraordinary circumstance". 
+    #     If it does, and one of the five terms ("year", "delay", "time",
+    #     "period", "deadline") is within 10 lemmas, then the function
+    #     returns True.  Otherwise, it returns False.
+    #     """
+    #     # If one of the four context words are w/in 100 characters of the
+    #     # phrase, we conclude that it is related to the one-year rule
+    #     lemma_list = [token.lemma_.lower() for token in self.doc]
+    #     for idx in range(0,len(lemma_list)):
+    #         if (lemma_list[idx] == 'change') \
+    #             & (lemma_list[idx + 1] == 'circumstance'):
+    #             idx_start = lemma_list.index('change')
+    #             idx_end  = idx_start + 1
+    #             search_list = [lemma for lemma in \
+    #                 lemma_list[idx_start - 10: idx_end + 10]]
+    #             if any(term in search_list \
+    #                 for term in ('year','delay','time','period','deadline')):
+    #                 return True
+    #     # Do the same for "extraordinary circumstance"
+    #     for idx in range(0,len(lemma_list)):
+    #         if (lemma_list[idx] == 'extraordinary') \
+    #             & (lemma_list[idx + 1] == 'circumstance'):
+    #             idx_start = lemma_list.index('change')
+    #             idx_end  = idx_start + 1
+    #             search_list = [lemma for lemma in \
+    #                 lemma_list[idx_start - 10: idx_end + 10]]
+    #             if any(term in search_list for term in \
+    #                 ('year','delay','time','period','deadline')):
+    #                 return True
+    #     return False
