@@ -70,6 +70,15 @@ async def create_upload_file_get_fields(file: bytes = File(...)):
     ### Json object / dictionary to be returned
     case_data = {}
 
+    ### Case ID (dummy data)
+    case_data['case_id'] = 'test'
+
+    ### Initial or appelate (dummy data)
+    case_data['initial_or_appellate'] = 'test'
+
+    ### Case origin
+    case_data['case_origin'] = 'test'
+
     ### Application field
     app = case.get_application()
     app = [ap for ap, b in app.items() if b]
