@@ -13,7 +13,7 @@ from pathlib import Path
 import re
 import os
 import spacy
-#import poppler
+import poppler
 from spacy.tokens.doc import Doc
 from spacy.tokens.span import Span
 from spacy.tokens.token import Token
