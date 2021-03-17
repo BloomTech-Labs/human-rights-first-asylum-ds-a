@@ -70,27 +70,36 @@ async def create_upload_file_get_fields(file: bytes = File(...)):
     ### Json object / dictionary to be returned
     case_data = {}
 
+    ### Case ID (dummy data)
+    case_data['case_id'] = 'test'
+
+    ### Initial or appelate (dummy data)
+    case_data['initial_or_appellate'] = 'test'
+
+    ### Case origin
+    case_data['case_origin'] = 'test'
+
     ### Application field
     app = case.get_application()
     app = [ap for ap, b in app.items() if b]
-    case_data['application'] = '; '.join(app) if app else None
+    case_data['application_type'] = '; '.join(app) if app else None
 
     ### Date field
-    case_data['date'] = case.get_date()
+    case_data['hearing_date'] = case.get_date()
 
     ### Country of origin 
-    case_data['country_of_origin'] = case.get_country_of_origin()
+    case_data['nation_of_origin'] = case.get_country_of_origin()
 
     ### Getting Panel members
     panel = case.get_panel()
-    case_data['panel_members'] = '; '.join(panel) if panel else None
+    case_data['judge'] = '; '.join(panel) if panel else None
 
     ### Getting case outcome
-    case_data['outcome'] = case.get_outcome()
+    case_data['case_outcome'] = case.get_outcome()
 
     ### Getting protected grounds
     pgs = case.get_protected_grounds()
-    case_data['protected_grounds'] = '; '.join(pgs) if pgs else None
+    case_data['protected_ground'] = '; '.join(pgs) if pgs else None
 
     ### Getting the violence type on the asylum seeker
     based_violence = case.get_based_violence()
@@ -103,7 +112,7 @@ async def create_upload_file_get_fields(file: bytes = File(...)):
               if based_violence \
               else None
       
-    case_data['based_violence'] = violence
+    case_data['type_of_violence_experienced'] = violence
     case_data['keywords'] = keywords
 
     ### Getting references / sex of applicant
@@ -115,27 +124,25 @@ async def create_upload_file_get_fields(file: bytes = File(...)):
     ]
 
     case_data['references'] = '; '.join([r for r in references if r])
-    case_data['sex_of_applicant'] = case.get_seeker_sex()
+    case_data['applicant_sex'] = case.get_seeker_sex()
     
-    ### Getting applicant's indigenous status
-    # indigenous_status = case.get_applicant_indigenous_status()
-    # case_data['is_applicant_indigenous'] = indigenous_status
+    ## Getting applicant's indigenous status
+    indigenous_status = case.get_applicant_indigenous_status()
+    case_data['applicant_indigenous_group'] = indigenous_status
 
-    ### Getting applicant's native language
-    # applicant_lang = case.get_applicant_language()
+    ## Getting applicant's native language
+    applicant_lang = case.get_applicant_language()
+    case_data['applicant_language'] = applicant_lang
 
-    # case_data['applicant_language'] = applicant_lang
-
-    # ### Getting ability to access interpreter
-    # access_to_interpreter = case.get_applicant_access_interpeter()
-    # case_data['applicant_access_to_interpreter'] = access_to_interpreter
+    ### Getting ability to access interpreter
+    access_to_interpreter = case.get_applicant_access_interpeter()
+    case_data['applicant_access_to_interpreter'] = access_to_interpreter
     
-    # ### Getting applicant's credibility status
-    # determined_applicant_credibility = case.get_applicant_determined_credibility()
-
-    # case_data['determined_applicant_credibility'] = determined_applicant_credibility
+    ### Getting applicant's credibility status
+    determined_applicant_credibility = case.get_applicant_determined_credibility()
+    case_data['applicant_perceived_credibility'] = determined_applicant_credibility
     
-    # ## Getting whether the case argued against the one-year guideline
-    # case_data['one_year_guideline'] = f'{case.check_for_one_year}'
+    ## Getting whether the case argued against the one-year guideline
+    case_data['case_filed_within_one_year'] = f'{case.check_for_one_year}'
 
     return case_data
