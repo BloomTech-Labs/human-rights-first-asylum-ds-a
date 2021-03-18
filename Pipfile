@@ -15,6 +15,7 @@ uvicorn = {extras = ["standard"], version = "*"}
 sqlalchemy = "*"
 pytesseract = "*"
 pdf2image = "*"
+dnspython = "*"
 Pillow = "*"
 cmake = "*"
 pylint = "*"
