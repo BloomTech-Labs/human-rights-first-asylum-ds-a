@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import uvicorn
+#import uvicorn
+import gunicorn
 import os
 from app import ocr
 from app import db
@@ -24,4 +25,5 @@ app.add_middleware(
 )
 
 if __name__ == '__main__':
-    uvicorn.run(app)
+    #uvicorn.run(app)
+    gunicorn.run(app)
