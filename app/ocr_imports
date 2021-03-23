@@ -1,0 +1,32 @@
+This contains deleted code or unused imports that the ocr.py file has for later reference.
+
+Changes to the ocr.py were:
+    removing unused imports,
+    removing extra #,
+    added consistency to the code by changing ' ' to " "
+    os variables were put underneath imports
+----------------------------------------------------------------
+This is the list of original imports
+
+import poppler
+import pytesseract
+from pdf2image import convert_from_bytes
+from fastapi import APIRouter, File
+import sqlalchemy
+from dotenv import load_dotenv, find_dotenv
+from sqlalchemy import create_engine
+from app.BIA_Scraper import BIACase
+import requests
+import pandas as pd
+import numpy as np
+from PIL import Image
+import os
+
+list of unused imports deleted in the py file
+
+import poppler
+from sqlalchemy import create_engine
+import requests
+import pandas as pd
+import numpy as np
+from PIL import Image
