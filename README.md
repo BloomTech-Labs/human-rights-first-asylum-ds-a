@@ -1,5 +1,5 @@
 # Human Rights First - Asylum
-An application to assist immigration attorneys and refugee representatives in advocating for cilents in asylum cases by identifying patterns in judicial decisions and predicting possible outcomes based on those patterns
+An application to assist immigration attorneys and refugee representatives in advocating for clients in asylum cases by identifying patterns in judicial decisions and predicting possible outcomes based on those patterns.
 
 ## Description
 We participated in the building of an application for human rights first, a 501(c)3 organization. Our application uses optical character recognition to scan input court decisions for such values as the name of the presiding judge, the decision, and the asylum seeker's country of origin, and inserts these values into a database. The hope is that advocates for asylum seekers can use these data to better tailor their arguments before a particular judge and maximize their client's chances of receiving asylum. To use the application offline, follow the steps under Installation.
@@ -14,63 +14,57 @@ We participated in the building of an application for human rights first, a 501(
 
 *  We created an API connecting the database to the web development back-end with the result that user uploaded case files can be inserted into the database.
 
-*  We created a model that, once the database has persiting data and the model is adjusted to the specificity of that data, will predict a posible outcome of an individual judge's or panels of judges decision(s) based on his/her/their past rulings of similar cases.  This model will also render results that display easy to interpret and use (from UX perspective) visualizations on micro-patterns within the data
+*  We created a model that, once the database has persisting data, and the model is adjusted to the specificity of that data, will predict a possible outcome of an individual judge's or panels of judges decision(s) based on his/her/their past rulings of similar cases.  This model will also render results that display easy to interpret and use (from UX perspective) visualizations on micro-patterns within the data
 
 ## Time structures
-Each team worked in weekly sprints with a total time contraint of one month for the total project.  Teams met with stakholder(s) during each sprint to present progress, ask questions, recieve feedback and explore evolving stakholder expectations.  The structure of each sprint was set:
-  *  Week 1 - Planning
-  *  Weeks 2 - 3 Working the Plan (coding and revising the plan according to evolving stakeholder needs and new understandings of the business problem)
-  *  Week 4 - Documentation and Presenting Work
+Each team worked in weekly sprints with a total time constraint of one month for the total project.  Teams met with stakeholder(s) during each sprint to present progress, ask questions, receive feedback and explore evolving stakeholder expectations.  The structure of each sprint was set:
+  * Week 1 - Planning
+  * Week 2 & 3 Working the Plan (coding and revising the plan according to evolving stakeholder needs and new understandings of the business problem)
+  * Week 4 - Documentation and Presenting Work
 
 Labs 29 chose to work together on all tasks and accomplished:
-  *  create an empty database with no schema
-  *  create a PDF scraper using OCR that converted PDF images to text
-  *  create a pathway to completion of FASTAPI
+  * create an empty database with no schema
+  * create a PDF scraper using OCR that converted PDF images to text
+  * create a pathway to completion of FastAPI
 
 Labs 30 chose to work asynchronously, yet supporting one another through pair-coding sessions and peer reviews and acomplished:
-  *  creating a relational database with [schema](assets/HRF_DS_DB_schema_diagram_SeanB.png)
-  *  completed connections between FASTAPI and the back-end of the web application
-  *  adapting Team 1's PDF scraper to filter out only asylum cases and then convert PDF images to text and then to json
+  * creating a relational database with [schema](assets/HRF_DS_DB_schema_diagram_SeanB.png)
+  * completed connections between FastAPI and the back-end of the web application
+  * adapting Team 1's PDF scraper to filter out only asylum cases and then convert PDF images to text and then to json
   * create a PDF scraper for search terms in all categories except social groups (time constraints)
-  *  explore alternative scraping methods for PDFs and keywords in search of effieciencies
-  *  create a pathway for data processing, model and visualization completion once there is persitent data
+  * explore alternative scraping methods for PDFs and keywords in search of efficiencies
+  * create a pathway for data processing, model and visualization completion once there is persistent data
 
 Labs 31 chose to work asynchronously, yet supporting one another through pair-coding sessions and peer reviews and acomplished:
-  * created a scraper class for use in an API
   * created an API hook implementing the scraper and OCR that returns a json object of fields the scraper finds in a PDF
   * created new fields for the scraper to search for
-  * started the process of deploying the API (currently on heroku but may be on AWS and has known issues)
-  * refined the dockerfile for fixing dependancy issues
+  * started the process of deploying the API
+  * refined the dockerfile for fixing dependency issues
   * started refining the scraper class
 
 ## Next Steps
-Inside of our team’s Google Drive you will find two important documents. A screenshot of a Product Road Map and a description of tasks associated with the road map. Please reference that for additional user stories such as:
-  * Additional field of Criminal Record, return a paragraph of crime associated if so
+Inside our team’s Google Drive you will find two important documents. A screenshot of a Product Road Map and a description of tasks associated with the road map. Please reference that for additional user stories such as:
+  * An additional field of Criminal Record, return a paragraph of crime associated if so
   * Interactive World and USA map to check statistics on who is approved or denied
   * Heat Map showing where majority of asylum seekers are coming from
-If you have any questions regarding the Product Road Map or Tasks please contact Lucas Petrus via Slack. Description is much longer in google drive, please make sure to reference.
 
 ## Tools
 
  * [Pytesseract](https://github.com/madmaze/pytesseract)
  * [FastAPI](https://github.com/tiangolo/fastapi)
  * [AWS Elastic Beanstalk](https://aws.amazon.com/elasticbeanstalk/)
- * [Heroku](https://www.heroku.com/about)
 
 ## Installation
 
  After cloning the repository, in your command line run the following commands:
+ Replace <name> with a name of your choice.
  ```
-pipenv install --dev
-pipenv shell
-sudo apt-get install tesseract-ocr
-sudo apt-get install poppler-utils --fix-missing
-python(3) -m spacy download en_core_web_sm
-uvicorn app.main:app --reload
+docker build . -t <name>
+docker run -it -p 5000:5000 <name> uvicorn app.main:app --host=0.0.0.0 --port=5000
 
-NOTE: An error may be thrown when running trying to run the app if you have not added a .env file including the Database URL
+NOTE: An error may be thrown when trying to run the app if you have not added the .env file with aws credentials
  ```
- Then open localhost:8000 in your browser. The application should be running. 
+ Then open http://0.0.0.0:5000 in your browser. The application should be running. 
 
  ## Contributors
 
