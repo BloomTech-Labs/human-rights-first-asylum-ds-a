@@ -1,20 +1,29 @@
+"""
+Local Docker Setup:
+docker build . -t <name>
+
+Run Docker Locally:
+docker run -it -p 5000:5000 <name> uvicorn app.main:app --host=0.0.0.0 --port=5000
+
+"""
+import os
+
+from boto3.session import Session
+from botocore.exceptions import ClientError, ConnectionError
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-#import uvicorn
-import gunicorn
-import os
-from app import ocr
-from app import db
-#exit
+from dotenv import load_dotenv
+
+from app.ocr import make_fields
+
 
 app = FastAPI(
-    title='HRF Aslyum B API',
-    description='Asylum Case Hearing Analysis',
-    docs_url='/'
+    title="DS API for HRF Asylum",
+    description="PDF OCR",
+    docs_url="/"
 )
 
-app.include_router(db.router, tags=['DataBase'])
-app.include_router(ocr.router, tags=['PDF Converter'])
+load_dotenv()
 
 app.add_middleware(
     CORSMiddleware,
@@ -24,6 +33,28 @@ app.add_middleware(
     allow_headers=['*'],
 )
 
-if __name__ == '__main__':
-    #uvicorn.run(app)
-    gunicorn.run(app)
+
+@app.post("/pdf-ocr/{uuid}")
+async def pdf_ocr(uuid: str):
+    """
+    Small Test UUID: <b>084d0556-5748-4687-93e3-394707be6cc0</b><br>
+    Large Test UUID: <b>477307493-V-J-M-AXXX-XXX-639-BIA-Aug-17-2020</b>
+    """
+    try:
+        s3 = Session(
+            aws_access_key_id=os.getenv('ACCESS_KEY'),
+            aws_secret_access_key=os.getenv('SECRET_KEY'),
+        ).client('s3')
+        response = s3.get_object(
+            Bucket=os.getenv('BUCKET_NAME'),
+            Key=f"{uuid}.pdf",
+        )
+        fields = make_fields(response['Body'].read())
+        return {
+            "status": f"File received: {uuid}.pdf",
+            "body": fields,
+        }
+    except ConnectionError:
+        return {"status": "Connection refused!"}
+    except ClientError:
+        return {"status": f"File not found: {uuid}.pdf"}
