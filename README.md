@@ -42,11 +42,18 @@ Labs 31 chose to work asynchronously, yet supporting one another through pair-co
   * refined the dockerfile for fixing dependency issues
   * started refining the scraper class
 
+Labs 32 chose to work collaboratively in order to achieve:
+  * aligned our endpoints to those of the FE & BE Web teams
+  * further refined dockfile for AWS Elastic Beanstalk
+  * deployed the functional scraper application to AWS EB
+  * code now reads files from BE connected S3 bucket
+  * started creating visualizations for FE implementation
+
 ## Next Steps
 Inside our team’s Google Drive you will find two important documents. A screenshot of a Product Road Map and a description of tasks associated with the road map. Please reference that for additional user stories such as:
   * An additional field of Criminal Record, return a paragraph of crime associated if so
   * Interactive World and USA map to check statistics on who is approved or denied
-  * Heat Map showing where majority of asylum seekers are coming from
+  * Itterating on visuals to make them 
 
 ## Tools
 
@@ -68,6 +75,14 @@ NOTE: An error may be thrown when trying to run the app if you have not added th
 
  ## Contributors
 
+ [Bharath Gogineni, Labs32](https://github.com/begogineni)
+
+ [Jace Hambrick, Labs32](https://github.com/Jace-Hambrick)
+
+ [Nicholas Adamski, Labs32](https://github.com/boscolio)
+
+ [Rassamy J. Soumphonphakdy, Labs32](https://github.com/rassamyjs)
+
  [Rebecca Duke Wiesenberg, Labs31](https://github.com/rdukewiesenb)
 
  [Reid Harris, Labs31](https://github.com/codealamode)
@@ -76,22 +91,22 @@ NOTE: An error may be thrown when trying to run the app if you have not added th
 
  [Noah Caldwell, Labs31](https://github.com/noahnisbet)
 
- [Tristan Brown, Labs29](https://github.com/Tristan-Brown1096)
+ [Tomas Phillips, Labs30](https://github.com/tomashphill)
 
  [Sean Byrne, Labs30](https://github.com/ssbyrne89)
 
  [Henry Gultom, Labs30](https://github.com/henryspg)
  
+ [RJ Proctor, Labs30](https://github.com/jproctor-rebecca)
+
  [Liam Cloud Hogan, Labs29](https://github.com/liam-cloud-hogan)
  
  [Steven Lee, Labs29](https://github.com/StevenBryceLee)
 
  [Edwina Palmer, Labs29](https://github.com/edwinapalmer)
 
- [Tomas Phillips, Labs30](https://github.com/tomashphill)
-
- [RJ Proctor, Labs30](https://github.com/jproctor-rebecca)
-
+ [Tristan Brown, Labs29](https://github.com/Tristan-Brown1096)
+ 
 ![Team2 Cross-functional Whole Team Structure](assets/HRF_cross_functional_product_dev_team_rjproctor.png)
 
  ## License
