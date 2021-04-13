@@ -1,4 +1,5 @@
 import time
+import re
 from typing import List, Tuple, Union, Callable, Dict, Iterator
 from collections import defaultdict
 from difflib import SequenceMatcher
@@ -28,6 +29,7 @@ def make_fields(file) -> dict:
         'country of origin': case.get_country_of_origin(),
         'panel members': case.get_panel(),
         'outcome': case.get_outcome(),
+        'state applied in': case.get_state(),
         'protected grounds': case.get_protected_grounds(),
         'based violence': case.get_based_violence(),
         'keywords': "Test",
@@ -299,6 +301,18 @@ class BIACase:
                 outcome = outcome.split('.')[0]
                 if any(itm.lower() in outcomes for itm in outcome.split()):
                     return outcome
+    
+    def get_state(self):
+        """
+        Returns the state the respondent originally applied in.
+        """
+        locs = re.findall("(?:[a-zA-Z ]{1,20}, [A-Z]{2} \d{5})", self.doc.text)
+        gpe = set(str(ent) for ent in self.doc.ents if ent.label_ == 'GPE')
+        for i in gpe:
+            for x in locs:
+            if i in x:
+                s = " ".join(locs)
+                return str(re.findall("(?:%s, [A-Z]{2})"%i, s)[0])
 
     def get_based_violence(self) -> Union[Dict[str, List[str]], None]:
         """
