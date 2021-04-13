@@ -4,6 +4,8 @@ docker build . -t <name>
 
 Run Docker Locally:
 docker run -it -p 5000:5000 <name> uvicorn app.main:app --host=0.0.0.0 --port=5000
+Run Locally using Windows:
+winpty docker run -it -p 5000:5000 <name> uvicorn app.main:app --host=0.0.0.0 --port=5000
 
 """
 import os
