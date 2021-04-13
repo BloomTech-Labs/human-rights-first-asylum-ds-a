@@ -26,4 +26,4 @@ Known Defects:
         - https://pymupdf.readthedocs.io/en/latest/app1.html PyMuPDF compared to other PDF readers
         - https://mupdf.com/docs/ MuPDF Documentation
         - https://pymupdf.readthedocs.io/en/latest/intro.html# PyMuPDF Documentation *IMPORTANT* Check whether use case is covered under AGPL Open Source Licensing.</strike>
-        - Since this project may fall out of compliance with an AGPL license in the future, it has been determined that PyMuPDF is not a suitable package.
+    - Since this project may fall out of compliance with an AGPL license in the future, it has been determined that PyMuPDF is not a suitable package.
