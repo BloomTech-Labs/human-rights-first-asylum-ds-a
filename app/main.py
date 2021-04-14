@@ -1,9 +1,22 @@
 """
-Local Docker Setup:
-docker build . -t <name>
+Local Testing
 
-Run Docker Locally:
-docker run -it -p 5000:5000 <name> uvicorn app.main:app --host=0.0.0.0 --port=5000
+    Local Docker Setup:
+    docker build . -t asylum
+
+    Run Docker Locally:
+    docker run -it -p 5000:5000 asylum uvicorn app.main:app --host=0.0.0.0 --port=5000
+
+AWS Deployment
+
+    Init EB app
+    eb init
+
+    Create EB app
+    eb create
+
+    Update EB app
+    eb deploy
 
 """
 import os
