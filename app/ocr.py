@@ -90,7 +90,7 @@ class BIACase:
         self.matcher = Matcher(nlp.vocab)
         self.doc: Doc = nlp(text)
         self.ents: Tuple[Span] = self.doc.ents
-        self.names = Judges()
+        self.judges = Judges()
 
     def get_ents(self, labels: List[str]) -> Iterator[Span]:
         """
