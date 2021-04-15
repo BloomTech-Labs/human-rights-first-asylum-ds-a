@@ -132,18 +132,41 @@ class BIACase:
         """
         • Returns the panel members of case in document.
         """
-        panel_members: List[str]
-        panel_members = []
-        possible_members: Iterator[Span]
-        possible_members = map(
-            lambda ent: ent.text, self.get_ents(['PERSON'])
-        )
-        for member in possible_members:
-            judge: Union[str, None]
-            judge = self.if_judge(member)
-            if judge:
-                panel_members.append(judge)
+        # Go through our list of judges and check if they are in our document
+        for judge in self.judges.names:
+            # We need to put the last name first. Start by splitting the name
+            judge_name_list = judge.split()
 
+            # empty list to hold spacy pattern
+            pattern = []
+
+            # Go through each part of the name (first -> last), and place accordingly
+            for part_of_name in judge_name_list:
+                # If it is the last name, put it at the beginning
+                if part_of_name == judge_name_list[-1]:
+                    pattern.insert(0, {'TEXT' : part_of_name})
+                else: # append first or middle name
+                    pattern.append({'TEXT' : part_of_name})
+            
+            # Insert a comma at index 1 (after last name at index 0)
+            pattern.insert(1, {'TEXT' : ','}) 
+            
+            # add pattern to matcher -> (<pattern_id>, <callback>, <pattern>)
+            self.matcher.add('JUDGES_PATTERN', None, pattern)
+            # Run matcher over document and get matches
+            matches = self.matcher(self.doc)
+
+        # container for panel members
+        panel_members = []
+
+        # for match in in matches
+        for match_id, start, end in matches:
+            # create a spacy span from values given to encapsulate the name
+            matched_span = self.doc[start:end]
+            # Append the text of the span to panel_members list
+            panel_members.append(matched_span.text)
+
+        # Join the set of panel members into a string
         return '; '.join(set(panel_members))
 
     def get_surrounding_sents(self, token: Token) -> Span:
