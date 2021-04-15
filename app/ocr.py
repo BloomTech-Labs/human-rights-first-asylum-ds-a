@@ -15,7 +15,6 @@ from spacy.tokens.token import Token
 
 nlp = load("en_core_web_sm")
 
-
 def make_fields(file) -> dict:
     start = time.time()
     pages = convert_from_bytes(file, dpi=90)
@@ -68,24 +67,15 @@ def similar_in_list(lst: Union[List[str], Iterator[str]]) -> Callable:
     return impl
 
 
-class GetJudge:
-    """ Returns the judge's name if a match is found. """
-    accuracy = 0.7
+class Judges:
+    """Grabs a list of judges from Wikipedia"""
 
     def __init__(self):
         judges_url = 'https://en.wikipedia.org/wiki/Board_of_Immigration_Appeals'
         html = requests.get(judges_url).text
         soup = BeautifulSoup(html, 'html.parser')
         table = soup.find("table", class_="wikitable")
-        names = [itm.get_text().strip() for itm in table.select("td")[1::4]]
-        self.is_judge: Callable = similar_in_list(names)
-
-    def __call__(self, name):
-        result = self.is_judge(name, self.accuracy)
-        if not result:
-            flip_name = ' '.join(reversed(name.split(', ')))
-            result = self.is_judge(flip_name, self.accuracy)
-        return result
+        self.names = [itm.get_text().strip() for itm in table.select("td")[1::4]]
 
 
 class BIACase:
@@ -98,7 +88,7 @@ class BIACase:
         """
         self.doc: Doc = nlp(text)
         self.ents: Tuple[Span] = self.doc.ents
-        self.if_judge = GetJudge()
+        self.names = Judges()
 
     def get_ents(self, labels: List[str]) -> Iterator[Span]:
         """
