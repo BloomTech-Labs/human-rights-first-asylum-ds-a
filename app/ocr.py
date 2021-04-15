@@ -12,6 +12,7 @@ from spacy import load
 from spacy.tokens.doc import Doc
 from spacy.tokens.span import Span
 from spacy.tokens.token import Token
+from spacy.matcher import Matcher
 
 nlp = load("en_core_web_sm")
 
@@ -86,6 +87,7 @@ class BIACase:
         • Scraping works utilizing spaCy, tokenizing the text, and iterating
         token by token searching for matching keywords.
         """
+        self.matcher = Matcher(nlp.vocab)
         self.doc: Doc = nlp(text)
         self.ents: Tuple[Span] = self.doc.ents
         self.names = Judges()
