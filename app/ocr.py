@@ -130,44 +130,39 @@ class BIACase:
 
     def get_panel(self) -> str:
         """
-        • Returns the panel members of case in document.
+        Cycles through judge names to see if they are panel members in the document.
+
+
+        RETURNS
+        -------
+        A string of semicolon separated panel member names in the format 
         """
         # Go through our list of judges and check if they are in our document
         for judge in self.judges.names:
-            # We need to put the last name first. Start by splitting the name
-            judge_name_list = judge.split()
+            judge_name_list = judge.split() 
+            pattern = [] 
 
-            # empty list to hold spacy pattern
-            pattern = []
-
-            # Go through each part of the name (first -> last), and place accordingly
+            # Go through each part of the name (first -> last), 
+            # place accordingly, and create spaCy pattern
             for part_of_name in judge_name_list:
-                # If it is the last name, put it at the beginning
-                if part_of_name == judge_name_list[-1]:
+                if part_of_name == judge_name_list[-1]: # If it is the last name, put it at the beginning
                     pattern.insert(0, {'TEXT' : part_of_name})
                 else: # append first or middle name
                     pattern.append({'TEXT' : part_of_name})
             
-            # Insert a comma at index 1 (after last name at index 0)
-            pattern.insert(1, {'TEXT' : ','}) 
+            pattern.insert(1, {'TEXT' : ','}) # Insert a comma at index 1 (after last name at index 0)
             
-            # add pattern to matcher -> (<pattern_id>, <callback>, <pattern>)
-            self.matcher.add('JUDGES_PATTERN', None, pattern)
-            # Run matcher over document and get matches
-            matches = self.matcher(self.doc)
+            self.matcher.add('JUDGES_PATTERN', None, pattern) # add pattern to matcher -> (<pattern_id>, <callback>, <pattern>)
+            matches = self.matcher(self.doc) # Run matcher over document and get matches
 
-        # container for panel members
-        panel_members = []
+        panel_members = [] # container for panel members
 
         # for match in in matches
         for match_id, start, end in matches:
-            # create a spacy span from values given to encapsulate the name
-            matched_span = self.doc[start:end]
-            # Append the text of the span to panel_members list
-            panel_members.append(matched_span.text)
+            matched_span = self.doc[start:end] # create a spacy span from values given to encapsulate the name
+            panel_members.append(matched_span.text) # Append the text of the span to panel_members list
 
-        # Join the set of panel members into a string
-        return '; '.join(set(panel_members))
+        return '; '.join(set(panel_members)) # Join the set of panel members into a string
 
     def get_surrounding_sents(self, token: Token) -> Span:
         """
