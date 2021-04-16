@@ -2,7 +2,8 @@ import time
 from typing import List, Tuple, Union, Callable, Dict, Iterator
 from collections import defaultdict
 from difflib import SequenceMatcher
-
+import re
+import datetime
 import pytesseract
 from pdf2image import convert_from_bytes
 from bs4 import BeautifulSoup
@@ -12,6 +13,7 @@ from spacy import load
 from spacy.tokens.doc import Doc
 from spacy.tokens.span import Span
 from spacy.tokens.token import Token
+from spacy.matcher import Matcher
 
 nlp = load("en_core_web_sm")
 
@@ -129,12 +131,38 @@ class BIACase:
 
     def get_date(self) -> str:
         """
-        • Returns date of the document. Easy to validate by the PDF filename.
+        • Finds all dates within document in all different formats
+        • Returns most recent date found within document
+        • Returns all dates in standard XX/XX/XXXX format 
         """
-        dates = map(str, self.get_ents(['DATE']))
-        for s in dates:
-            if len(s.split()) == 3:
-                return s
+        #Format: MM/DD/YYYY
+        pattern_1 = [{'TEXT':{'REGEX':r'^\d{1,2}/\d{1,2}/\d{2}(?:\d{2})?$'}}]
+
+        #Format: Month DD, YYYY
+        pattern_2 = [{'IS_ALPHA': True, 'LENGTH': 3},
+                  {'IS_DIGIT': True},
+                  {'IS_PUNCT': True},
+                  {'IS_DIGIT': True}]
+
+        matcher = Matcher(nlp.vocab)
+
+        matcher.add('Type1', [pattern_1])
+        matcher.add('Type2', [pattern_2])
+        matches = matcher(self.doc)
+
+        all_dates = []
+
+        for match_id, start, end in matches:
+            string_id = nlp.vocab.strings[match_id]
+            span = self.doc[start:end]
+            if string_id == 'Type2':
+              reformat_date = datetime.datetime.strptime(span.text, '%b %d, %Y')
+            else:
+              reformat_date = datetime.datetime.strptime(span.text, '%m/%d/%Y')
+            all_dates.append(reformat_date)
+
+        sorted_dates = sorted(all_dates, reverse=True)
+        return '{}/{}/{}'.format(sorted_dates[0].month, sorted_dates[0].day, sorted_dates[0].year)
 
     def get_panel(self) -> str:
         """
