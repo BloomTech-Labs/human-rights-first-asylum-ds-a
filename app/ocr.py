@@ -170,7 +170,9 @@ class BIACase:
             sent_before_start = self.doc[start - 1].sent.start
             sent_after_end: int
             sent_after_end = self.doc[end + 1].sent.end
-        except:
+
+        # TODO: Check if this is the only error type
+        except IndexError:
             return token.sent
 
         surrounding: Span
