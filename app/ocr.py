@@ -1,5 +1,6 @@
 import time
 import re
+import json
 from typing import List, Tuple, Union, Callable, Dict, Iterator
 from collections import defaultdict
 from difflib import SequenceMatcher
@@ -16,6 +17,10 @@ from spacy.tokens.token import Token
 
 nlp = load("en_core_web_sm")
 
+# read in dictionary of all court locations
+with open('./app/court_locations.json') as f:
+  court_locs = json.load(f)
+
 
 def make_fields(file) -> dict:
     start = time.time()
@@ -29,7 +34,8 @@ def make_fields(file) -> dict:
         'country of origin': case.get_country_of_origin(),
         'panel members': case.get_panel(),
         'outcome': case.get_outcome(),
-        'state applied in': case.get_state(),
+        'state of origin': case.get_city_state(),
+        'city of origin': case.city,
         'protected grounds': case.get_protected_grounds(),
         'based violence': case.get_based_violence(),
         'keywords': "Test",
@@ -101,6 +107,8 @@ class BIACase:
         self.doc: Doc = nlp(text)
         self.ents: Tuple[Span] = self.doc.ents
         self.if_judge = GetJudge()
+        self.state = None
+        self.city = None
 
     def get_ents(self, labels: List[str]) -> Iterator[Span]:
         """
@@ -247,7 +255,7 @@ class BIACase:
         relevant_applications: List[str]
         relevant_applications = [
             'asylum',
-            'withholding',
+            'removal',
             'torture'
         ]
 
@@ -272,7 +280,7 @@ class BIACase:
 
                     if app == 'asylum':
                         application['asylum'] = True
-                    elif app == 'withholding':
+                    elif app == 'removal':
                         application['withholding_of_removal'] = True
                     elif app == 'torture':
                         application['CAT'] = True
@@ -302,17 +310,19 @@ class BIACase:
                 if any(itm.lower() in outcomes for itm in outcome.split()):
                     return outcome
     
-    def get_state(self):
+    def get_city_state(self):
         """
-        Returns the state the respondent originally applied in.
+        Finds the city & state the respondent originally applied in. The function
+        returns the state. City can be accessed as an attribute.
         """
-        locs = re.findall("(?:[a-zA-Z ]{1,20}, [A-Z]{2} \d{5})", self.doc.text)
         gpe = set(str(ent) for ent in self.doc.ents if ent.label_ == 'GPE')
-        for i in gpe:
-            for x in locs:
-            if i in x:
-                s = " ".join(locs)
-                return str(re.findall("(?:%s, [A-Z]{2})"%i, s)[0])
+        for k, v in court_locs.items():
+            for c in v['city']:
+                if f"{c}, {k}" in doc.text[:750] and c in gpe:
+                    self.state = k
+                    self.city = c
+        return k
+
 
     def get_based_violence(self) -> Union[Dict[str, List[str]], None]:
         """
