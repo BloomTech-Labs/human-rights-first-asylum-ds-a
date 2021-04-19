@@ -73,11 +73,23 @@ class GetJudge:
     accuracy = 0.7
 
     def __init__(self):
-        judges_url = 'https://en.wikipedia.org/wiki/Board_of_Immigration_Appeals'
+        judges_url = 'https://www.justice.gov/eoir/eoir-immigration-court-listing#MP'
         html = requests.get(judges_url).text
         soup = BeautifulSoup(html, 'html.parser')
-        table = soup.find("table", class_="wikitable")
-        names = [itm.get_text().strip() for itm in table.select("td")[1::4]]
+        tables = soup.find_all("tbody")
+        names = []
+        for table in tables:
+            for judges in table.find_all('tr')[2:]:
+                names.extend(list(judges)[4].get_text().strip().replace('\t', '').split('\n'))
+
+        judges_url = 'https://www.justice.gov/eoir/board-of-immigration-appeals-bios'
+        html = requests.get(judges_url).text
+        soup = BeautifulSoup(html, 'html.parser')
+        body_div = soup.find("div", class_='bodytext')
+        bolded_names = body_div.find_all('b')
+        names.extend([name.get_text() for name in bolded_names])
+        strong_names = body_div.find_all('strong')
+        names.extend([name.get_text() for name in strong_names][1:-1])
         self.is_judge: Callable = similar_in_list(names)
 
     def __call__(self, name):
