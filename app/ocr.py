@@ -1,6 +1,7 @@
 import time
 import re
 import json
+from collections import Counter
 from typing import List, Tuple, Union, Callable, Dict, Iterator
 from collections import defaultdict
 from difflib import SequenceMatcher
@@ -251,41 +252,30 @@ class BIACase:
         and Convention Against Torture applications, the others should be
         ignored and not included in the dataset.
         """
-
-        relevant_applications: List[str]
-        relevant_applications = [
-            'asylum',
-            'removal',
-            'torture'
-        ]
-
-        similar_app: Callable[[str, float], Union[str, None]]
-        similar_app = similar_in_list(relevant_applications)
-
-        app: Dict[str, bool]
-        application = {
-            'asylum': False,
-            'withholding_of_removal': False,
-            'CAT': False
+        app_types = {
+            'CAT': ['Convention against Torture', 'Convention Against Torture'],
+            'Asylum': ['Asylum', 'asylum', 'asylum application'],
+            'Withholding of Removal': ['Withholding of Removal', 'withholding of removal'],
+            'Other': ['Termination', 'Reopening', "Voluntary Departure",
+                    'Cancellation of removal','Deferral of removal']
         }
-
+        
+        start = 0
+        
         for token in self.doc:
-            if similar(token.text, 'APPLICATION', .86):
-                for i in range(1, 30):
-                    word: str
-                    word = self.doc[i + token.i].text.lower()
-
-                    app: Union[str, None]
-                    app = similar_app(word, 0.9)
-
-                    if app == 'asylum':
-                        application['asylum'] = True
-                    elif app == 'removal':
-                        application['withholding_of_removal'] = True
-                    elif app == 'torture':
-                        application['CAT'] = True
-
-        return '; '.join(k for k, v in application.items() if v)
+            if token.text == 'APPLICATION':
+                start += token.idx
+                break
+        
+        outcome = set()
+        for k,v in app_types.items():
+            for x in v:
+                if x in doc.text[start: start + 300]:
+                    if k == "Other":
+                        outcome.add(x)
+                    else:
+                        outcome.add(k)
+        return "; ".join(list(outcome))
 
     def get_outcome(self) -> str:
         """
@@ -315,13 +305,42 @@ class BIACase:
         Finds the city & state the respondent originally applied in. The function
         returns the state. City can be accessed as an attribute.
         """
-        gpe = set(str(ent) for ent in self.doc.ents if ent.label_ == 'GPE')
-        for k, v in court_locs.items():
-            for c in v['city']:
-                if f"{c}, {k}" in doc.text[:750] and c in gpe:
-                    self.state = k
+        statecache = []
+        citycache = set()
+
+        fileloc = 0
+        for token in self.doc:
+            if token.text == 'File':
+                fileloc += token.idx
+                break
+
+        for k in court_locs.keys():
+            for s in re.findall(f"(?:{k}", self.doc.text[:750]):
+                statecache.append(s)
+
+        c = Counter(statecache)
+        state = c.most_common(n=1)[0][0]
+
+        for v in court_locs.get(state)['city']:
+            for c in re.findall(f"({v}, {state})", self.doc.text[:750]):
+                citycache.add(v)
+        
+        if len(citycache) == 1:
+            self.state = state
+            self.city = list(citycache)[0]
+            return state
+        
+        elif len(citycache) > 1:
+            for c in citycache:
+                if c in self.doc.text[fileloc: fileloc + 100]:
+                    self.state = state
                     self.city = c
-        return k
+                    return state
+
+        else:
+            self.state = state
+            self.city = "; ".join(list(citycache))
+            return state
 
 
     def get_based_violence(self) -> Union[Dict[str, List[str]], None]:
