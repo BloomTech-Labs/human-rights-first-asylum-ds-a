@@ -270,7 +270,7 @@ class BIACase:
         outcome = set()
         for k,v in app_types.items():
             for x in v:
-                if x in doc.text[start: start + 300]:
+                if x in self.doc.text[start: start + 300]:
                     if k == "Other":
                         outcome.add(x)
                     else:
