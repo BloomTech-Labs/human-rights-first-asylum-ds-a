@@ -62,7 +62,7 @@ async def pdf_ocr(uuid: str):
             Bucket=os.getenv('BUCKET_NAME'),
             Key=f"{uuid}.pdf",
         )
-        fields = make_fields(response['Body'].read())
+        fields = await make_fields(response['Body'].read())
         return {
             "status": f"File received: {uuid}.pdf",
             "body": fields,

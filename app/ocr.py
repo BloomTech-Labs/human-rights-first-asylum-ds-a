@@ -16,7 +16,7 @@ from spacy.tokens.token import Token
 nlp = load("en_core_web_sm")
 
 
-def make_fields(file) -> dict:
+async def make_fields(file) -> dict:
     start = time.time()
     pages = convert_from_bytes(file, dpi=90)
     text = map(pytesseract.image_to_string, pages)
