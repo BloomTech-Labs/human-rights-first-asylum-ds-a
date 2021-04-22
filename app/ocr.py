@@ -315,14 +315,14 @@ class BIACase:
                 break
 
         for k in court_locs.keys():
-            for s in re.findall(f"(?:{k}", self.doc.text[:750]):
+            for s in re.findall(f"(?:{k})", self.doc.text[:750]):
                 statecache.append(s)
 
         c = Counter(statecache)
         state = c.most_common(n=1)[0][0]
 
         for v in court_locs.get(state)['city']:
-            for c in re.findall(f"({v}, {state})", self.doc.text[:750]):
+            for c in re.findall(f"(?:{v}, {state})", self.doc.text[:750]):
                 citycache.add(v)
         
         if len(citycache) == 1:
