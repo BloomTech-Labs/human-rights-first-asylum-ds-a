@@ -174,7 +174,8 @@ class BIACase:
             all_dates.append(reformat_date)
 
         sorted_dates = sorted(all_dates, reverse=True)
-        return '{}/{}/{}'.format(sorted_dates[0].month, sorted_dates[0].day, sorted_dates[0].year)
+        #Backend requested output format: 'yyyy-mm-dd'
+        return '{}-{}-{}'.format(sorted_dates[0].year, sorted_dates[0].month, sorted_dates[0].day)
 
     def get_panel(self) -> str:
         """
