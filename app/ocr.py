@@ -498,7 +498,8 @@ class BIACase:
         phrase_matcher = PhraseMatcher(nlp.vocab)
         phrase_matcher.add("RESP", None, *patterns)
 
-
+        # Pass in doc into PhraseMatcher
+        matches = phrase_matcher(self.doc)
 
     def get_indigenous_status(self) -> str:
         """
