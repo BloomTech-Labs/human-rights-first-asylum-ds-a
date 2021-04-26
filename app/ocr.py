@@ -485,6 +485,10 @@ class BIACase:
                    "Applicant", "applicant", "Applicant's", "applicant's"]
         patterns = [nlp(text) for text in phrases]
 
+        # Gender constants
+        male_prons = ['he', 'He', "He's", "he's", 'his']
+        female_prons = ['she', 'She', "She's", "she's", 'hers']
+
 
 
     def get_indigenous_status(self) -> str:
