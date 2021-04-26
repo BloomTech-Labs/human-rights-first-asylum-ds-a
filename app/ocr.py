@@ -489,6 +489,11 @@ class BIACase:
         male_prons = ['he', 'He', "He's", "he's", 'his']
         female_prons = ['she', 'She', "She's", "she's", 'hers']
 
+        # Variables for analysis storage
+        male_count = 0
+        female_count = 0
+        found = ""
+
 
 
     def get_indigenous_status(self) -> str:
