@@ -482,12 +482,12 @@ class BIACase:
 
         # Search terms formatted
         phrases = ["Respondent's", "Respondent", "respondent's", "respondent",
-                   "Applicant", "applicant", "Applicant's", "applicant's"]
+                   "Applicant", "applicant", "Applicant's", "applicant's", 'filed an application']
         patterns = [nlp(text) for text in phrases]
 
         # Gender constants
-        male_prons = ['he', 'He', "He's", "he's", 'his']
-        female_prons = ['she', 'She', "She's", "she's", 'hers']
+        male_prons = ['he', "he's", 'his', 'himself']
+        female_prons = ['she', "she's", 'her', 'herself']
 
         # Variables for analysis storage
         male_count = 0
