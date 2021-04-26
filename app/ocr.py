@@ -1,4 +1,7 @@
 import time
+import re
+import json
+from collections import Counter
 from typing import List, Tuple, Union, Callable, Dict, Iterator
 from collections import defaultdict
 from difflib import SequenceMatcher
@@ -19,6 +22,10 @@ from fuzzywuzzy import process
 
 nlp = load("en_core_web_sm")
 
+# read in dictionary of all court locations
+with open('./app/court_locations.json') as f:
+  court_locs = json.load(f)
+
 
 def make_fields(file) -> dict:
     start = time.time()
@@ -32,6 +39,8 @@ def make_fields(file) -> dict:
         'country of origin': case.get_country_of_origin(),
         'panel members': case.get_panel(),
         'outcome': case.get_outcome(),
+        'state of origin': case.get_city_state(),
+        'city of origin': case.city,
         'protected grounds': case.get_protected_grounds(),
         'based violence': case.get_based_violence(),
         'keywords': "Test",
@@ -40,7 +49,7 @@ def make_fields(file) -> dict:
         'indigenous': case.get_indigenous_status(),
         'applicant language': case.get_applicant_language(),
         'credibility': case.get_credibility(),
-        'check for one year': case.check_for_one_year(),
+        'check for one year': case.check_for_one_year(),        
         'precedent cases': case.get_precedent_cases(),
         'statutes': case.get_statutes(),
     }
@@ -117,6 +126,8 @@ class BIACase:
         self.doc: Doc = nlp(text)
         self.ents: Tuple[Span] = self.doc.ents
         self.if_judge = GetJudge()
+        self.state = None
+        self.city = None
 
     def get_ents(self, labels: List[str]) -> Iterator[Span]:
         """
@@ -286,45 +297,34 @@ class BIACase:
         and Convention Against Torture applications, the others should be
         ignored and not included in the dataset.
         """
-
-        relevant_applications: List[str]
-        relevant_applications = [
-            'asylum',
-            'withholding',
-            'torture'
-        ]
-
-        similar_app: Callable[[str, float], Union[str, None]]
-        similar_app = similar_in_list(relevant_applications)
-
-        app: Dict[str, bool]
-        application = {
-            'asylum': False,
-            'withholding_of_removal': False,
-            'CAT': False
+        app_types = {
+            'CAT': ['Convention against Torture', 'Convention Against Torture'],
+            'Asylum': ['Asylum', 'asylum', 'asylum application'],
+            'Withholding of Removal': ['Withholding of Removal', 'withholding of removal'],
+            'Other': ['Termination', 'Reopening', "Voluntary Departure",
+                    'Cancellation of removal','Deferral of removal']
         }
-
+        
+        start = 0
+        
         for token in self.doc:
-            if similar(token.text, 'APPLICATION', .86):
-                for i in range(1, 30):
-                    word: str
-                    word = self.doc[i + token.i].text.lower()
+            if token.text == 'APPLICATION':
+                start += token.idx
+                break
+        
+        outcome = set()
+        for k,v in app_types.items():
+            for x in v:
+                if x in self.doc.text[start: start + 300]:
+                    if k == "Other":
+                        outcome.add(x)
+                    else:
+                        outcome.add(k)
+        return "; ".join(list(outcome))
 
-                    app: Union[str, None]
-                    app = similar_app(word, 0.9)
-
-                    if app == 'asylum':
-                        application['asylum'] = True
-                    elif app == 'withholding':
-                        application['withholding_of_removal'] = True
-                    elif app == 'torture':
-                        application['CAT'] = True
-
-        return '; '.join(k for k, v in application.items() if v)
-
-    def get_outcome(self) -> List[str]:
+    def get_outcome(self) -> str:
         """
-        • Returns list outcome terms from the case in a list. These will appear after 'ORDER' at the end of the document.
+        • Returns list of outcome terms from the case in a list. These will appear after 'ORDER' at the end of the document.
         """
         outcomes_return = []
         ordered_outcome = {'ORDER', 'ORDERED'}
@@ -339,6 +339,49 @@ class BIACase:
                         outcomes_return.append(outcomes_list[n])
                 break
         return outcomes_return
+    
+    def get_city_state(self):
+        """
+        Finds the city & state the respondent originally applied in. The function
+        returns the state. City can be accessed as an attribute.
+        """
+        statecache = []
+        citycache = set()
+
+        fileloc = 0
+        for token in self.doc:
+            if token.text == 'File':
+                fileloc += token.idx
+                break
+
+        for k in court_locs.keys():
+            for s in re.findall(f"(?:{k})", self.doc.text[:750]):
+                statecache.append(s)
+
+        c = Counter(statecache)
+        state = c.most_common(n=1)[0][0]
+
+        for v in court_locs.get(state)['city']:
+            for c in re.findall(f"(?:{v}, {state})", self.doc.text[:750]):
+                citycache.add(v)
+        
+        if len(citycache) == 1:
+            self.state = state
+            self.city = list(citycache)[0]
+            return state
+        
+        elif len(citycache) > 1:
+            for c in citycache:
+                if c in self.doc.text[fileloc: fileloc + 100]:
+                    self.state = state
+                    self.city = c
+                    return state
+
+        else:
+            self.state = state
+            self.city = "; ".join(list(citycache))
+            return state
+
 
     def get_based_violence(self) -> List[str]:
         """
@@ -377,91 +420,6 @@ class BIACase:
         if(len(gang_match) != 0):
             terms_list.append('Gang')
         return terms_list
-
-    def get_gender(self) -> str:
-        """
-        • This field needs to be validated. Currently, it assumes the
-        sex of the seeker by the number of instances of pronouns in the
-        document.
-        """
-        male = 0
-        female = 0
-
-        for token in self.doc:
-            if token.text in {'him', 'his', 'he'}:
-                male += 1
-            elif token.text in {'her', 'hers', 'she'}:
-                female += 1
-
-        if male > female:
-            return 'male'
-        elif female > male:
-            return 'female'
-        else:
-            return 'unknown'
-
-    def get_statutes(self) -> dict: 
-        """Returns statutes mentioned in a given .txt document as a dictionary: {"""
-        # Removes patterns with only words instead of numbers, and matches known statute patterns' shape using spacy to be added
-        not_in_test = {'Xxx','xxx','XXX'}
-        statutes_list = []
-        for token in self.doc:
-            word_shape_match = str(token.shape_)
-            if(word_shape_match[0:3] not in not_in_test):
-
-                # Matches shape of statutes- these can have 3-4 prefixes, 0-2 suffixes, and extracts all subsections if there isn't a space between any of them
-                statute_shape_match = str(token.shape_).replace('x','d').replace('X','d')
-                if(statute_shape_match[0:4] == 'ddd(' or statute_shape_match[0:4] == 'ddd.' or statute_shape_match[0:5] == 'dddd.' or statute_shape_match[0:5] == 'dddd(' or statute_shape_match[0:6] == 'ddddd.' or statute_shape_match[0:6] == 'ddddd('):                
-                    # Close any open parentheses & append if not already present
-                    has_open_paren = False
-                    temp_token3 = str(token)
-                    for i in range(0, len(temp_token3)):
-                        if(temp_token3[i] == '('):
-                            has_open_paren = True
-                        if(temp_token3[i] == ')'):
-                            has_open_paren = False
-                    if(has_open_paren == True):                    
-                        temp_token3 = temp_token3 + ')'
-                    if temp_token3 not in statutes_list:
-                        statutes_list.append(temp_token3)
-        statutes_list = sorted(statutes_list)
-        
-        # Creates a dictionary with the key being the type of statute, and value being the listed statutes determined by the first 4 numbers in a statute.
-        return_dict = {}
-        CFR = []
-        INA = []
-        other = []
-        USC = []
-        for j in range(0, len(statutes_list)):
-            if(statutes_list[j][0:4].isnumeric() == True):
-                if(int(statutes_list[j][0:4]) >= 1000 and int(statutes_list[j][0:4]) <= 1003):
-                    CFR.append(statutes_list[j])
-                    continue
-                elif(int(statutes_list[j][0:4]) >= 1100 and int(statutes_list[j][0:4]) <= 1999):
-                    USC.append(statutes_list[j])
-                    continue
-                else:
-                    other.append(statutes_list[j])
-                    continue        
-            elif(statutes_list[j][0:3].isnumeric() == True):
-                if(int(statutes_list[j][0:3]) >= 100 and int(statutes_list[j][0:3]) <= 199):
-                    USC.append(statutes_list[j])
-                    continue
-                elif(int(statutes_list[j][0:3]) >= 200 and int(statutes_list[j][0:3]) <= 399):
-                    INA.append(statutes_list[j])
-                    continue
-                else:
-                    other.append(statutes_list[j])
-                    continue
-            else:
-                other.append(statutes_list[j])
-        #TODO: Remove overlap between corresponding INA and USC statutes, recreate this table- https://www.uscis.gov/laws-and-policy/legislation/immigration-and-nationality-act
-        #TODO: Make a dictionary that has the laws for a corresponding statute, map those to a certain level of granularity that can be displayed to the end user
-        return_dict["CFR"] = CFR
-        return_dict["INA"] = INA
-        return_dict["Other"] = other
-        return_dict["USC"] = USC
-        return return_dict
 
     def get_precedent_cases(self) -> List[str]:
         """"Returns a list of court cases mentioned within the document, i.e. 'Matter of A-B-' and 'Urbina-Mejia v. Holder'"""
@@ -531,6 +489,91 @@ class BIACase:
             elif clean_cases[l] not in final_cases:                
                 final_cases.append(clean_cases[l])
         return final_cases
+
+    def get_statutes(self) -> dict: 
+        """Returns statutes mentioned in a given .txt document as a dictionary: {"""
+        # Removes patterns with only words instead of numbers, and matches known statute patterns' shape using spacy to be added
+        not_in_test = {'Xxx','xxx','XXX'}
+        statutes_list = []
+        for token in self.doc:
+            word_shape_match = str(token.shape_)
+            if(word_shape_match[0:3] not in not_in_test):
+
+                # Matches shape of statutes- these can have 3-4 prefixes, 0-2 suffixes, and extracts all subsections if there isn't a space between any of them
+                statute_shape_match = str(token.shape_).replace('x','d').replace('X','d')
+                if(statute_shape_match[0:4] == 'ddd(' or statute_shape_match[0:4] == 'ddd.' or statute_shape_match[0:5] == 'dddd.' or statute_shape_match[0:5] == 'dddd(' or statute_shape_match[0:6] == 'ddddd.' or statute_shape_match[0:6] == 'ddddd('):                
+                    # Close any open parentheses & append if not already present
+                    has_open_paren = False
+                    temp_token3 = str(token)
+                    for i in range(0, len(temp_token3)):
+                        if(temp_token3[i] == '('):
+                            has_open_paren = True
+                        if(temp_token3[i] == ')'):
+                            has_open_paren = False
+                    if(has_open_paren == True):                    
+                        temp_token3 = temp_token3 + ')'
+                    if temp_token3 not in statutes_list:
+                        statutes_list.append(temp_token3)
+        statutes_list = sorted(statutes_list)
+        
+        # Creates a dictionary with the key being the type of statute, and value being the listed statutes determined by the first 4 numbers in a statute.
+        return_dict = {}
+        CFR = []
+        INA = []
+        other = []
+        USC = []
+        for j in range(0, len(statutes_list)):
+            if(statutes_list[j][0:4].isnumeric() == True):
+                if(int(statutes_list[j][0:4]) >= 1000 and int(statutes_list[j][0:4]) <= 1003):
+                    CFR.append(statutes_list[j])
+                    continue
+                elif(int(statutes_list[j][0:4]) >= 1100 and int(statutes_list[j][0:4]) <= 1999):
+                    USC.append(statutes_list[j])
+                    continue
+                else:
+                    other.append(statutes_list[j])
+                    continue        
+            elif(statutes_list[j][0:3].isnumeric() == True):
+                if(int(statutes_list[j][0:3]) >= 100 and int(statutes_list[j][0:3]) <= 199):
+                    USC.append(statutes_list[j])
+                    continue
+                elif(int(statutes_list[j][0:3]) >= 200 and int(statutes_list[j][0:3]) <= 399):
+                    INA.append(statutes_list[j])
+                    continue
+                else:
+                    other.append(statutes_list[j])
+                    continue
+            else:
+                other.append(statutes_list[j])
+        #TODO: Remove overlap between corresponding INA and USC statutes, recreate this table- https://www.uscis.gov/laws-and-policy/legislation/immigration-and-nationality-act
+        #TODO: Make a dictionary that has the laws for a corresponding statute, map those to a certain level of granularity that can be displayed to the end user
+        return_dict["CFR"] = CFR
+        return_dict["INA"] = INA
+        return_dict["Other"] = other
+        return_dict["USC"] = USC
+        return return_dict
+
+    def get_gender(self) -> str:
+        """
+        • This field needs to be validated. Currently, it assumes the
+        sex of the seeker by the number of instances of pronouns in the
+        document.
+        """
+        male = 0
+        female = 0
+
+        for token in self.doc:
+            if token.text in {'him', 'his', 'he'}:
+                male += 1
+            elif token.text in {'her', 'hers', 'she'}:
+                female += 1
+
+        if male > female:
+            return 'male'
+        elif female > male:
+            return 'female'
+        else:
+            return 'unknown'
 
     def get_indigenous_status(self) -> str:
         """
