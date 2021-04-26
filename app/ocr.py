@@ -14,7 +14,7 @@ from spacy.tokens.doc import Doc
 from spacy.tokens.span import Span
 from spacy.tokens.token import Token
 from spacy.matcher import Matcher
-import spacy
+from spacy.matcher import PhraseMatcher
 from fuzzywuzzy import process
 
 nlp = load("en_core_web_sm")
