@@ -78,7 +78,7 @@ def similar_in_list(lst: Union[List[str], Iterator[str]]) -> Callable:
 
     return impl
 
-
+# TODO: This static list should be stored and accessed via the backend 
 panel_members = [
      "Adkins-Blanch, Charles K.",
      "Michael P. Baird",
