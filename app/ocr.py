@@ -507,7 +507,24 @@ class BIACase:
                 if nlp.vocab.strings[match_id] in ['RESP']:
                     found += sentences.text
 
+            # Pass string of sentences with target phrases to tag POS
+            found_nlp = nlp(found)
 
+            # Count instances of part-of-speech tagged as pronouns in sentences
+            for word_pos in found_nlp:
+                if word_pos.pos_ == 'PRON':
+                    if word_pos.text.lower() in male_prons:
+                        male_count += 1
+                    elif word_pos.text.lower() in female_prons:
+                        female_count += 1
+
+            # Analyze highest count and return that gender or empty string for equal
+            if female_count > male_count:
+                return "Female"
+            elif male_count > female_count:
+                return "Male"
+            else:
+                return ""
 
     def get_indigenous_status(self) -> str:
         """
