@@ -13,7 +13,7 @@ from spacy import load
 from spacy.tokens.doc import Doc
 from spacy.tokens.span import Span
 from spacy.tokens.token import Token
-from spacy.matcher import Matcher
+from spacy.matcher import Matcher, PhraseMatcher
 
 nlp = load("en_core_web_sm")
 
@@ -70,36 +70,54 @@ def similar_in_list(lst: Union[List[str], Iterator[str]]) -> Callable:
     return impl
 
 
-class GetJudge:
-    """ Returns the judge's name if a match is found. """
-    accuracy = 0.7
-
-    def __init__(self):
-        judges_url = 'https://www.justice.gov/eoir/eoir-immigration-court-listing#MP'
-        html = requests.get(judges_url).text
-        soup = BeautifulSoup(html, 'html.parser')
-        tables = soup.find_all("tbody")
-        names = []
-        for table in tables:
-            for judges in table.find_all('tr')[2:]:
-                names.extend(list(judges)[4].get_text().strip().replace('\t', '').split('\n'))
-
-        judges_url = 'https://www.justice.gov/eoir/board-of-immigration-appeals-bios'
-        html = requests.get(judges_url).text
-        soup = BeautifulSoup(html, 'html.parser')
-        body_div = soup.find("div", class_='bodytext')
-        bolded_names = body_div.find_all('b')
-        names.extend([name.get_text() for name in bolded_names])
-        strong_names = body_div.find_all('strong')
-        names.extend([name.get_text() for name in strong_names][1:-1])
-        self.is_judge: Callable = similar_in_list(names)
-
-    def __call__(self, name):
-        result = self.is_judge(name, self.accuracy)
-        if not result:
-            flip_name = ' '.join(reversed(name.split(', ')))
-            result = self.is_judge(flip_name, self.accuracy)
-        return result
+panel_members = [
+    "Adkins-Blanch, Charles K.",
+    "Michael P. Baird",
+    "Cassidy, William A.",
+    "Cole, Patricia A.",
+    "Couch, V. Stuart",
+    "Creppy, Michael J.",
+    "Crossett, John P.",
+    "Donovan, Teresa L.",
+    "Foote, Megan E.",
+    "Geller, Joan B.",
+    "Gemoets, Marcos",
+    "Gonzalez, Gabriel",
+    "Goodwin, Deborah K.",
+    "Gorman, Stephanie E.",
+    "Grant, Edward R.",
+    "Greer, Anne J.",
+    "Guendelsberger, John",
+    "Hunsucker, Keith E.",
+    "Kelly, Edward F.",
+    "Kendall Clark, Molly",
+    "Liebmann, Beth S.",
+    "Liebowitz, Ellen C.",
+    "Mahtabfar, Sunita B.",
+    "Malphrus, Garry D.",
+    "Mann, Ana",
+    "Miller, Neil P.",
+    "Monsky, Megan Foote",
+    "Montante Jr., Phillip J.",
+    "Morris, Daniel",
+    "Mullane, Hugh G.",
+    "Neal, David L.",
+    "Noferi, Mark",
+    "O'Connor, Blair",
+    "O'Herron, Margaret M.",
+    "O'Leary, Brian M.",
+    "Owen, Sirce E.",
+    "Pauley, Roger",
+    "Petty, Aaron R.",
+    "Pepper, S. Kathleen",
+    "RILEY, KEVIN W.",
+    "Rosen, Scott",
+    "Snow, Thomas G.",
+    "Swanwick, Daniel L.",
+    "Wendtland, Linda S.",
+    "Wetmore, David H.",
+    "Wilson, Earle B."
+]
 
 
 class BIACase:
@@ -112,7 +130,6 @@ class BIACase:
         """
         self.doc: Doc = nlp(text)
         self.ents: Tuple[Span] = self.doc.ents
-        self.if_judge = GetJudge()
 
     def get_ents(self, labels: List[str]) -> Iterator[Span]:
         """
@@ -179,21 +196,27 @@ class BIACase:
 
     def get_panel(self) -> str:
         """
-        • Returns the panel members of case in document.
+        • Returns a semicolon separated string of panel members for appellate case documents.
         """
-        panel_members: List[str]
-        panel_members = []
-        possible_members: Iterator[Span]
-        possible_members = map(
-            lambda ent: ent.text, self.get_ents(['PERSON'])
-        )
-        for member in possible_members:
-            judge: Union[str, None]
-            judge = self.if_judge(member)
-            if judge:
-                panel_members.append(judge)
 
-        return '; '.join(set(panel_members))
+        matcher = PhraseMatcher(nlp.vocab) # Create the phrase matcher
+        uid = 0 # Unique identifier for each judge's patterns
+
+        # Add two patterns to the matcher for each judge
+        for judge in panel_members:
+            matcher.add(f'PATTERN_{uid}', [nlp(judge)]) # Just the name as it is in the list
+            matcher.add(f'PATTERNX_{uid}', [nlp(judge.replace(".",""))]) # A pattern that looks for the names without periods, sometimes not picked up by the scan
+            uid += 1
+
+        matches = matcher(self.doc) # Run the phrase matcher over the doc
+        case_panel_members = set()
+        
+        if len(matches) > 0: # If a judge from our list is found in the document
+            for match_id, start, end in matches:
+                judge = self.doc[start:end] # A span object of the match, fetched with its `start` and `end` indecies within the doc
+                case_panel_members.add(judge.text) # Extract the text from the span object, and add to the set of panel members
+
+        return '; '.join(case_panel_members)
 
     def get_surrounding_sents(self, token: Token) -> Span:
         """
