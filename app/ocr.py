@@ -501,6 +501,14 @@ class BIACase:
         # Pass in doc into PhraseMatcher
         matches = phrase_matcher(self.doc)
 
+        # Append all sentences with target-tag to string storage variable
+        for sentences in self.doc.sents:
+            for match_id, start, end in phrase_matcher(nlp(sentences.text)):
+                if nlp.vocab.strings[match_id] in ['RESP']:
+                    found += sentences.text
+
+
+
     def get_indigenous_status(self) -> str:
         """
         • If the term "indigenous" appears in the document, the field will return
