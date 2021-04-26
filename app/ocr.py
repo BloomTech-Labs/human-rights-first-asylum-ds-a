@@ -13,7 +13,7 @@ from spacy import load
 from spacy.tokens.doc import Doc
 from spacy.tokens.span import Span
 from spacy.tokens.token import Token
-from spacy.matcher import Matcher
+from spacy.matcher import Matcher, PhraseMatcher
 
 nlp = load("en_core_web_sm")
 
@@ -466,25 +466,21 @@ class BIACase:
 
     def get_gender(self) -> str:
         """
-        • This field needs to be validated. Currently, it assumes the
-        sex of the seeker by the number of instances of pronouns in the
-        document.
+        Based on sentences where the Respondent/Applicant keywords are found,
+        count the instances of gendered pronouns. This approach assumes the
+        sentence refers to subject in shorthand by using gendered pronouns
+        as opposed to keywords multiple times in sentence. This function
+        returns a final result to be packaged into json.
+
+        Parameters:
+        spacy.doc (obj):
+
+        Returns:
+        str: Gender
+
         """
-        male = 0
-        female = 0
 
-        for token in self.doc:
-            if token.text in {'him', 'his', 'he'}:
-                male += 1
-            elif token.text in {'her', 'hers', 'she'}:
-                female += 1
 
-        if male > female:
-            return 'male'
-        elif female > male:
-            return 'female'
-        else:
-            return 'unknown'
 
     def get_indigenous_status(self) -> str:
         """
