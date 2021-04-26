@@ -494,6 +494,10 @@ class BIACase:
         female_count = 0
         found = ""
 
+        # PhraseMatcher setup, add tag (RESP) and pass in patterns
+        phrase_matcher = PhraseMatcher(nlp.vocab)
+        phrase_matcher.add("RESP", None, *patterns)
+
 
 
     def get_indigenous_status(self) -> str:
