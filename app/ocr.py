@@ -480,6 +480,11 @@ class BIACase:
 
         """
 
+        # Search terms formatted
+        phrases = ["Respondent's", "Respondent", "respondent's", "respondent",
+                   "Applicant", "applicant", "Applicant's", "applicant's"]
+        patterns = [nlp(text) for text in phrases]
+
 
 
     def get_indigenous_status(self) -> str:
