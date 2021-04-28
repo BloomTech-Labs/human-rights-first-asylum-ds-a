@@ -514,13 +514,10 @@ class BIACase:
         sentence refers to subject in shorthand by using gendered pronouns
         as opposed to keywords multiple times in sentence. This function
         returns a final result to be packaged into json.
-
         Parameters:
         spacy.doc (obj):
-
         Returns:
         str: Gender
-
         """
 
         # Search terms formatted
@@ -541,9 +538,6 @@ class BIACase:
         phrase_matcher = PhraseMatcher(nlp.vocab)
         phrase_matcher.add("RESP", None, *patterns)
 
-        # Pass in doc into PhraseMatcher
-        matches = phrase_matcher(self.doc)
-
         # Append all sentences with target-tag to string storage variable
         for sentences in self.doc.sents:
             for match_id, start, end in phrase_matcher(nlp(sentences.text)):
@@ -560,15 +554,18 @@ class BIACase:
                     male_count += 1
                 elif word_pos.text.lower() in female_prons:
                     female_count += 1
+            if word_pos.text.lower() in male_prons:
+                male_count += 1
+            elif word_pos.text.lower() in female_prons:
+                female_count += 1
 
         # Analyze highest count and return that gender or empty string for equal
-        # Testing comment
         if female_count > male_count:
             return "Female"
         elif male_count > female_count:
             return "Male"
         else:
-            return ""
+            return "Unknown"
 
     def get_indigenous_status(self) -> str:
         """
