@@ -205,9 +205,9 @@ class BIACase:
         #Backend requested output format: 'yyyy-mm-dd'
         return '{}-{}-{}'.format(sorted_dates[0].year, sorted_dates[0].month, sorted_dates[0].day)
 
-    def get_panel(self) -> str:
+    def get_panel(self) -> List[str]:
          """
-         • Returns a semicolon separated string of panel members for appellate case documents.
+         • Returns a list of panel members for appellate case documents.
          """
 
          matcher = PhraseMatcher(nlp.vocab) # Create the phrase matcher
@@ -227,7 +227,7 @@ class BIACase:
                  judge = self.doc[start:end] # A span object of the match, fetched with its `start` and `end` indecies within the doc
                  case_panel_members.add(judge.text) # Extract the text from the span object, and add to the set of panel members
 
-         return '; '.join(case_panel_members)
+         return list(case_panel_members)
 
     def get_surrounding_sents(self, token: Token) -> Span:
         """
