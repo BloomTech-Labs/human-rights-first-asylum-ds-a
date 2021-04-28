@@ -521,7 +521,7 @@ class BIACase:
         """
 
         # Search terms formatted
-        phrases = ["Respondent's", "Respondent", "respondent's", "respondent",
+        phrases = ["Respondent's", "Respondent", "respondent's", "respondent", "respondents",
                    "Applicant", "applicant", "Applicant's", "applicant's", 'filed an application']
         patterns = [nlp(text) for text in phrases]
 
