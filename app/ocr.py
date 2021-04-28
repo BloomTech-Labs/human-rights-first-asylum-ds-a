@@ -16,7 +16,7 @@ from spacy import load
 from spacy.tokens.doc import Doc
 from spacy.tokens.span import Span
 from spacy.tokens.token import Token
-from spacy.matcher import Matcher
+from spacy.matcher import Matcher, PhraseMatcher
 
 nlp = load("en_core_web_sm")
 
@@ -509,25 +509,66 @@ class BIACase:
 
     def get_gender(self) -> str:
         """
-        • This field needs to be validated. Currently, it assumes the
-        sex of the seeker by the number of instances of pronouns in the
-        document.
+        Based on sentences where the Respondent/Applicant keywords are found,
+        count the instances of gendered pronouns. This approach assumes the
+        sentence refers to subject in shorthand by using gendered pronouns
+        as opposed to keywords multiple times in sentence. This function
+        returns a final result to be packaged into json.
+
+        Parameters:
+        spacy.doc (obj):
+
+        Returns:
+        str: Gender
+
         """
-        male = 0
-        female = 0
 
-        for token in self.doc:
-            if token.text in {'him', 'his', 'he'}:
-                male += 1
-            elif token.text in {'her', 'hers', 'she'}:
-                female += 1
+        # Search terms formatted
+        phrases = ["Respondent's", "Respondent", "respondent's", "respondent",
+                   "Applicant", "applicant", "Applicant's", "applicant's", 'filed an application']
+        patterns = [nlp(text) for text in phrases]
 
-        if male > female:
-            return 'male'
-        elif female > male:
-            return 'female'
+        # Gender constants
+        male_prons = ['he', "he's", 'his', 'himself']
+        female_prons = ['she', "she's", 'her', 'herself']
+
+        # Variables for analysis storage
+        male_count = 0
+        female_count = 0
+        found = ""
+
+        # PhraseMatcher setup, add tag (RESP) and pass in patterns
+        phrase_matcher = PhraseMatcher(nlp.vocab)
+        phrase_matcher.add("RESP", None, *patterns)
+
+        # Pass in doc into PhraseMatcher
+        matches = phrase_matcher(self.doc)
+
+        # Append all sentences with target-tag to string storage variable
+        for sentences in self.doc.sents:
+            for match_id, start, end in phrase_matcher(nlp(sentences.text)):
+                if nlp.vocab.strings[match_id] in ['RESP']:
+                    found += sentences.text
+
+        # Pass string of sentences with target phrases to tag POS
+        found_nlp = nlp(found)
+
+        # Count instances of part-of-speech tagged as pronouns in sentences
+        for word_pos in found_nlp:
+            if word_pos.pos_ == 'PRON':
+                if word_pos.text.lower() in male_prons:
+                    male_count += 1
+                elif word_pos.text.lower() in female_prons:
+                    female_count += 1
+
+        # Analyze highest count and return that gender or empty string for equal
+        # Testing comment
+        if female_count > male_count:
+            return "Female"
+        elif male_count > female_count:
+            return "Male"
         else:
-            return 'unknown'
+            return ""
 
     def get_indigenous_status(self) -> str:
         """
