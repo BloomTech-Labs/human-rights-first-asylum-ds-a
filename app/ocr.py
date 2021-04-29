@@ -334,11 +334,11 @@ class BIACase:
         # Interesting edge case in 349320269- typo on 'terminated' present in the pdf: fuzzywuzzy matches terminated
         # to [(terninated, 90)]
         for token in self.doc:
-            if (str(token) in ordered_outcome):
+            if str(token) in ordered_outcome:
                 # Can be changed to append on partial match: len(fuzzy_match[0][0]) > 5 and fuzzy_match[0][1] >= 90
                 for n in range(0, len(outcomes_list)):
                     fuzzy_match = process.extract(outcomes_list[n], self.doc[token.i:token.i + 175], limit=1)
-                    if (fuzzy_match[0][1] == 100):
+                    if fuzzy_match[0][1] == 100:
                         outcomes_return.append(outcomes_list[n])
                 break
         return outcomes_return
@@ -420,13 +420,13 @@ class BIACase:
 
         # Printing full_text[judge_match2[0][1]:judge_match2[0][2]] gives word it matches on, can put in the [0] a
         # for loop to see all matches
-        if (len(violence_match) != 0):
+        if len(violence_match) != 0:
             terms_list.append('Violent')
-        if (len(family_match) != 0):
+        if len(family_match) != 0:
             terms_list.append('Family')
-        if (len(gender_match) != 0):
+        if len(gender_match) != 0:
             terms_list.append('Gender')
-        if (len(gang_match) != 0):
+        if len(gang_match) != 0:
             terms_list.append('Gang')
         return terms_list
 
@@ -446,7 +446,7 @@ class BIACase:
                        'see', 'was'}
         for token in self.doc:
             # Append 'X v. Y' precedent case: k loop extracts X, l loop extracts Y
-            if (str(token) == 'v.'):
+            if str(token) == 'v.':
                 test_index = token.i
                 vs_start = 0
                 vs_end = 0
@@ -466,25 +466,25 @@ class BIACase:
                     cases_with_dupes.append(str(self.doc[vs_start:vs_end]))
 
             # Append 'Matter of X' precedent cases 
-            if (str(token) == 'Matter'):
+            if str(token) == 'Matter':
                 start_index = token.i
                 false_flag = False
                 end_index = 0
                 for j in range(start_index, start_index + 15):
                     # OCR misclassifies 'Matter of Z-Z-O-' as 'Matter of 2-2-0' enough times to need to hardcode this in
-                    if (str(self.doc[j]).isnumeric() == True):
-                        if (str(self.doc[j]) == '2' or str(self.doc[j]) == '0'):
+                    if str(self.doc[j]).isnumeric() == True:
+                        if (str(self.doc[j])) == '2' or (str(self.doc[j]) == '0'):
                             continue
                         else:
                             end_index += 1
                             break
-                    if (str(self.doc[j]) in break_words or str(self.doc[j]).isnumeric() == True):
+                    if (str(self.doc[j])) in break_words or (str(self.doc[j]).isnumeric() == True):
                         end_index = j
                         break
-                    if (str(self.doc[j]) == ':'):
+                    if str(self.doc[j]) == ':':
                         false_flag = True
                         break
-                if (false_flag == False):
+                if not false_flag:
                     temp_var = str(self.doc[start_index:end_index])
                     if temp_var not in cases_with_dupes:
                         cases_with_dupes.append(temp_var)
@@ -500,7 +500,7 @@ class BIACase:
             if (clean_cases[l][0:2] == '. ' or clean_cases[l][0:2] == ', '):
                 if clean_cases[l][0:2] not in final_cases:
                     final_cases.append(clean_cases[l][2:])
-            elif (clean_cases[l][0:3] == '., '):
+            elif clean_cases[l][0:3] == '., ':
                 if clean_cases[l][0:2] not in final_cases:
                     final_cases.append(clean_cases[l][3:])
             elif clean_cases[l] not in final_cases:
@@ -515,7 +515,7 @@ class BIACase:
         statutes_list = []
         for token in self.doc:
             word_shape_match = str(token.shape_)
-            if (word_shape_match[0:3] not in not_in_test):
+            if word_shape_match[0:3] not in not_in_test:
 
                 # Matches shape of statutes- these can have 3-4 prefixes, 0-2 suffixes,
                 # and extracts all subsections if there isn't a space between any of them
@@ -525,11 +525,11 @@ class BIACase:
                     has_open_paren = False
                     temp_token3 = str(token)
                     for i in range(0, len(temp_token3)):
-                        if (temp_token3[i] == '('):
+                        if temp_token3[i] == "(":
                             has_open_paren = True
-                        if (temp_token3[i] == ')'):
+                        if temp_token3[i] == ")":
                             has_open_paren = False
-                    if (has_open_paren == True):
+                    if has_open_paren == True:
                         temp_token3 = temp_token3 + ')'
                     if temp_token3 not in statutes_list:
                         statutes_list.append(temp_token3)
