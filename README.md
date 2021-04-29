@@ -7,17 +7,17 @@ An application to assist immigration attorneys and refugee representatives in ad
 
 
 ## Architecture
-![image](https://github.com/Lambda-School-Labs/human-rights-first-asylum-be-a/blob/main/reference/architecture.png?raw=true)
+![image](https://github.com/Lambda-School-Labs/human-rights-first-asylum-be-a/blob/main/reference/architecture.png?raw=true)  
 This diagram shows the current state of the architecture.
 
 ## Codebases
-[Front-End](https://github.com/Lambda-School-Labs/human-rights-first-asylum-fe-a/blob/main/README.md)
+[Front-End](https://github.com/Lambda-School-Labs/human-rights-first-asylum-fe-a/blob/main/README.md)  
 Uses NodeJS to create the web-based user interface for uploading case documents, managing users, and viewing data in the form of tables and visualizations. 
 
-[Back-End](https://github.com/Lambda-School-Labs/human-rights-first-asylum-be-a/blob/main/README.md)
+[Back-End](https://github.com/Lambda-School-Labs/human-rights-first-asylum-be-a/blob/main/README.md)  
 Uses Javascript and Postgres to manage databases containing tables for users, judges, and cases.
 
-[Data Science](https://github.com/Lambda-School-Labs/human-rights-first-asylum-ds-a/blob/main/README.md)
+[Data Science](https://github.com/Lambda-School-Labs/human-rights-first-asylum-ds-a/blob/main/README.md)  
 Uses Python and Tesseract for optical character recognition (OCR) to convert pdf images into text data that can be searched via natural language processing (NLP) techniques. Key data, which we refer to as structured fields, are extracted from the text data and sent to the back-end for storage.
 
 ## Our Role
@@ -35,49 +35,49 @@ Brief description of what's in this repo. Break down based on folder.
 
 ## Installation
 
- After cloning the repository, in your command line run the following commands:
- Replace <name> with a name of your choice.
- ```
+After cloning the repository, in your command line run the following commands:
+Replace <name> with a name of your choice.
+```
 docker build . -t <name>
 docker run -it -p 5000:5000 <name> uvicorn app.main:app --host=0.0.0.0 --port=5000
-
 NOTE: An error may be thrown when trying to run the app if you have not added the .env file with aws credentials
- ```
- Then open http://0.0.0.0:5000 in your browser. The application should be running. 
+```
+
+Then open http://0.0.0.0:5000 in your browser. The application should be running. 
 
 ## Contributors
 ###### Labs 33
-[Michael Kolek](https://github.com/InqM)
-[Francis LaBounty](https://github.com/francislabountyjr)
-[Jennifer Faith](https://github.com/JenFaith)
-[Brett Doffing](https://github.com/doffing81)
-[Daniel Fernandez](https://github.com/Daniel-Fernandez-951)
-[Kevin Weatherwalks](https://github.com/KWeatherwalks)
+[Michael Kolek](https://github.com/InqM)  
+[Francis LaBounty](https://github.com/francislabountyjr)  
+[Jennifer Faith](https://github.com/JenFaith)  
+[Brett Doffing](https://github.com/doffing81)  
+[Daniel Fernandez](https://github.com/Daniel-Fernandez-951)  
+[Kevin Weatherwalks](https://github.com/KWeatherwalks)  
 
 ###### Labs 32
- [Bharath Gogineni](https://github.com/begogineni)
- [Jace Hambrick](https://github.com/Jace-Hambrick)
- [Nicholas Adamski](https://github.com/boscolio)
- [Rassamy J. Soumphonphakdy](https://github.com/rassamyjs)
+[Bharath Gogineni](https://github.com/begogineni)  
+[Jace Hambrick](https://github.com/Jace-Hambrick)  
+[Nicholas Adamski](https://github.com/boscolio)  
+[Rassamy J. Soumphonphakdy](https://github.com/rassamyjs)  
 
 ###### Labs 31
- [Rebecca Duke Wiesenberg](https://github.com/rdukewiesenb)
- [Reid Harris](https://github.com/codealamode)
- [Lucas Petrus](https://github.com/lucaspetrus)
- [Noah Caldwell](https://github.com/noahnisbet)
+[Rebecca Duke Wiesenberg](https://github.com/rdukewiesenb)  
+[Reid Harris](https://github.com/codealamode)  
+[Lucas Petrus](https://github.com/lucaspetrus)  
+[Noah Caldwell](https://github.com/noahnisbet)  
 
 ###### Labs 30
-[Tomas Phillips](https://github.com/tomashphill)
-[Sean Byrne](https://github.com/ssbyrne89)
-[Henry Gultom](https://github.com/henryspg)
-[RJ Proctor](https://github.com/jproctor-rebecca)
+[Tomas Phillips](https://github.com/tomashphill)  
+[Sean Byrne](https://github.com/ssbyrne89)  
+[Henry Gultom](https://github.com/henryspg)  
+[RJ Proctor](https://github.com/jproctor-rebecca)  
 
 ###### Labs 29
-[Liam Cloud Hogan](https://github.com/liam-cloud-hogan)
-[Steven Lee](https://github.com/StevenBryceLee)
-[Edwina Palmer](https://github.com/edwinapalmer)
-[Tristan Brown](https://github.com/Tristan-Brown1096)
+[Liam Cloud Hogan](https://github.com/liam-cloud-hogan)  
+[Steven Lee](https://github.com/StevenBryceLee)  
+[Edwina Palmer](https://github.com/edwinapalmer)  
+[Tristan Brown](https://github.com/Tristan-Brown1096)  
 
 
- ## License
- This project is licensed under the terms of the MIT license.
+## License
+This project is licensed under the terms of the MIT license.
