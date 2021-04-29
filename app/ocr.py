@@ -160,10 +160,10 @@ class BIACase:
         • Returns most recent date found within document
         • Returns all dates in standard XX/XX/XXXX format 
         """
-        #Format: MM/DD/YYYY
+        # Format: MM/DD/YYYY
         pattern_1 = [{'TEXT':{'REGEX':r'^\d{1,2}/\d{1,2}/\d{2}(?:\d{2})?$'}}]
 
-        #Format: Month DD, YYYY
+        # Format: Month DD, YYYY
         pattern_2 = [{'IS_ALPHA': True, 'LENGTH': 3},
                   {'IS_DIGIT': True},
                   {'IS_PUNCT': True},
@@ -187,7 +187,7 @@ class BIACase:
             all_dates.append(reformat_date)
 
         sorted_dates = sorted(all_dates, reverse=True)
-        #Backend requested output format: 'yyyy-mm-dd'
+        # Backend requested output format: 'yyyy-mm-dd'
         return '{}-{}-{}'.format(sorted_dates[0].year, sorted_dates[0].month, sorted_dates[0].day)
 
     def get_panel(self) -> str:
@@ -327,7 +327,7 @@ class BIACase:
         outcomes_return = []
         ordered_outcome = {'ORDER', 'ORDERED'}
         outcomes_list = ['denied','dismissed','granted','remanded','returned','reversal','sustained','terminated','terninated','vacated']
-        #Interesting edge case in 349320269- typo on 'terminated' present in the pdf: fuzzywuzzy matches terminated to [(terninated, 90)]
+        # Interesting edge case in 349320269- typo on 'terminated' present in the pdf: fuzzywuzzy matches terminated to [(terninated, 90)]
         for token in self.doc:
             if(str(token) in ordered_outcome):
                 # Can be changed to append on partial match: len(fuzzy_match[0][0]) > 5 and fuzzy_match[0][1] >= 90
@@ -543,8 +543,8 @@ class BIACase:
                     continue
             else:
                 other.append(statutes_list[j])
-        #TODO: Remove overlap between corresponding INA and USC statutes, recreate this table- https://www.uscis.gov/laws-and-policy/legislation/immigration-and-nationality-act
-        #TODO: Make a dictionary that has the laws for a corresponding statute, map those to a certain level of granularity that can be displayed to the end user
+        # TODO: Remove overlap between corresponding INA and USC statutes, recreate this table- https://www.uscis.gov/laws-and-policy/legislation/immigration-and-nationality-act
+        # TODO: Make a dictionary that has the laws for a corresponding statute, map those to a certain level of granularity that can be displayed to the end user
         return_dict["CFR"] = CFR
         return_dict["INA"] = INA
         return_dict["Other"] = other
