@@ -20,7 +20,7 @@ from fuzzywuzzy import process
 
 nlp = load("en_core_web_sm")
 
-# read in dictionary of all court locations
+# Read in dictionary of all court locations
 with open('./app/court_locations.json') as f:
     court_locs = json.load(f)
 
@@ -322,12 +322,17 @@ class BIACase:
 
     def get_outcome(self) -> List[str]:
         """
-        • Returns list of outcome terms from the case in a list. These will appear after 'ORDER' at the end of the document.
+        • Returns list of outcome terms from the case in a list.
+          These will appear after 'ORDER' at the end of the document.
         """
+
         outcomes_return = []
         ordered_outcome = {'ORDER', 'ORDERED'}
-        outcomes_list = ['denied','dismissed','granted','remanded','returned','reversal','sustained','terminated','terninated','vacated']
-        # Interesting edge case in 349320269- typo on 'terminated' present in the pdf: fuzzywuzzy matches terminated to [(terninated, 90)]
+        outcomes_list = ['denied', 'dismissed', 'granted', 'remanded', 'returned',
+                         'reversal', 'sustained', 'terminated', 'terninated', 'vacated']
+
+        # Interesting edge case in 349320269- typo on 'terminated' present in the pdf: fuzzywuzzy matches terminated
+        # to [(terninated, 90)]
         for token in self.doc:
             if(str(token) in ordered_outcome):
                 # Can be changed to append on partial match: len(fuzzy_match[0][0]) > 5 and fuzzy_match[0][1] >= 90
@@ -383,10 +388,12 @@ class BIACase:
 
     def get_based_violence(self) -> List[str]:
         """
-        Returns a list of keyword buckets which indicate certain types of violence mentioned in a case, current buckets are: Violence, Family, Gender, and Gangs.
-        These keywords can be changed in their respective lists, and an item being present in the list means that the given type of violence is mentioned in the document.
+        Returns a list of keyword buckets which indicate certain types of violence mentioned in a case,
+        current buckets are: Violence, Family, Gender, and Gangs.
+        These keywords can be changed in their respective lists, and an item being present in the list
+        means that the given type of violence is mentioned in the document.
         """
-        #Converts words to lemmas & inputs to nlp-list, then searches for matches in the text
+        # Converts words to lemmas & inputs to nlp-list, then searches for matches in the text
         def get_matches(input_list, topic, full_text):
             temp_matcher = PhraseMatcher(full_text.vocab, attr="LEMMA")
             for n in range(0, len(input_list)):
@@ -397,18 +404,22 @@ class BIACase:
 
         # Lists of keywords that fall within a bucket to search for
         terms_list = []
-        violent_list = ['abduct', 'abuse', 'assassinate', 'assault', 'coerce', 'exploit', 'fear', 'harm', 'hurt', 'kidnap', 'kill', 'murder', 'persecute', 'rape', 'scare', 'shoot', 'suffer', 'threat', 'torture']
+        violent_list = ['abduct', 'abuse', 'assassinate', 'assault', 'coerce', 'exploit',
+                        'fear', 'harm','hurt','kidnap', 'kill', 'murder', 'persecute',
+                        'rape', 'scare', 'shoot', 'suffer', 'threat', 'torture']
         family_list = ['child', 'daughter', 'family', 'husband', 'parent', 'partner', 'son', 'wife', 'woman']
-        gender_list = ['fgm', 'gay', 'gender', 'homosexual', 'homosexuality', 'lesbian', 'lgbt', 'lgbtq', 'lgbtqia', 'queer', 'sexuality', 'transgender']
+        gender_list = ['fgm', 'gay', 'gender', 'homosexual', 'homosexuality', 'lesbian', 'lgbt', 'lgbtq', 'lgbtqia',
+                       'queer', 'sexuality', 'transgender']
         gang_list = ['cartel', 'gang', 'militia']    
 
-        # Outputs a list of phrasematch occurences for a given list of keywords
+        # Outputs a list of PhraseMatch occurrences for a given list of keywords
         violence_match = get_matches(violent_list, 'Violent', self.doc)
         family_match = get_matches(family_list, 'Family', self.doc)
         gender_match = get_matches(gender_list, 'Gender', self.doc)
         gang_match = get_matches(gang_list, 'Gang', self.doc)
 
-        # Printing full_text[judge_match2[0][1]:judge_match2[0][2]] gives word it matches on, can put in the [0] a for loop to see all matches
+        # Printing full_text[judge_match2[0][1]:judge_match2[0][2]] gives word it matches on, can put in the [0] a
+        # for loop to see all matches
         if(len(violence_match) != 0):
             terms_list.append('Violent')
         if(len(family_match) != 0):
@@ -420,12 +431,19 @@ class BIACase:
         return terms_list
 
     def get_precedent_cases(self) -> List[str]:
-        """"Returns a list of court cases mentioned within the document, i.e. 'Matter of A-B-' and 'Urbina-Mejia v. Holder'"""
-        # These lists were largely gotten through trial and error & don't work as well on non-GCP documents- initially set rules were broken & hardcoded stops made most sense when considering punctuation & mis-reads by OCR
+        """"
+        Returns a list of court cases mentioned within the document, i.e. 'Matter of A-B-' and 'Urbina-Mejia v. Holder'
+         """
+        # These lists were largely gotten through trial and error & don't work as well on non-GCP documents initially
+        # set rules were broken & hardcoded stops made most sense when considering punctuation & mis-reads by OCR
         cases_with_dupes = []
         ok_words = {'&', "'", ',', '-', '.', 'al', 'et', 'ex', 'n', 'rel'}
-        reverse_break_words = {'(', '(IJ', 'Cf', 'Compare', 'He', 'I&N', 'IN', 'In', 'Section', 'See', 'She', 'Under', 'While', 'and', 'as', 'at', 'because', 'cf', 'e.g.', 'in', 'is', 'procedural', 'section', 'see', 'was'}
-        break_words = {'(', '(IJ', ',', '.', '....', 'Compare', 'He', 'I&N', 'IN', 'In', 'Section', 'See', 'She', 'Under', 'While', 'and', 'as', 'at', 'because', 'e.g.', 'in', 'is', 'procedural', 'section', 'see', 'was'}
+        reverse_break_words = {'(', '(IJ', 'Cf', 'Compare', 'He', 'I&N', 'IN', 'In', 'Section', 'See', 'She', 'Under',
+                               'While', 'and', 'as', 'at', 'because', 'cf', 'e.g.', 'in', 'is', 'procedural', 'section',
+                               'see', 'was'}
+        break_words = {'(', '(IJ', ',', '.', '....', 'Compare', 'He', 'I&N', 'IN', 'In', 'Section', 'See', 'She',
+                       'Under', 'While', 'and', 'as', 'at', 'because', 'e.g.', 'in', 'is', 'procedural', 'section',
+                       'see', 'was'}
         for token in self.doc:  
             # Append 'X v. Y' precedent case: k loop extracts X, l loop extracts Y
             if(str(token) == 'v.'):
@@ -490,14 +508,16 @@ class BIACase:
 
     def get_statutes(self) -> dict: 
         """Returns statutes mentioned in a given .txt document as a dictionary: {"""
-        # Removes patterns with only words instead of numbers, and matches known statute patterns' shape using spacy to be added
+        # Removes patterns with only words instead of numbers,
+        # and matches known statute patterns' shape using spacy to be added
         not_in_test = {'Xxx','xxx','XXX'}
         statutes_list = []
         for token in self.doc:
             word_shape_match = str(token.shape_)
             if(word_shape_match[0:3] not in not_in_test):
 
-                # Matches shape of statutes- these can have 3-4 prefixes, 0-2 suffixes, and extracts all subsections if there isn't a space between any of them
+                # Matches shape of statutes- these can have 3-4 prefixes, 0-2 suffixes,
+                # and extracts all subsections if there isn't a space between any of them
                 statute_shape_match = str(token.shape_).replace('x','d').replace('X','d')
                 if(statute_shape_match[0:4] == 'ddd(' or statute_shape_match[0:4] == 'ddd.' or statute_shape_match[0:5] == 'dddd.' or statute_shape_match[0:5] == 'dddd(' or statute_shape_match[0:6] == 'ddddd.' or statute_shape_match[0:6] == 'ddddd('):                
                     # Close any open parentheses & append if not already present
@@ -514,7 +534,8 @@ class BIACase:
                         statutes_list.append(temp_token3)
         statutes_list = sorted(statutes_list)
         
-        # Creates a dictionary with the key being the type of statute, and value being the listed statutes determined by the first 4 numbers in a statute.
+        # Creates a dictionary with the key being the type of statute,
+        # and value being the listed statutes determined by the first 4 numbers in a statute.
         return_dict = {}
         CFR = []
         INA = []
@@ -576,7 +597,7 @@ class BIACase:
     def get_indigenous_status(self) -> str:
         """
         • If the term "indigenous" appears in the document, the field will return
-        the name of asylum seeker's tribe/nation/group. Cuurently, the field will return
+        the name of asylum seeker's tribe/nation/group. Currently, the field will return
         the two tokens that precede "indigenous;" this method needs to be fine-tuned and
         validated.
         """
