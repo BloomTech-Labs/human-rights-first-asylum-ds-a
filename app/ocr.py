@@ -23,7 +23,7 @@ nlp = load("en_core_web_sm")
 
 # read in dictionary of all court locations
 with open('./app/court_locations.json') as f:
-  court_locs = json.load(f)
+    court_locs = json.load(f)
 
 
 def make_fields(file) -> dict:
@@ -182,9 +182,9 @@ class BIACase:
             string_id = nlp.vocab.strings[match_id]
             span = self.doc[start:end]
             if string_id == 'Type2':
-              reformat_date = datetime.datetime.strptime(span.text, '%b %d, %Y')
+                reformat_date = datetime.datetime.strptime(span.text, '%b %d, %Y')
             else:
-              reformat_date = datetime.datetime.strptime(span.text, '%m/%d/%Y')
+                reformat_date = datetime.datetime.strptime(span.text, '%m/%d/%Y')
             all_dates.append(reformat_date)
 
         sorted_dates = sorted(all_dates, reverse=True)
