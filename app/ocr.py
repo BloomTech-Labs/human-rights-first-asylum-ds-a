@@ -19,6 +19,7 @@ from spacy.tokens.token import Token
 from spacy.matcher import Matcher, PhraseMatcher
 from fuzzywuzzy import process
 
+
 nlp = load("en_core_web_sm")
 
 # read in dictionary of all court locations
@@ -554,25 +555,48 @@ class BIACase:
 
     def get_gender(self) -> str:
         """
-        • This field needs to be validated. Currently, it assumes the
-        sex of the seeker by the number of instances of pronouns in the
-        document.
+        Based on sentences where the Respondent/Applicant keywords are found,
+        count the instances of gendered pronouns. This approach assumes the
+        sentence refers to subject in shorthand by using gendered pronouns
+        as opposed to keywords multiple times in sentence. This function
+        returns a final result to be packaged into json.
+        Parameters:
+        spacy.doc (obj):
+        Returns:
+        str: Gender
         """
-        male = 0
-        female = 0
 
-        for token in self.doc:
-            if token.text in {'him', 'his', 'he'}:
-                male += 1
-            elif token.text in {'her', 'hers', 'she'}:
-                female += 1
+        # Search terms formatted
+        phrases = ["respondent", "respondents", "applicant", 'filed an application']
+        patterns = [nlp(text) for text in phrases]
 
-        if male > female:
-            return 'male'
-        elif female > male:
-            return 'female'
+        # Gender constants
+        male_prons = ['he', "he's", 'his', 'himself']
+        female_prons = ['she', "she's", 'her', 'herself']
+
+        # Variables for analysis storage
+        male_found = []
+        female_found = []
+
+        # PhraseMatcher setup, add tag (RESP) and pass in patterns
+        phrase_matcher = PhraseMatcher(nlp.vocab, attr='LEMMA')
+        phrase_matcher.add("RESP", None, *patterns)
+
+        # Sentences with both 'RESP' tag and gendered pronouns added to respective list
+        for sent in self.doc.sents:
+            for match_id, _, _ in phrase_matcher(nlp(sent.text)):
+                if nlp.vocab.strings[match_id] in ['RESP', *male_prons]:
+                    male_found.append(sent.text)
+                elif nlp.vocab.strings[match_id] in ['RESP', *female_prons]:
+                    female_found.append(sent.text)
+
+        # Make `set()` of list to eliminate duplicates and compare lengths
+        if len(set(female_found)) > len(set(male_found)):
+            return "Female"
+        elif len(set(male_found)) > len(set(female_found)):
+            return "Male"
         else:
-            return 'unknown'
+            return "Unknown"
 
     def get_indigenous_status(self) -> str:
         """
