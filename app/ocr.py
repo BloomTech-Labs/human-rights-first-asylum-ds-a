@@ -487,7 +487,7 @@ class BIACase:
                     final_cases.append(clean_cases[l][3:])
             elif clean_cases[l] not in final_cases:                
                 final_cases.append(clean_cases[l])
-        return final_cases
+        return [s.replace('\n', ' ').replace('  ', ' ') for s in final_cases]
 
     def get_statutes(self) -> dict: 
         """Returns statutes mentioned in a given .txt document as a dictionary: {"""
