@@ -38,7 +38,7 @@
 - **Function name: **`get_panel()`
 - **Details:** Returns list of panel members from an appeal. Panel members are judges, but they also have seats on the board of immigration appeals so they specifically have the last say on appeal cases. At this level, sometimes you will have as many as 7 panel members hear the same appeal. On cases that are not appeals, this field will return a null value. Panel members 
 - **Returns:** A list of panel members as strings -> ["Guendelsberger, John","O'Leary, Brian M.","Grant, Edward"]
-- **Current Status:** Waiting on merge (update upon close or merge of [PR #104](https://github.com/Lambda-School-Labs/human-rights-first-asylum-ds-a/pull/104)).
+- **Current Status:** Merged and current.
 
 ### Judges
 - **Function name: **`get_judges()`
