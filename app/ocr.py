@@ -567,8 +567,7 @@ class BIACase:
         """
 
         # Search terms formatted
-        phrases = ["Respondent's", "Respondent", "respondent's", "respondent", "respondents",
-                   "Applicant", "applicant", "Applicant's", "applicant's", 'filed an application']
+        phrases = ["respondent", "respondents", "applicant", 'filed an application']
         patterns = [nlp(text) for text in phrases]
 
         # Gender constants
@@ -576,39 +575,25 @@ class BIACase:
         female_prons = ['she', "she's", 'her', 'herself']
 
         # Variables for analysis storage
-        male_count = 0
-        female_count = 0
-        found = ""
+        male_found = []
+        female_found = []
 
         # PhraseMatcher setup, add tag (RESP) and pass in patterns
-        phrase_matcher = PhraseMatcher(nlp.vocab)
+        phrase_matcher = PhraseMatcher(nlp.vocab, attr='LEMMA')
         phrase_matcher.add("RESP", None, *patterns)
 
-        # Append all sentences with target-tag to string storage variable
-        for sentences in self.doc.sents:
-            for match_id, start, end in phrase_matcher(nlp(sentences.text)):
-                if nlp.vocab.strings[match_id] in ['RESP']:
-                    found += sentences.text
+        # Sentences with both 'RESP' tag and gendered pronouns added to respective list
+        for sent in self.doc.sents:
+            for match_id, _, _ in phrase_matcher(nlp(sent.text)):
+                if nlp.vocab.strings[match_id] in ['RESP', *male_prons]:
+                    male_found.append(sent.text)
+                elif nlp.vocab.strings[match_id] in ['RESP', *female_prons]:
+                    female_found.append(sent.text)
 
-        # Pass string of sentences with target phrases to tag POS
-        found_nlp = nlp(found)
-
-        # Count instances of part-of-speech tagged as pronouns in sentences
-        for word_pos in found_nlp:
-            if word_pos.pos_ == 'PRON':
-                if word_pos.text.lower() in male_prons:
-                    male_count += 1
-                elif word_pos.text.lower() in female_prons:
-                    female_count += 1
-            if word_pos.text.lower() in male_prons:
-                male_count += 1
-            elif word_pos.text.lower() in female_prons:
-                female_count += 1
-
-        # Analyze highest count and return that gender or empty string for equal
-        if female_count > male_count:
+        # Make `set()` of list to eliminate duplicates and compare lengths
+        if len(set(female_found)) > len(set(male_found)):
             return "Female"
-        elif male_count > female_count:
+        elif len(set(male_found)) > len(set(female_found)):
             return "Male"
         else:
             return "Unknown"
