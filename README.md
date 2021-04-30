@@ -52,7 +52,8 @@ Then open http://0.0.0.0:5000 in your browser. The application should be running
 [Jennifer Faith](https://github.com/JenFaith)  
 [Brett Doffing](https://github.com/doffing81)  
 [Daniel Fernandez](https://github.com/Daniel-Fernandez-951)  
-[Kevin Weatherwalks](https://github.com/KWeatherwalks)  
+[Kevin Weatherwalks](https://github.com/KWeatherwalks)   
+[Alex Krieger](https://github.com/kriegersaurusrex)  
 
 ###### Labs 32
 [Bharath Gogineni](https://github.com/begogineni)  
