@@ -31,8 +31,8 @@ The **app** folder contains the FastAPI application which creates an endpoint fo
 
 ### Additional Readmes
 - [SCRAPER_INFO](https://github.com/Lambda-School-Labs/human-rights-first-asylum-ds-a/blob/main/SCRAPER_INFO.md) contains important information about the status of each function used to extract fields from documents.
-- [KnownDefects](https://github.com/Lambda-School-Labs/human-rights-first-asylum-ds-a/blob/main/KnownDefects.md)
-- [NOTEBOOKS]()
+- [KnownDefects](https://github.com/Lambda-School-Labs/human-rights-first-asylum-ds-a/blob/main/KnownDefects.md) contains information about potential issues to be aware of.
+- [NOTEBOOKS]() contains helpful information about the notebooks and scripts used to explore solutions.
 
 ## Tools
 
