@@ -44,7 +44,7 @@
 - **Function name: **`get_judges()`
 - **Details:** Returns judge presiding over the original decision- this is located at the bottom of an original decision, if one exists in the document. Judges are not mentioned in appeals cases so those cases will return 'Null'
 - **Returns:** String like ‘Clarease Rankin Yates’
-- **Current Status:** There has been ongoing discussion about how to best pull out this field and the get_pannel field. When we inherited this code, every time the function was run it was scraping data about the judges from a Wikipedia page. As of 4/27, the conclusion was that we needed to create a database or some sort of storage in the backend to hold a static list of these judges. This has not been started yet. A basic implementation can be found in the notebook at [PR #111](https://github.com/Lambda-School-Labs/human-rights-first-asylum-ds-a/pull/111)
+- **Current Status:** There has been ongoing discussion about how to best pull out this field and the get_pannel field. When we inherited this code, every time the function was run it was scraping data about the judges from a Wikipedia page. As of 4/27, the conclusion was that we needed to create a database or some sort of storage in the backend to hold a static list of these judges. This has not been started yet. A basic implementation can be found in [this notebook](https://github.com/Lambda-School-Labs/human-rights-first-asylum-ds-a/blob/main/notebooks/get_judge_implementation.ipynb).
 
 ### Outcomes
 - **Function name: **`get_outcome()`
