@@ -74,9 +74,9 @@
 
 ### Gender
 - **Function name: **`get_gender()`
-- **Details:** Returns gender of applicant
-- **Returns:** String example 'male'
-- **Current Status:** Updates were made 4/28 and are waiting to be approved
+- **Details:** Returns gender of applicant or unknown. Uses `PhraseMatcher` with 'LEMMA' attribute activated to match to root word. Suffers accuracy when refugee is a family or more than one.
+- **Returns:** String example 'Male'
+- **Current Status:** Updates were made 4/30/21 Labs 33. 
 
 ### Indigenous Status
 
