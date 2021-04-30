@@ -32,19 +32,19 @@
 - **Function name: **`get_country_of_origin()`
 - **Details:** Returns country where applicant is from
 - **Returns:** String like 'Tunisia'
-- **Current Status:** Unknown. Contact Brett Doffing and Josiah McKinney for update.
+- **Current Status:** While SpaCy's Matcher functionality was experimented with, nothing has been produced to show whether the current implementation is better or worse.
 
 ### Panel Members
 - **Function name: **`get_panel()`
 - **Details:** Returns list of panel members from an appeal. Panel members are judges, but they also have seats on the board of immigration appeals so they specifically have the last say on appeal cases. At this level, sometimes you will have as many as 7 panel members hear the same appeal. On cases that are not appeals, this field will return a null value. Panel members 
-- **Returns:** String like '‘Guendelsberger, John’,’O'Leary, Brian M.’,’Grant, Edward’'
-- **Current Status:** Unknown. Contact Brett Doffing and Josiah McKinney for update.
+- **Returns:** A list of panel members as strings -> ["Guendelsberger, John","O'Leary, Brian M.","Grant, Edward"]
+- **Current Status:** Waiting on merge (update upon close or merge of [PR #104](https://github.com/Lambda-School-Labs/human-rights-first-asylum-ds-a/pull/104)).
 
 ### Judges
 - **Function name: **`get_judges()`
 - **Details:** Returns judge presiding over the original decision- this is located at the bottom of an original decision, if one exists in the document. Judges are not mentioned in appeals cases so those cases will return 'Null'
 - **Returns:** String like ‘Clarease Rankin Yates’
-- **Current Status:** There has been ongoing discussion about how to best pull out this field and the get_pannel field. When we inherited this code, every time the function was run it was scraping data about the judges from a Wikipedia page. As of 4/27, the conclusion was that we needed to create a database or some sort of storage in the backend to hold a static list of these judges. This has not been started yet.
+- **Current Status:** There has been ongoing discussion about how to best pull out this field and the get_pannel field. When we inherited this code, every time the function was run it was scraping data about the judges from a Wikipedia page. As of 4/27, the conclusion was that we needed to create a database or some sort of storage in the backend to hold a static list of these judges. This has not been started yet. A basic implementation can be found in the notebook at [PR #111](https://github.com/Lambda-School-Labs/human-rights-first-asylum-ds-a/pull/111)
 
 ### Outcomes
 - **Function name: **`get_outcome()`
