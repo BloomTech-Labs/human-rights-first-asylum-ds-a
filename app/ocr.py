@@ -565,8 +565,7 @@ class BIACase:
                     continue
             else:
                 other.append(statutes_list[j])
-        # TODO: Remove overlap between corresponding INA and USC statutes, recreate this table- https://www.uscis.gov/laws-and-policy/legislation/immigration-and-nationality-act
-        # TODO: Make a dictionary that has the laws for a corresponding statute, map those to a certain level of granularity that can be displayed to the end user
+
         return_dict["CFR"] = CFR
         return_dict["INA"] = INA
         return_dict["Other"] = other
