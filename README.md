@@ -21,11 +21,18 @@ Uses Javascript and Postgres to manage databases containing tables for users, ju
 Uses Python and Tesseract for optical character recognition (OCR) to convert pdf images into text data that can be searched via natural language processing (NLP) techniques. Key data, which we refer to as structured fields, are extracted from the text data and sent to the back-end for storage.
 
 ## Our Role
-What we have done and need to do to move the project forward.
+
+See this team's history [here]().
+
 
 ## Files
-Brief description of what's in this repo. Break down based on folder.
 
+The **app** folder contains the FastAPI application which creates an endpoint for processing a single `.pdf` file stored in the AWS S3 bucket. 
+
+### Additional Readmes
+- [SCRAPER_INFO](https://github.com/Lambda-School-Labs/human-rights-first-asylum-ds-a/blob/main/SCRAPER_INFO.md) contains important information about the status of each function used to extract fields from documents.
+- [KnownDefects](https://github.com/Lambda-School-Labs/human-rights-first-asylum-ds-a/blob/main/KnownDefects.md)
+- [NOTEBOOKS]()
 
 ## Tools
 
@@ -33,13 +40,15 @@ Brief description of what's in this repo. Break down based on folder.
  * [FastAPI](https://github.com/tiangolo/fastapi) - API for endpoint that processes pdfs
  * [AWS Elastic Beanstalk](https://aws.amazon.com/elasticbeanstalk/) - Service for app deployment
 
-## Installation
+## API Installation
 
 After cloning the repository, in your command line run the following commands:
 Replace <name> with a name of your choice.
+
 ```
 docker build . -t <name>
 docker run -it -p 5000:5000 <name> uvicorn app.main:app --host=0.0.0.0 --port=5000
+
 NOTE: An error may be thrown when trying to run the app if you have not added the .env file with aws credentials
 ```
 
