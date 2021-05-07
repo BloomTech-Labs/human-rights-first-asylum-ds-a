@@ -1,17 +1,17 @@
-boto3~=1.17.36
+beautifulsoup4~=4.9.3
+bs4~=0.0.1
+boto3~=1.17.45
+botocore~=1.20.45
+dnspython~=2.1.0
 fastapi~=0.63.0
-pydantic~=1.8.1
-python-dotenv~=0.15.0
-uvicorn[standard]~=0.13.4
-botocore~=1.20.36
+fuzzywuzzy~=0.18.0
 geonamescache~=1.2.0
 pdf2image~=1.14.0
+pydantic~=1.7.3
+python-dotenv~=0.15.0
 pytesseract~=0.3.7
 python-multipart~=0.0.5
 requests~=2.25.1
-spacy~=2.2.4
-bs4~=0.0.1
-beautifulsoup4~=4.9.3
-dnspython~=2.1.0
-fuzzywuzzy~=0.18.0
-en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.2.5/en_core_web_sm-2.2.5.tar.gz
+spacy~=3.0.6
+uvicorn[standard]~=0.13.4
+en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.0.0/en_core_web_sm-3.0.0.tar.gz
