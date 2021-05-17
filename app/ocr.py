@@ -356,17 +356,33 @@ class BIACase:
         outcomes_list = ['denied', 'dismissed', 'granted', 'remanded', 'returned',
                          'reversal', 'sustained', 'terminated', 'terninated', 'vacated']
 
-        # Interesting edge case in 349320269- typo on 'terminated' present in the pdf: fuzzywuzzy matches terminated
-        # to [(terninated, 90)]
+        # locate where in the document the orders start
+        order_start_i = -1
         for token in self.doc:
             if str(token) in ordered_outcome:
-                # Can be changed to append on partial match: len(fuzzy_match[0][0]) > 5 and fuzzy_match[0][1] >= 90
-                for n in range(0, len(outcomes_list)):
-                    fuzzy_match = process.extract(outcomes_list[n], self.doc[token.i:token.i + 175], limit=1)
-                    if fuzzy_match[0][1] == 100:
-                        outcomes_return.append(outcomes_list[n])
+                order_start_i = token.i
                 break
-        return outcomes_return
+                
+        # If we can't find where the orders start, assume there aren't any
+        if order_start_i == -1:
+            return []
+        
+        # Locate where in the document the orders end
+        order_end_i = min(order_start_i+175, len(self.doc))
+        # Orders end when we see "FOR THE COURT" - this avoids finding keywords in footnotes
+        for i in range(order_start_i+1, min(order_end_i, len(self.doc)-2)):
+            if str(self.doc[i]) == "FOR" and str(self.doc[i+1]) == "THE" and str(self.doc[i+2]) == "BOARD":
+                order_end_i = i
+                break
+                
+        # If we can find where the orders start, check it for each type of outcome
+        for outcome in outcomes_list:
+            for i in range(order_start_i, order_end_i):
+                if str(self.doc[i]) == outcome:
+                    outcomes_return.append(outcome)
+                    break
+                
+        return outcomes_return    
 
     def get_city_state(self):
         """
