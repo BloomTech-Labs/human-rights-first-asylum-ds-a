@@ -415,10 +415,10 @@ class BIACase:
 
         # locate where in the document the orders start
         order_start_i = -1
-        #for token in self.doc:
-        #    if token.text in ordered_outcome:
-        #        order_start_i = token.i
-        #        break
+        for token in self.doc:
+            if token.text in ordered_outcome:
+                order_start_i = token.i
+                break
 
         # If we can't find where the orders start, assume there aren't any
         if order_start_i == -1:
