@@ -402,44 +402,36 @@ class BIACase:
     def get_outcome(self) -> List[str]:
         outcomes_return = []
         ordered_outcome = {'ORDER', 'ORDERED'}
-        outcomes_list = ['denied', 'dismissed', 'granted', 'remanded',
-                         'returned', 'sustained', 'terminated',
-                         'vacated', 'affirmed']
-        two_before_exclusion = {'may', 'any', 'has'}
-        one_before_exclusion = {'it', 'has'}
+        outcomes_list = ['denied', 'dismissed', 'granted', 'remanded', 'returned',
+                         'reversal', 'sustained', 'terminated', 'terninated', 'vacated']
 
         # locate where in the document the orders start
         order_start_i = -1
-        #for token in self.doc:
-        #    if token.text in ordered_outcome:
-        #        order_start_i = token.i
-        #        break
-
+        for token in self.doc:
+            if str(token) in ordered_outcome:
+                order_start_i = token.i
+                break
+                
         # If we can't find where the orders start, assume there aren't any
         if order_start_i == -1:
-            order_start_i = 0
-
+            return []
+        
         # Locate where in the document the orders end
-        order_end_i = len(self.doc)
-        # Orders end when we see "FOR THE BOARD" or "WARNING"
-        # - this avoids finding keywords in footnotes or warnings
-        for i in range(order_start_i+1, min(order_end_i, len(self.doc) - 2)):
-            if (self.doc[i:i+3].text == "FOR THE BOARD" or
-                self.doc[i].text == "WARNING"):
+        order_end_i = min(order_start_i+175, len(self.doc))
+        # Orders end when we see "FOR THE COURT" - this avoids finding keywords in footnotes
+        for i in range(order_start_i+1, min(order_end_i, len(self.doc)-2)):
+            if str(self.doc[i]) == "FOR" and str(self.doc[i+1]) == "THE" and str(self.doc[i+2]) == "BOARD":
                 order_end_i = i
                 break
-
-        # If we can find where the orders start, check the range for each type
-        # of outcome
+                
+        # If we can find where the orders start, check it for each type of outcome
         for outcome in outcomes_list:
             for i in range(order_start_i, order_end_i):
-                if (similar_outcome(self.doc[i].text, outcome) and
-                    self.doc[i-2].text not in two_before_exclusion and
-                    self.doc[i-1].text not in one_before_exclusion):
+                if str(self.doc[i]) == outcome:
                     outcomes_return.append(outcome)
                     break
-
-        return outcomes_return
+                
+        return outcomes_return    
 
     def get_city_state(self):
         """
