@@ -434,8 +434,7 @@ class BIACase:
                 order_end_i = i
                 break
 
-        # If we can find where the orders start, check the range for each type
-        # of outcome
+        # Check the range for each type of outcome
         for outcome in outcomes_list:
             for i in range(order_start_i, order_end_i):
                 if (similar_outcome(self.doc[i].text, outcome) and
