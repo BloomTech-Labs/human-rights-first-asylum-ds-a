@@ -400,6 +400,11 @@ class BIACase:
         return "; ".join(list(outcome))
 
     def get_outcome(self) -> List[str]:
+        """
+        • Returns list of outcome terms from the case in a list.
+          These will appear after 'ORDER' at the end of the document.
+        """
+
         outcomes_return = []
         ordered_outcome = {'ORDER', 'ORDERED'}
         outcomes_list = ['denied', 'dismissed', 'granted', 'remanded',
