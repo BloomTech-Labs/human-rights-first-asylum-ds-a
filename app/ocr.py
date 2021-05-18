@@ -420,7 +420,7 @@ class BIACase:
                 order_start_i = token.i
                 break
 
-        # If we can't find where the orders start, assume there aren't any
+        # If we can't find where the orders start, check the whole opinion
         if order_start_i == -1:
             order_start_i = 0
 
