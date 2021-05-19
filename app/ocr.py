@@ -33,24 +33,23 @@ def make_fields(file) -> dict:
     string = " ".join(text)
     case = BIACase(string)
     case_data = {
-        'application': case.get_application(),
-        'date': case.get_date(),
-        'country of origin': case.get_country_of_origin(),
-        'panel members': case.get_panel(),
-        'outcome': case.get_outcome(),
-        'state of origin': case.get_city_state(),
+        'application': case.application,
+        'date': case.date,
+        'country of origin': case.country_of_origin,
+        'panel members': case.panel,
+        'outcome': case.outcome,
+        'state of origin': case.state,
         'city of origin': case.city,
-        'protected grounds': case.get_protected_grounds(),
-        'based violence': case.get_based_violence(),
-        'keywords': "Test",
-        'references': "Test",
-        'gender': case.get_gender(),
-        'indigenous': case.get_indigenous_status(),
-        'applicant language': case.get_applicant_language(),
-        'credibility': case.get_credibility(),
-        'check for one year': case.check_for_one_year(),
-        'precedent cases': case.get_precedent_cases(),
-        'statutes': case.get_statutes(),
+        'circuit of origin': case.circuit,
+        'protected grounds': case.protected_grounds,
+        'based violence': case.based_violence,
+        'gender': case.gender,
+        'indigenous': case.indigenous_status,
+        'applicant language': case.applicant_language,
+        'credibility': case.credibility,
+        'check for one year': case.one_year,
+        'precedent cases': case.precedent_cases,
+        'statutes': case.statutes,
     }
     time_taken = time.time() - start
     case_data["time to process"] = f"{time_taken:.2f} seconds"
@@ -186,6 +185,19 @@ panel_members = [
  ]
 
 
+circuit_dict = {
+    '''used by get_circuit'''
+    'DC': 'DC', 'ME': '1', 'MA': '1', 'VT': '1', 'RI': '1', 'PR': '1', 
+    'CT': '2', 'NY': '2', 'VT': '2', 'DE': '3', 'PA': '3', 'NJ': '3', 'VI': '3',
+    'MD': '4', 'VA': '4', 'NC': '4', 'SC': '4', 'WV': '4', 'LA': '5', 'MS': '5',
+    'TX': '5', 'KY': '6', 'OH': '6', 'TN': '6', 'MI': '6', 'IL': '7', 'IN': '7',
+    'WI': '7', 'AK': '8', 'IA': '8', 'MN': '8', 'MO': '8', 'NE': '8', 'ND': '8',
+    'SD': '8', 'AK': '9', 'AZ': '9', 'CA': '9', 'GU': '9', 'HI': '9', 'ID': '9',
+    'MT': '9', 'NV': '9', 'MP': '9', 'OR': '9', 'WA': '9', 'CO': '10', 
+    'KS': '10', 'NM': '10', 'OK': '10', 'UT': '10', 'WY': '10', 'AL': '11',
+    'FL': '11', 'GA': '11'
+ }
+
 class BIACase:
     def __init__(self, text: str):
         """
@@ -196,8 +208,27 @@ class BIACase:
         """
         self.doc: Doc = nlp(text)
         self.ents: Tuple[Span] = self.doc.ents
-        self.state = None
-        self.city = None
+        # get_appellate() needs to be called before get_panel()
+        self.appellate = self.get_appellate(), 
+        self.application = self.get_application(),
+        self.date = self.get_date(),
+        self.country_of_origin = self.get_country_of_origin(),
+        self.panel = self.get_panel(),
+        # get_outcome() needs to be called before get_protected_grounds()
+        self.outcome = self.get_outcome(), 
+        # get_state() needs to be called before get_city() and get_circuit()
+        self.state = self.get_state(), 
+        self.city = self.get_city()
+        self.circuit = self.get_circuit()
+        self.protected_grounds = self.get_protected_grounds(),
+        self.based_violence = self.get_based_violence(),
+        self.gender = self.get_gender(),
+        self.indigenous_status = self.get_indigenous_status(),
+        self.applicant_language = self.get_applicant_language(),
+        self.credibility = self.get_credibility(),
+        self.one_year = self.check_for_one_year(),
+        self.precedent_cases = self.get_precedent_cases(),
+        self.statutes = self.get_statutes(),
 
     def get_ents(self, labels: List[str]) -> Iterator[Span]:
         """
@@ -205,6 +236,14 @@ class BIACase:
         if no label is specified, returns all entities
         """
         return (ent for ent in self.ents if ent.label_ in labels)
+
+    def get_circuit(self):
+        '''returns the circuit the case started in.'''
+        return circuit_dict[self.state]
+    
+    def get_appellate(self):
+        '''this still needs to be implemented'''
+        return True
 
     def get_country_of_origin(self) -> Union[str, None]:
         """
@@ -445,7 +484,11 @@ class BIACase:
 
         return outcomes_return
 
-    def get_city_state(self):
+    def get_state(self):
+        '''this still needs to be implemented'''
+        return 'New California'
+
+    def get_city(self):
         """
         Finds the city & state the respondent originally applied in. The function
         returns the state. City can be accessed as an attribute.
