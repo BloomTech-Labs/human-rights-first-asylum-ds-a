@@ -81,6 +81,60 @@ def similar_in_list(lst: Union[List[str], Iterator[str]]) -> Callable:
 
     return impl
 
+def similar_outcome(str1, str2):
+    """
+    Returns True if the strings are off by a single character, and that 
+    character is not a 'd' at the end. That 'd' at the end of a word is highly 
+    indicative of whether something is actually an outcome.
+    
+    This is used in the get_outcome() method.
+    """
+    if abs(len(str1) - len(str2)) > 1:
+        return False
+    min_len = min(len(str1), len(str2))
+    i = 0
+    while i < min_len and str1[i] == str2[i]:
+        i += 1
+
+    # We've reached the end of one string, the other is one character longer
+    if i == min_len:
+        # If that character is a 'd', return False, otherwise True
+        if ((len(str1) > len(str2) and str1[-1] == 'd') 
+            or (len(str2) > len(str1) and str2[-1] == 'd')):
+            return False
+        else:
+            return True
+
+    # We're looking at a substitution that is 'd' at the end
+    if (i == len(str1) -1 and len(str1) == len(str2) 
+        and (str1[-1] == 'd' or str2[-1] == 'd')):
+        return False
+
+    # We're looking at a substitution other than 'd' at the end
+    i2 = i + 1
+    while i2 < min_len and str1[i2] == str2[i2]:
+        i2 += 1
+    if i2 == len(str1) and i2 == len(str2):
+        return True
+
+    # We're in the middle, str1 has an extra character
+    if len(str1) == len(str2) + 1:
+        i2 = i
+        while i2 < min_len and str1[i2+1] == str2[i2]:
+            i2 += 1
+        if i2 + 1 == len(str1) and i2 == len(str2):
+            return True
+
+    # We're in the middle, str2 has an extra character
+    if len(str1) + 1 == len(str2):
+        i2 = i
+        while i2 < min_len and str1[i2] == str2[i2+1]:
+            i2 += 1
+        if i2 == len(str1) and i2 + 1 == len(str2):
+            return True
+
+    return False
+
 # TODO: This static list should be stored and accessed via the backend 
 panel_members = [
      "Adkins-Blanch, Charles K.",
@@ -353,36 +407,43 @@ class BIACase:
 
         outcomes_return = []
         ordered_outcome = {'ORDER', 'ORDERED'}
-        outcomes_list = ['denied', 'dismissed', 'granted', 'remanded', 'returned',
-                         'reversal', 'sustained', 'terminated', 'terninated', 'vacated']
+        outcomes_list = ['denied', 'dismissed', 'granted', 'remanded',
+                         'returned', 'sustained', 'terminated',
+                         'vacated', 'affirmed']
+        two_before_exclusion = {'may', 'any', 'has'}
+        one_before_exclusion = {'it', 'has'}
 
         # locate where in the document the orders start
         order_start_i = -1
         for token in self.doc:
-            if str(token) in ordered_outcome:
+            if token.text in ordered_outcome:
                 order_start_i = token.i
                 break
-                
-        # If we can't find where the orders start, assume there aren't any
+
+        # If we can't find where the orders start, check the whole opinion
         if order_start_i == -1:
-            return []
-        
+            order_start_i = 0
+
         # Locate where in the document the orders end
-        order_end_i = min(order_start_i+175, len(self.doc))
-        # Orders end when we see "FOR THE COURT" - this avoids finding keywords in footnotes
-        for i in range(order_start_i+1, min(order_end_i, len(self.doc)-2)):
-            if str(self.doc[i]) == "FOR" and str(self.doc[i+1]) == "THE" and str(self.doc[i+2]) == "BOARD":
+        order_end_i = len(self.doc)
+        # Orders end when we see "FOR THE BOARD" or "WARNING"
+        # - this avoids finding keywords in footnotes or warnings
+        for i in range(order_start_i+1, min(order_end_i, len(self.doc) - 2)):
+            if (self.doc[i:i+3].text == "FOR THE BOARD" or
+                self.doc[i].text == "WARNING"):
                 order_end_i = i
                 break
-                
-        # If we can find where the orders start, check it for each type of outcome
+
+        # Check the range for each type of outcome
         for outcome in outcomes_list:
             for i in range(order_start_i, order_end_i):
-                if str(self.doc[i]) == outcome:
+                if (similar_outcome(self.doc[i].text, outcome) and
+                    self.doc[i-2].text not in two_before_exclusion and
+                    self.doc[i-1].text not in one_before_exclusion):
                     outcomes_return.append(outcome)
                     break
-                
-        return outcomes_return    
+
+        return outcomes_return
 
     def get_city_state(self):
         """
