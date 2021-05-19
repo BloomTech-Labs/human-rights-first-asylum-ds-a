@@ -60,3 +60,19 @@ async def pdf_ocr(uuid: str):
         return {"status": "Connection refused!"}
     except ClientError:
         return {"status": f"File not found: {uuid}.pdf"}
+
+
+@app.get("/vis/correlations")
+def correlations():
+    """ Correlation Matrix Heat Map """
+    pass
+
+
+@app.post("/vis/judges/{judge_id}")
+def vis_judges(judge_name: str):
+    pass
+
+
+@app.get("/vis/circuits/{circuit_id}")
+def vis_circuits(circuit_name: str):
+    pass
