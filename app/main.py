@@ -77,13 +77,6 @@ def vis_judges(judge_data: str):
     jsondata = json.loads(judge_data)['data']
 
     df = pd.DataFrame.from_dict(jsondata)
-    # keep_cols = [
-    #     'case_outcome',
-    #     'country_of_origin',
-    #     'protected_grounds',
-    #     'gender',
-    # ]
-    # df = df[keep_cols]
 
     # creating df for graphing
     outcomes_list = ['Denied', 'Granted', 'Remanded', 'Sustained', 'Terminated']
@@ -120,7 +113,6 @@ def vis_judges(judge_data: str):
 
     # Change the bar mode - stack vs group
     fig.update_layout(barmode='stack')
-    # fig.show()
 
     return fig.to_json()
 
