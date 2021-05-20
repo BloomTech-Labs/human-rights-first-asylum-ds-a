@@ -12,9 +12,8 @@ import os
 
 from boto3.session import Session
 from botocore.exceptions import ClientError, ConnectionError
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import Request, FastAPI
 from dotenv import load_dotenv
 
 from app.ocr import make_fields
