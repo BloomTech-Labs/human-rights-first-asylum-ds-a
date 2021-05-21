@@ -12,7 +12,7 @@ import os
 
 from boto3.session import Session
 from botocore.exceptions import ClientError, ConnectionError
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
@@ -65,17 +65,19 @@ async def pdf_ocr(uuid: str):
     except ClientError:
         return {"status": f"File not found: {uuid}.pdf"}
 
+from fastapi import Request, FastAPI
+
 
 @app.post("/vis/judges/{judge_id}")
-def vis_judges(judge_data: str):
+async def vis_judges(request: Request):
     """
-    Takes judge_data from BE and stores it in a dataframe.
+    Receives judge_data from BE and stores it in a dataframe.
     Creates a fig object with the bar chart info and returns it in json format.
     Features: protected grounds
     """
-
-    jsondata = json.loads(judge_data)['data']
-
+    # Receive data from backend and convert to dataframe
+    jsonstring = await request.body()
+    jsondata = json.loads(jsonstring)['data']
     df = pd.DataFrame.from_dict(jsondata)
 
     # creating df for graphing
