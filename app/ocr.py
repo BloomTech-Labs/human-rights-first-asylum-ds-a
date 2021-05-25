@@ -19,7 +19,7 @@ from spacy.tokens import Doc, Span, Token
 from spacy.matcher import Matcher, PhraseMatcher
 from typing import List, Tuple, Union, Callable, Dict, Iterator
 
-nlp = load("en_core_web_sm")
+nlp = load("en_core_web_md")
 
 # Read in dictionary of all court locations
 with open('./app/court_locations.json') as f:
@@ -167,7 +167,7 @@ circuit_dict = {
     # judges?
 # I think only the appelate judge are below...nationwide there are around
     # 435
-panel_members = [
+appellate_panel_members = [
      "Adkins-Blanch, Charles K.",
      "Michael P. Baird",
      "Cassidy, William A.",
@@ -292,7 +292,6 @@ class BIACase:
         token by token searching for matching keywords.
         """
         self.doc: Doc = nlp(text)
-        self.ents: Tuple[Span] = self.doc.ents
         # !!!get_appellate() needs to be called before get_panel()
         self.appellate = self.get_appellate(),
         self.application = self.get_application(),
@@ -314,13 +313,6 @@ class BIACase:
         self.one_year = self.check_for_one_year(),
         self.precedent_cases = self.get_precedent_cases(),
         self.statutes = self.get_statutes(),
-
-    def get_ents(self, labels: List[str]) -> Iterator[Span]:
-        """
-        • Retrieves entitiess of a specified label(s) in the document,
-        if no label is specified, returns all entities
-        """
-        return (ent for ent in self.ents if ent.label_ in labels)
 
     def get_circuit(self):
         '''returns the circuit the case started in.'''
@@ -386,54 +378,45 @@ class BIACase:
         # Backend requested output format: 'yyyy-mm-dd'
         return '{}-{}-{}'.format(sorted_dates[0].year, sorted_dates[0].month, sorted_dates[0].day)
 
-    def get_panel(self) -> List[str]:
-         """
-         • Returns a list of panel members for appellate case documents.
-         """
-
-         matcher = PhraseMatcher(nlp.vocab) # Create the phrase matcher
-         uid = 0 # Unique identifier for each judge's patterns
-
-         # Add two patterns to the matcher for each judge
-         for judge in panel_members:
-             matcher.add(f'PATTERN_{uid}', [nlp(judge)]) # Just the name as it is in the list
-             matcher.add(f'PATTERNX_{uid}', [nlp(judge.replace(".",""))]) # A pattern that looks for the names without periods, sometimes not picked up by the scan
-             uid += 1
-
-         matches = matcher(self.doc) # Run the phrase matcher over the doc
-         case_panel_members = set()
-
-         if len(matches) > 0: # If a judge from our list is found in the document
-             for match_id, start, end in matches:
-                 judge = self.doc[start:end] # A span object of the match, fetched with its `start` and `end` indecies within the doc
-                 case_panel_members.add(judge.text) # Extract the text from the span object, and add to the set of panel members
-
-         return list(case_panel_members)
-
-
-    def get_surrounding_sents(self, token: Token) -> Span:
+    def get_panel(self):
         """
-        • This function will return the two sentences surrounding the token,
-        including the sentence holding the token.
+        Uses the appellate_panel_members list and spacy PhraseMatcher to check a
+        document for members in the appellate_panel_member list.
+
+        !!! Currently only works for this static list of judges. If not appelate
+            or the list of apppelate judges changes, or there's an appelate
+            judge not in the list.
+
+            May want to generate an updatable list.
+            May want to generate a non-appellate judge list
+            This has important interactions with "is_appellate()" function. If
+                this function returns a judge, it IS from the appellate list,
+                and is therefore an appellate case.
         """
-        start: int
-        start = token.sent.start
 
-        end: int
-        end = token.sent.end
 
-        try:
-            sent_before_start: int
-            sent_before_start = self.doc[start - 1].sent.start
-            sent_after_end: int
-            sent_after_end = self.doc[end + 1].sent.end
-        except (IndexError, AttributeError):
-            return token.sent
+        # create PhraseMatcher object with en_cor_web_md
+        matcher = PhraseMatcher(nlp.vocab, attr="LOWER")
+        # generate a list of patterns
+        patterns = [nlp.make_doc(text) for text in appellate_panel_members]
+        # add the patterns to the matcher's library
+        matcher.add("panel_names", patterns)
 
-        surrounding: Span
-        surrounding = self.doc[sent_before_start:sent_after_end + 1]
-
-        return surrounding
+        # Create a list for phrase matches(judge names) to go.
+        matches = []
+        # find all matches, anywhere in the doc, that is a name from the
+        # appellate panel members list, and append them as spans(human readable)
+        for match_id, start, end in matcher(self.doc):
+            # to matches list
+            span = self.doc[start:end]
+            matches.append(span.text)
+        # if matches were found, return the list of panel members
+        if matches:
+            return sorted(set(matches))
+        # otherwise, the judge is in the appellate list; either not in the list
+            # or not an appellate judge
+        else:
+            return None # IS THIS OKAY?
 
     def get_protected_grounds(self) -> str:
         """
@@ -909,6 +892,7 @@ class BIACase:
         #
         #     if s == 'interpreter' or s == 'translator':
         #         surrounding: Span
+        # !!!!! No longer using surrounding_sents file, should use spacy matcher.
         #         surrounding = self.get_surrounding_sents(token)
         #
         #         next_word = self.doc[token.i+1].text.lower()
