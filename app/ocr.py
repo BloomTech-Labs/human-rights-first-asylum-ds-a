@@ -1,3 +1,4 @@
+
 import time
 import json
 from collections import Counter
@@ -56,21 +57,29 @@ def make_fields(file) -> dict:
     return case_data
 
 
-def similar(matcher_pattern, self.doc):
+def similar(a: str, return_b: str, min_score: float) -> Union[str, None]:
     """
-    Uses spacy.matcher to find a pattern, the input should be:
-    Format: pattern = [{"LOWER": <word>}, {"LOWER": <the next word>}, ...etc]
-    Then searches a given document for the pattern/s
+    • Returns 2nd string if similarity score is above supplied
+    minimum score. Else, returns None.
+    """
+    if SequenceMatcher(None, a, return_b).ratio() >= min_score:
+        return return_b
+
+
+def similar_in_list(lst: Union[List[str], Iterator[str]]) -> Callable:
+    """
+    • Uses a closure on supplied list to return a function that iterates over
+    the list in order to search for the first similar term. It's used widely
+    in the scraper.
     """
 
-    # create matcher object
-    matcher = Matcher(nlp.vocab)
+    def impl(item: str, min_score: float) -> Union[str, None]:
+        for s in lst:
+            s = similar(item, s, min_score)
+            if s:
+                return s
 
-    # Add the pattern that is being searched for
-    matcher.add('matcher_pattern', matcher_pattern)
-
-    # return the "matcher" objects; as Span objects(human readable)
-    return matcher(file, as_spans=True)
+    return impl
 
 def similar_outcome(str1, str2):
     """
@@ -765,7 +774,7 @@ class BIACase:
         # indigenous = [
         #     'indigenous'
         # ]
-        # USE THE NEW SIMILAR INSTEAD of similar_in_list
+        #
         # similar_indig: Callable[[str, float], Union[str, None]]
         # similar_indig = similar_in_list(indigenous)
         #
@@ -849,7 +858,6 @@ class BIACase:
         # credibility = [
         #     'credible'
         # ]
-        # USE NEW SIMILAR function instead of similar_in_list
         # similar_cred: Callable[[str, float], Union[str, None]]
         # similar_cred = similar_in_list(credibility)
         # for token in self.doc:
@@ -877,7 +885,6 @@ class BIACase:
         If it does, and one of the five terms ("year", "delay", "time",
         "period", "deadline") is within 10 lemmas, then the function
         returns True.  Otherwise, it returns False.
-
         If one of the four context words are w/in 100 characters of the
         phrase, we conclude that it is related to the one-year rule
         """
