@@ -1,30 +1,35 @@
+"""
+IMPORTS/LIBS
+Imports of libraries and packages, including spacy nlp library, and reading in
+court location dictionary
+"""
 
-import time
-import json
-from collections import Counter
-from typing import List, Tuple, Union, Callable, Dict, Iterator
-from collections import defaultdict
-from difflib import SequenceMatcher
-import re
+
 import datetime
-import pytesseract
-from pdf2image import convert_from_bytes
-from bs4 import BeautifulSoup
+import json
+import time
 import geonamescache
+import re
 import requests
+import pytesseract
+from collections import Counter, defaultdict
+from pdf2image import convert_from_bytes
 from spacy import load
-from spacy.tokens.doc import Doc
-from spacy.tokens.span import Span
-from spacy.tokens.token import Token
+from spacy.tokens import Doc, Span, Token
 from spacy.matcher import Matcher, PhraseMatcher
-from fuzzywuzzy import process
-
+from typing import List, Tuple, Union, Callable, Dict, Iterator
 
 nlp = load("en_core_web_sm")
 
 # Read in dictionary of all court locations
 with open('./app/court_locations.json') as f:
     court_locs = json.load(f)
+
+"""
+MAKE FILEDS
+This is the main overall function that creates a dictionary of the desired
+fields and their respective values; info that goes into those fields.
+"""
 
 
 def make_fields(file) -> dict:
@@ -56,30 +61,32 @@ def make_fields(file) -> dict:
     case_data["time to process"] = f"{time_taken:.2f} seconds"
     return case_data
 
+"""
+SIMILAR/Matcher functions
+functions that search court document texts for phrases or specific words; used
+in get_outcome, get_country_of_origin, get_outcome
+"""
 
-def similar(a: str, return_b: str, min_score: float) -> Union[str, None]:
+
+def similar(self, matcher_pattern):
     """
-    • Returns 2nd string if similarity score is above supplied
-    minimum score. Else, returns None.
+    A function that uses a spacy Matcher object to search for words or
+    consecutive words as a phrase.
+
+    Format: pattern = [{"LOWER": <word>}, {"LOWER": <the next word>}, ...etc]
+    Can look for multiple patterns simultaneously using list of patterns;
+        [[{"ARG": word}], [{"ARG": word}], [{"ARG": word}]]
+
+    DOC: https://spacy.io/usage/rule-based-matching
     """
-    if SequenceMatcher(None, a, return_b).ratio() >= min_score:
-        return return_b
+    # create matcher object
+    matcher = Matcher(nlp.vocab)
 
+    # Add the pattern that will be searched for
+    matcher.add('matcher_pattern', matcher_pattern)
 
-def similar_in_list(lst: Union[List[str], Iterator[str]]) -> Callable:
-    """
-    • Uses a closure on supplied list to return a function that iterates over
-    the list in order to search for the first similar term. It's used widely
-    in the scraper.
-    """
-
-    def impl(item: str, min_score: float) -> Union[str, None]:
-        for s in lst:
-            s = similar(item, s, min_score)
-            if s:
-                return s
-
-    return impl
+    # return the "matcher" objects; as Span objects(human readable text)
+    return matcher(self.doc, as_spans=True)
 
 def similar_outcome(str1, str2):
     """
@@ -134,6 +141,12 @@ def similar_outcome(str1, str2):
             return True
 
     return False
+
+"""
+LISTS
+
+global info about judges; states and their court circuits
+"""
 
 # TODO: This static list should be stored and accessed via the backend
 panel_members = [
@@ -199,6 +212,14 @@ circuit_dict = {
     'FL': '11', 'GA': '11'
  }
 
+
+"""CLASS and Get methods
+
+The following defines the BIACase Class. When receiving a court doc, we use this
+Class and the algorithms/methods to extract info for the desired fields/info
+that are scraped from the text of the court docs.
+"""
+
 class BIACase:
     def __init__(self, text: str):
         """
@@ -209,15 +230,15 @@ class BIACase:
         """
         self.doc: Doc = nlp(text)
         self.ents: Tuple[Span] = self.doc.ents
-        # get_appellate() needs to be called before get_panel()
+        # !!!get_appellate() needs to be called before get_panel()
         self.appellate = self.get_appellate(),
         self.application = self.get_application(),
         self.date = self.get_date(),
         self.country_of_origin = self.get_country_of_origin(),
         self.panel = self.get_panel(),
-        # get_outcome() needs to be called before get_protected_grounds()
+        # !!!get_outcome() needs to be called before get_protected_grounds()
         self.outcome = self.get_outcome(),
-        # get_state() needs to be called before get_city() and get_circuit()
+        # !!!get_state() needs to be called before get_city() and get_circuit()
         self.state = self.get_state(),
         self.city = self.get_city()
         self.circuit = self.get_circuit()
@@ -774,7 +795,8 @@ class BIACase:
         # indigenous = [
         #     'indigenous'
         # ]
-        #
+        # !!! Would need to change this code to use SIMLAR/spacy matcher
+            # INSTEAD of similar_in_list
         # similar_indig: Callable[[str, float], Union[str, None]]
         # similar_indig = similar_in_list(indigenous)
         #
@@ -858,6 +880,8 @@ class BIACase:
         # credibility = [
         #     'credible'
         # ]
+        # !!! NO Longer using similar_in_list, Use the new SIMLIlAR function
+            # and SPACY matcher or PhraseMatcher
         # similar_cred: Callable[[str, float], Union[str, None]]
         # similar_cred = similar_in_list(credibility)
         # for token in self.doc:
