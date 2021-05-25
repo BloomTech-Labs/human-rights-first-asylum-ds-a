@@ -70,7 +70,7 @@ in get_outcome, get_country_of_origin, get_outcome
 
 def similar(self, matcher_pattern):
     """
-    A function that uses a spacy Matcher object to search for words or
+    A function that uses spacy Matcher object to search for words or
     consecutive words as a phrase.
 
     Format: pattern = [{"LOWER": <word>}, {"LOWER": <the next word>}, ...etc]
