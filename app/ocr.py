@@ -134,6 +134,39 @@ def similar_outcome(str1, str2):
 
     return False
 
+def similar_protected_grounds(target_phrases, file):
+    ''' 
+    Creates SpaCy matcher that searches for specified target_phrases
+    '''
+    matcher = Matcher(nlp.vocab)
+    matcher.add('target_phrases', target_phrases)
+    matches = matcher(file, as_spans=True)
+    # matches returned are SpaCy Spans object
+    # in the functions where similiar is used
+    # must present target_phrases in a list of dictionary using Spacy pattern syntax
+    # example pattern = [[{"LOWER": "race"}]
+
+    return matches
+
+def in_parenthetical(match, doc):
+    '''
+    Checks for text wrapped in parathesis, and removes any
+    returned protected grounds if they we're wrapped in parenthesis 
+    used in protected grounds in order to improve accuracy
+    '''
+    open_parens = 0
+    for i in range(match.end, len(doc)):
+        if doc[i].text == '(':
+            open_parens += 1
+        elif doc[i].text == ')':
+            if open_parens > 0:
+                open_parens -= 1
+            else:
+                return True
+        elif doc[i] in {'.', '?', '!'}:
+            return False
+    return False
+
 # TODO: This static list should be stored and accessed via the backend 
 panel_members = [
      "Adkins-Blanch, Charles K.",
@@ -350,61 +383,64 @@ class BIACase:
 
         return surrounding
 
-    def get_protected_grounds(self) -> str:
+    def get_protected_grounds(self):
         """
         • This will return the protected ground(s) of the applicant. Special
         checks are needed. Checking for keywords is not enough, as sometimes
         documents label laws that describe each protected ground. Examples
         are 'Purely Political Offense' and 'Real Id Act'.
         """
-        protected_grounds: List[str] = [
-            'race',
-            'religion',
-            'nationality',
-            'social',
-            'political',
+        pattern = [
+        [{"LOWER": "race"}], 
+        [{"LOWER": "religion"}], # expand to check for list of religions
+        [{"LOWER": "nationality"}], # currently, phrase is pulled but out of context
+        [{"LOWER": "social"}, {"LOWER": "group"}], 
+        [{"LOWER": "political"}, {"LOWER": "opinion"}],
+        [{"LOWER": "political"}, {"LOWER": "offense"}],
+        [{"LOWER": "political"}],
         ]
 
-        pgs = []
+        religions = ['christianity','christian','islam','atheist','hinduism',
+                     'buddihism','jewish','judaism','islamist','sunni','shia',
+                    'muslim','buddhist','atheists','jew','hindu', 'atheism']
 
-        similar_pg: Callable[[str, float], Union[str, None]]
-        similar_pg = similar_in_list(protected_grounds)
+        politicals = ['political opinion', 'political offense']
 
-        for token in self.doc:
+        confirmed_matches = []
 
-            sent: str = token.sent.text.lower()
+        # create pattern for specified religions
+        for religion in religions:
+            pattern.append([{"LOWER": religion}])
 
-            s: Union[str, None] = similar_pg(token.text.lower(), 0.9)
+        potential_grounds = similar_protected_grounds(target_phrases=pattern, file=self.doc)
 
-            if s == 'social':
-                next_word = self.doc[token.i + 1].text.lower()
-                if not similar(next_word, 'group', 0.95):
+        for match in potential_grounds:
+        # remove 'nationality act' from potential_grounds
+            if match.text.lower() == 'nationality':
+                if 'act' in match.sent.text.lower():
                     continue
 
-            elif s == 'political':
-                next_word = self.doc[token.i + 1].text.lower()
-                if similar(next_word, 'offense', 0.95):
-                    continue
+                else:
+                    if 'nationality' not in confirmed_matches:
+                        confirmed_matches.append('nationality')
 
-            elif s == 'nationality':
-                next_word = self.doc[token.i + 1].text.lower()
-                if similar(next_word, 'act', 1):
-                    continue
+        # check for specified religion, replace with 'religion'
+            elif match.text.lower() in religions:
+                if 'religion' not in confirmed_matches:
+                    confirmed_matches.append('religion')
 
-            if s:
-                surrounding: Span
-                surrounding = self.get_surrounding_sents(token)
-
-                if 'real id' in sent:
-                    continue
-                elif 'grounds specified' in surrounding.text.lower():
-                    continue
-                elif 'no claim' in surrounding.text.lower():
-                    continue
-
-                pgs.append(s)
-
-        return '; '.join(set(pgs))
+            elif match.text.lower() in politicals:
+                if 'political' not in confirmed_matches:
+                    confirmed_matches.append('political')
+            
+            else:
+                confirmed_matches.append(match.text.lower())
+        
+        if confirmed_matches:
+            return list(set(confirmed_matches))
+        
+        else:
+            return []
 
     def get_application(self) -> str:
         """
