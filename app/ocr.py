@@ -134,20 +134,6 @@ def similar_outcome(str1, str2):
 
     return False
 
-def similar_protected_grounds(target_phrases, file):
-    ''' 
-    Creates SpaCy matcher that searches for specified target_phrases
-    '''
-    matcher = Matcher(nlp.vocab)
-    matcher.add('target_phrases', target_phrases)
-    matches = matcher(file, as_spans=True)
-    # matches returned are SpaCy Spans object
-    # in the functions where similiar is used
-    # must present target_phrases in a list of dictionary using Spacy pattern syntax
-    # example pattern = [[{"LOWER": "race"}]
-
-    return matches
-
 def in_parenthetical(match, doc):
     '''
     Checks for text wrapped in parathesis, and removes any
@@ -412,7 +398,7 @@ class BIACase:
         for religion in religions:
             pattern.append([{"LOWER": religion}])
 
-        potential_grounds = similar_protected_grounds(target_phrases=pattern, file=self.doc)
+        potential_grounds = similar(matcher_pattern=pattern, file=self.doc)
 
         for match in potential_grounds:
         # remove 'nationality act' from potential_grounds
