@@ -56,36 +56,28 @@ def make_fields(file) -> dict:
     return case_data
 
 
-def similar(a: str, return_b: str, min_score: float) -> Union[str, None]:
+def similar(matcher_pattern, self.doc):
     """
-    • Returns 2nd string if similarity score is above supplied
-    minimum score. Else, returns None.
-    """
-    if SequenceMatcher(None, a, return_b).ratio() >= min_score:
-        return return_b
-
-
-def similar_in_list(lst: Union[List[str], Iterator[str]]) -> Callable:
-    """
-    • Uses a closure on supplied list to return a function that iterates over
-    the list in order to search for the first similar term. It's used widely
-    in the scraper.
+    Uses spacy.matcher to find a pattern, the input should be:
+    Format: pattern = [{"LOWER": <word>}, {"LOWER": <the next word>}, ...etc]
+    Then searches a given document for the pattern/s
     """
 
-    def impl(item: str, min_score: float) -> Union[str, None]:
-        for s in lst:
-            s = similar(item, s, min_score)
-            if s:
-                return s
+    # create matcher object
+    matcher = Matcher(nlp.vocab)
 
-    return impl
+    # Add the pattern that is being searched for
+    matcher.add('matcher_pattern', matcher_pattern)
+
+    # return the "matcher" objects; as Span objects(human readable)
+    return matcher(file, as_spans=True)
 
 def similar_outcome(str1, str2):
     """
-    Returns True if the strings are off by a single character, and that 
-    character is not a 'd' at the end. That 'd' at the end of a word is highly 
+    Returns True if the strings are off by a single character, and that
+    character is not a 'd' at the end. That 'd' at the end of a word is highly
     indicative of whether something is actually an outcome.
-    
+
     This is used in the get_outcome() method.
     """
     if abs(len(str1) - len(str2)) > 1:
@@ -98,14 +90,14 @@ def similar_outcome(str1, str2):
     # We've reached the end of one string, the other is one character longer
     if i == min_len:
         # If that character is a 'd', return False, otherwise True
-        if ((len(str1) > len(str2) and str1[-1] == 'd') 
+        if ((len(str1) > len(str2) and str1[-1] == 'd')
             or (len(str2) > len(str1) and str2[-1] == 'd')):
             return False
         else:
             return True
 
     # We're looking at a substitution that is 'd' at the end
-    if (i == len(str1) -1 and len(str1) == len(str2) 
+    if (i == len(str1) -1 and len(str1) == len(str2)
         and (str1[-1] == 'd' or str2[-1] == 'd')):
         return False
 
@@ -134,7 +126,7 @@ def similar_outcome(str1, str2):
 
     return False
 
-# TODO: This static list should be stored and accessed via the backend 
+# TODO: This static list should be stored and accessed via the backend
 panel_members = [
      "Adkins-Blanch, Charles K.",
      "Michael P. Baird",
@@ -187,13 +179,13 @@ panel_members = [
 
 circuit_dict = {
     '''used by get_circuit'''
-    'DC': 'DC', 'ME': '1', 'MA': '1', 'VT': '1', 'RI': '1', 'PR': '1', 
+    'DC': 'DC', 'ME': '1', 'MA': '1', 'VT': '1', 'RI': '1', 'PR': '1',
     'CT': '2', 'NY': '2', 'VT': '2', 'DE': '3', 'PA': '3', 'NJ': '3', 'VI': '3',
     'MD': '4', 'VA': '4', 'NC': '4', 'SC': '4', 'WV': '4', 'LA': '5', 'MS': '5',
     'TX': '5', 'KY': '6', 'OH': '6', 'TN': '6', 'MI': '6', 'IL': '7', 'IN': '7',
     'WI': '7', 'AK': '8', 'IA': '8', 'MN': '8', 'MO': '8', 'NE': '8', 'ND': '8',
     'SD': '8', 'AK': '9', 'AZ': '9', 'CA': '9', 'GU': '9', 'HI': '9', 'ID': '9',
-    'MT': '9', 'NV': '9', 'MP': '9', 'OR': '9', 'WA': '9', 'CO': '10', 
+    'MT': '9', 'NV': '9', 'MP': '9', 'OR': '9', 'WA': '9', 'CO': '10',
     'KS': '10', 'NM': '10', 'OK': '10', 'UT': '10', 'WY': '10', 'AL': '11',
     'FL': '11', 'GA': '11'
  }
@@ -209,15 +201,15 @@ class BIACase:
         self.doc: Doc = nlp(text)
         self.ents: Tuple[Span] = self.doc.ents
         # get_appellate() needs to be called before get_panel()
-        self.appellate = self.get_appellate(), 
+        self.appellate = self.get_appellate(),
         self.application = self.get_application(),
         self.date = self.get_date(),
         self.country_of_origin = self.get_country_of_origin(),
         self.panel = self.get_panel(),
         # get_outcome() needs to be called before get_protected_grounds()
-        self.outcome = self.get_outcome(), 
+        self.outcome = self.get_outcome(),
         # get_state() needs to be called before get_city() and get_circuit()
-        self.state = self.get_state(), 
+        self.state = self.get_state(),
         self.city = self.get_city()
         self.circuit = self.get_circuit()
         self.protected_grounds = self.get_protected_grounds(),
@@ -240,7 +232,7 @@ class BIACase:
     def get_circuit(self):
         '''returns the circuit the case started in.'''
         return circuit_dict[self.state]
-    
+
     def get_appellate(self):
         '''this still needs to be implemented'''
         return True
@@ -269,7 +261,7 @@ class BIACase:
         """
         • Finds all dates within document in all different formats
         • Returns most recent date found within document
-        • Returns all dates in standard XX/XX/XXXX format 
+        • Returns all dates in standard XX/XX/XXXX format
         """
         # Format: MM/DD/YYYY
         pattern_1 = [{'TEXT': {'REGEX': r'^\d{1,2}/\d{1,2}/\d{2}(?:\d{2})?$'}}]
@@ -610,7 +602,7 @@ class BIACase:
                 if str(self.doc[vs_start:vs_end]) not in cases_with_dupes:
                     cases_with_dupes.append(str(self.doc[vs_start:vs_end]))
 
-            # Append 'Matter of X' precedent cases 
+            # Append 'Matter of X' precedent cases
             if str(token) == 'Matter':
                 start_index = token.i
                 false_flag = False
@@ -773,7 +765,7 @@ class BIACase:
         # indigenous = [
         #     'indigenous'
         # ]
-        #
+        # USE THE NEW SIMILAR INSTEAD of similar_in_list
         # similar_indig: Callable[[str, float], Union[str, None]]
         # similar_indig = similar_in_list(indigenous)
         #
@@ -857,6 +849,7 @@ class BIACase:
         # credibility = [
         #     'credible'
         # ]
+        # USE NEW SIMILAR function instead of similar_in_list
         # similar_cred: Callable[[str, float], Union[str, None]]
         # similar_cred = similar_in_list(credibility)
         # for token in self.doc:
