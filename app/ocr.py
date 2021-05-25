@@ -371,11 +371,12 @@ class BIACase:
 
     def get_protected_grounds(self):
         """
-        • This will return the protected ground(s) of the applicant. Special
+        This will return the protected ground(s) of the applicant. Special
         checks are needed. Checking for keywords is not enough, as sometimes
         documents label laws that describe each protected ground. Examples
         are 'Purely Political Offense' and 'Real Id Act'.
         """
+        
         pattern = [
         [{"LOWER": "race"}], 
         [{"LOWER": "religion"}], # expand to check for list of religions
