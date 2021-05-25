@@ -148,7 +148,25 @@ LISTS
 global info about judges; states and their court circuits
 """
 
+circuit_dict = {
+    '''used by get_circuit'''
+    'DC': 'DC', 'ME': '1', 'MA': '1', 'VT': '1', 'RI': '1', 'PR': '1',
+    'CT': '2', 'NY': '2', 'VT': '2', 'DE': '3', 'PA': '3', 'NJ': '3', 'VI': '3',
+    'MD': '4', 'VA': '4', 'NC': '4', 'SC': '4', 'WV': '4', 'LA': '5', 'MS': '5',
+    'TX': '5', 'KY': '6', 'OH': '6', 'TN': '6', 'MI': '6', 'IL': '7', 'IN': '7',
+    'WI': '7', 'AK': '8', 'IA': '8', 'MN': '8', 'MO': '8', 'NE': '8', 'ND': '8',
+    'SD': '8', 'AK': '9', 'AZ': '9', 'CA': '9', 'GU': '9', 'HI': '9', 'ID': '9',
+    'MT': '9', 'NV': '9', 'MP': '9', 'OR': '9', 'WA': '9', 'CO': '10',
+    'KS': '10', 'NM': '10', 'OK': '10', 'UT': '10', 'WY': '10', 'AL': '11',
+    'FL': '11', 'GA': '11'
+ }
+
 # TODO: This static list should be stored and accessed via the backend
+# TODO: Find a way to add old immigration judges and new immigrations judges
+    # not in this static list. Like, How do we keep an updated list of all
+    # judges?
+# I think only the appelate judge are below...nationwide there are around
+    # 435
 panel_members = [
      "Adkins-Blanch, Charles K.",
      "Michael P. Baird",
@@ -196,21 +214,66 @@ panel_members = [
      "Wendtland, Linda S.",
      "Wetmore, David H.",
      "Wilson, Earle B."
- ]
+     ]
 
-
-circuit_dict = {
-    '''used by get_circuit'''
-    'DC': 'DC', 'ME': '1', 'MA': '1', 'VT': '1', 'RI': '1', 'PR': '1',
-    'CT': '2', 'NY': '2', 'VT': '2', 'DE': '3', 'PA': '3', 'NJ': '3', 'VI': '3',
-    'MD': '4', 'VA': '4', 'NC': '4', 'SC': '4', 'WV': '4', 'LA': '5', 'MS': '5',
-    'TX': '5', 'KY': '6', 'OH': '6', 'TN': '6', 'MI': '6', 'IL': '7', 'IN': '7',
-    'WI': '7', 'AK': '8', 'IA': '8', 'MN': '8', 'MO': '8', 'NE': '8', 'ND': '8',
-    'SD': '8', 'AK': '9', 'AZ': '9', 'CA': '9', 'GU': '9', 'HI': '9', 'ID': '9',
-    'MT': '9', 'NV': '9', 'MP': '9', 'OR': '9', 'WA': '9', 'CO': '10',
-    'KS': '10', 'NM': '10', 'OK': '10', 'UT': '10', 'WY': '10', 'AL': '11',
-    'FL': '11', 'GA': '11'
- }
+US_abbrev = {
+        'AL': 'Alabama',
+        'AK': 'Alaska',
+        'AS': 'American Samoa',
+        'AZ': 'Arizona',
+        'AR': 'Arkansas',
+        'CA': 'California',
+        'CO': 'Colorado',
+        'CT': 'Connecticut',
+        'DE': 'Delaware',
+        'DC': 'District of Columbia',
+        'FL': 'Florida',
+        'GA': 'Georgia',
+        'GU': 'Guam',
+        'HI': 'Hawaii',
+        'ID': 'Idaho',
+        'IL': 'Illinois',
+        'IN': 'Indiana',
+        'IA': 'Iowa',
+        'KS': 'Kansas',
+        'KY': 'Kentucky',
+        'LA': 'Louisiana',
+        'ME': 'Maine',
+        'MD': 'Maryland',
+        'MA': 'Massachusetts',
+        'MI': 'Michigan',
+        'MN': 'Minnesota',
+        'MS': 'Mississippi',
+        'MO': 'Missouri',
+        'MT': 'Montana',
+        'NE': 'Nebraska',
+        'NV': 'Nevada',
+        'NH': 'New Hampshire',
+        'NJ': 'New Jersey',
+        'NM': 'New Mexico',
+        'NY': 'New York',
+        'NC': 'North Carolina',
+        'ND': 'North Dakota',
+        'MP': 'Northern Mariana Islands',
+        'OH': 'Ohio',
+        'OK': 'Oklahoma',
+        'OR': 'Oregon',
+        'PA': 'Pennsylvania',
+        'PR': 'Puerto Rico',
+        'RI': 'Rhode Island',
+        'SC': 'South Carolina',
+        'SD': 'South Dakota',
+        'TN': 'Tennessee',
+        'TX': 'Texas',
+        'UT': 'Utah',
+        'VT': 'Vermont',
+        'VI': 'Virgin Islands',
+        'VA': 'Virginia',
+        'WA': 'Washington',
+        'WV': 'West Virginia',
+        'WI': 'Wisconsin',
+        'WY': 'Wyoming'
+        }
 
 
 """CLASS and Get methods
@@ -741,48 +804,40 @@ class BIACase:
 
     def get_gender(self) -> str:
         """
-        Based on sentences where the Respondent/Applicant keywords are found,
-        count the instances of gendered pronouns. This approach assumes the
-        sentence refers to subject in shorthand by using gendered pronouns
-        as opposed to keywords multiple times in sentence. This function
-        returns a final result to be packaged into json.
-        Parameters:
-        spacy.doc (obj):
-        Returns:
-        str: Gender
+        Searches through a given document and counts the TOTAL number of "male"
+        pronoun uses and "female" pronoun uses. Whichever count("M" or "F") is
+        higher, that gender is returned.
+
+        In the event of a tie; currently returns "Unknown"; may be able to code
+        for this edge case. Current accuracy is >95%, low priority fix.
         """
 
-        # Search terms formatted
-        phrases = ["respondent", "respondents", "applicant", 'filed an application']
-        patterns = [nlp(text) for text in phrases]
+        # List if gendered pronouns
+        male_prons = ['he', "he's", 'his', 'him', 'himself']
+        female_prons = ['she', "she's", 'her', 'hers', 'herself']
 
-        # Gender constants
-        male_prons = ['he', "he's", 'his', 'himself']
-        female_prons = ['she', "she's", 'her', 'herself']
+        # list for spacy.matcher pattens
+        f_patterns = []
+        m_patterns = []
 
-        # Variables for analysis storage
-        male_found = []
-        female_found = []
+        # generating list of patterns (f: pattern = [{'LOWER': word}]), for
+            # spacy matcher search
+        for prons in female_prons:
+            f_patterns.append([{'LOWER':prons}])
+        for prons in male_prons:
+            m_patterns.append([{'LOWER':prons}])
 
-        # PhraseMatcher setup, add tag (RESP) and pass in patterns
-        phrase_matcher = PhraseMatcher(nlp.vocab, attr='LEMMA')
-        phrase_matcher.add("RESP", None, *patterns)
+        # use simlar() function (Above) to find patterns(pronouns) in whole text
+        m_similar = similar(m_patterns, self.doc)
+        f_similar = similar(f_patterns, self.doc)
 
-        # Sentences with both 'RESP' tag and gendered pronouns added to respective list
-        for sent in self.doc.sents:
-            for match_id, _, _ in phrase_matcher(nlp(sent.text)):
-                if nlp.vocab.strings[match_id] in ['RESP', *male_prons]:
-                    male_found.append(sent.text)
-                elif nlp.vocab.strings[match_id] in ['RESP', *female_prons]:
-                    female_found.append(sent.text)
-
-        # Make `set()` of list to eliminate duplicates and compare lengths
-        if len(set(female_found)) > len(set(male_found)):
-            return "Female"
-        elif len(set(male_found)) > len(set(female_found)):
-            return "Male"
+        # check the number of gendered pronoun occurrences and return gender
+        if len(m_similar) > len(f_similar):
+            return 'Male'
+        elif len(f_similar) > len(m_similar):
+            return 'Female'
         else:
-            return "Unknown"
+            return 'Unknown'
 
     def get_indigenous_status(self) -> str:
         """
