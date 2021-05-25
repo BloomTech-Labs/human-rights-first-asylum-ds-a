@@ -57,29 +57,16 @@ def make_fields(file) -> dict:
     return case_data
 
 
-def similar(a: str, return_b: str, min_score: float) -> Union[str, None]:
-    """
-    • Returns 2nd string if similarity score is above supplied
-    minimum score. Else, returns None.
-    """
-    if SequenceMatcher(None, a, return_b).ratio() >= min_score:
-        return return_b
+def similar(matcher_pattern, file):
+    # create matcher object
+    matcher = Matcher(nlp.vocab)
+    # Add the pattern that is being searched for
+        # make pattern within attribute functions below that use similar
+        # Format: pattern = [{"LOWER": <word>}, {"LOWER": <the next word>}, ...etc]
+    matcher.add('matcher_pattern', matcher_pattern)
+    # return the "matcher" objects; as Span objects(human readable)
+    return matcher(file, as_spans=True)
 
-
-def similar_in_list(lst: Union[List[str], Iterator[str]]) -> Callable:
-    """
-    • Uses a closure on supplied list to return a function that iterates over
-    the list in order to search for the first similar term. It's used widely
-    in the scraper.
-    """
-
-    def impl(item: str, min_score: float) -> Union[str, None]:
-        for s in lst:
-            s = similar(item, s, min_score)
-            if s:
-                return s
-
-    return impl
 
 # TODO: This static list should be stored and accessed via the backend 
 panel_members = [
