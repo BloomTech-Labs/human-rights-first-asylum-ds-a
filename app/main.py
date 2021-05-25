@@ -17,8 +17,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
 from app.ocr import make_fields
+from app.visualizations import get_stacked_bar_chart
 
-import plotly.graph_objects as go
 import pandas as pd
 import json
 
@@ -65,58 +65,30 @@ async def pdf_ocr(uuid: str):
     except ClientError:
         return {"status": f"File not found: {uuid}.pdf"}
 
-from fastapi import Request, FastAPI
-
 
 @app.post("/vis/judges/{judge_id}")
 async def vis_judges(request: Request):
     """
-    Receives judge_data from BE and stores it in a dataframe.
-    Creates a fig object with the bar chart info and returns it in json format.
-    Features: protected grounds
+    Receives judge_data from BE and stores it in a dataframe.  
+    Creates a dictionary with multiple graphs, one graph for each feature.  
+    Features: protected grounds, gender, country_of_origin.  
+    returns the graphs in json format.  
     """
+
     # Receive data from backend and convert to dataframe
     jsonstring = await request.body()
     jsondata = json.loads(jsonstring)['data']
     df = pd.DataFrame.from_dict(jsondata)
 
-    # creating df for graphing
-    outcomes_list = ['Denied', 'Granted', 'Remanded', 'Sustained', 'Terminated']
+    chart_1 = get_stacked_bar_chart(df, 'protected_grounds')
+    chart_2 = get_stacked_bar_chart(df, 'gender')
+    chart_3 = get_stacked_bar_chart(df, 'country_of_origin')
 
-    df_protected_grounds = df.groupby('case_outcome').protected_grounds.value_counts().unstack(0)
-    df_protected_grounds = df_protected_grounds.fillna(0)
+    charts_dict = {'bar_protected_grounds': chart_1,
+                   'bar_gender': chart_2,
+                   'bar_country_of_origin': chart_3}
 
-    # creating new column with an outcome a judge might not have had
-    for outcome in outcomes_list:
-        if outcome not in df_protected_grounds.columns:
-            df_protected_grounds[outcome] = 0.0
-
-    # rearranging for same order, but might be unnessessary bc of go object
-    df_protected_grounds = df_protected_grounds[outcomes_list]
-
-    # creating the graph
-    fig = go.Figure(data=[
-        go.Bar(name='Denied',
-               x=list(df_protected_grounds.index),
-               y=df_protected_grounds['Denied']),
-        go.Bar(name='Granted',
-               x=list(df_protected_grounds.index),
-               y=df_protected_grounds['Granted']),
-        go.Bar(name='Remanded',
-               x=list(df_protected_grounds.index),
-               y=df_protected_grounds['Remanded']),
-        go.Bar(name='Sustained',
-               x=list(df_protected_grounds.index),
-               y=df_protected_grounds['Sustained']),
-        go.Bar(name='Terminated',
-               x=list(df_protected_grounds.index),
-               y=df_protected_grounds['Terminated'])
-    ])
-
-    # Change the bar mode - stack vs group
-    fig.update_layout(barmode='stack')
-
-    return fig.to_json()
+    return json.dumps(charts_dict)
 
 
 @app.get("/vis/circuits/{circuit_id}")
