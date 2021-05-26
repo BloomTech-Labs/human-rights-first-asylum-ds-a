@@ -132,13 +132,6 @@ class BIACase:
         self.state = None
         self.city = None
 
-    def get_ents(self, labels: List[str]) -> Iterator[Span]:
-        """
-        • Retrieves entitiess of a specified label(s) in the document,
-        if no label is specified, returns all entities
-        """
-        return (ent for ent in self.ents if ent.label_ in labels)
-
     def get_country_of_origin(self) -> Union[str, None]:
         """
         • Returns the country of origin of the applicant. Currently just checks
@@ -219,30 +212,6 @@ class BIACase:
 
          return list(case_panel_members)
 
-
-    def get_surrounding_sents(self, token: Token) -> Span:
-        """
-        • This function will return the two sentences surrounding the token,
-        including the sentence holding the token.
-        """
-        start: int
-        start = token.sent.start
-
-        end: int
-        end = token.sent.end
-
-        try:
-            sent_before_start: int
-            sent_before_start = self.doc[start - 1].sent.start
-            sent_after_end: int
-            sent_after_end = self.doc[end + 1].sent.end
-        except (IndexError, AttributeError):
-            return token.sent
-
-        surrounding: Span
-        surrounding = self.doc[sent_before_start:sent_after_end + 1]
-
-        return surrounding
 
     def get_protected_grounds(self) -> str:
         """
@@ -371,47 +340,80 @@ class BIACase:
                 
         return outcomes_return    
 
-    def get_city_state(self):
+    def is_appellate(self.doc):
+        if self.judge_list:
+            self.appellate = True
+        else:
+            self.appellate = False
+
+    def get_state(self):
         """
+        IF the case is an appellate decision the first page will show 
+        the legal teams' address on page 1, and the respondents address 
+        on page 2. We need to decide if appellate before getting state.
+
         Finds the city & state the respondent originally applied in. The function
         returns the state. City can be accessed as an attribute.
         """
-        statecache = []
-        citycache = set()
+        
+        pattern = [
+            [{"LOWER": 'file'}],
+            [{"LOWER": 'files'}]
+            ]
 
-        fileloc = 0
-        for token in self.doc:
-            if token.text == 'File':
-                fileloc += token.idx
-                break
+        matches = similar(self.doc, pattern)
 
-        for k in court_locs.keys():
-            for s in re.findall(f"(?:{k})", self.doc.text[:750]):
-                statecache.append(s)
+        sentence = str(matches[0].sent)
+        clean_sentence = sentence.replace(',', ' ').replace('\n', ' ')
 
-        c = Counter(statecache)
-        state = c.most_common(n=1)[0][0]
-
-        for v in court_locs.get(state)['city']:
-            for c in re.findall(f"(?:{v}, {state})", self.doc.text[:750]):
-                citycache.add(v)
-
-        if len(citycache) == 1:
-            self.state = state
-            self.city = list(citycache)[0]
-            return state
-
-        elif len(citycache) > 1:
-            for c in citycache:
-                if c in self.doc.text[fileloc: fileloc + 100]:
-                    self.state = state
-                    self.city = c
-                    return state
-
+        #if an appellate case the first page will have the location of the appellate court, NOT origin
+        if self.appellate == True:
+            
+            #finds first state that's in the citycache
+            for abbrev in clean_sentence:
+                if abbrev in US_abbrev.keys():
+                    self.state = abbrev
+                    return self.state
+            
         else:
-            self.state = state
-            self.city = "; ".join(list(citycache))
-            return state
+            #if non-appellate the first page will have the court location including city & state
+            for s in self.doc:
+                if s in US_abbrev.keys():
+                    self.state = s
+                    return self.state
+
+    def get_city(self, self.state):
+        #uses the abbreviation from self.state and #gets the list of cities in a state
+        citycache = set()
+        for v in court_locs.get(self.state)['city']:
+            citycache.add(v)
+
+        pattern = [
+            [{"LOWER": 'file'}],
+            [{"LOWER": 'files'}]
+            ]
+
+        matches = similar(self.doc, pattern)
+
+        sentence = str(matches[0].sent)
+        clean_sentence = sentence.replace(',', ' ').replace('\n', ' ').title()
+
+        #if an appellate case the first page will have the location of the appellate court, NOT origin
+        if self.appellate == True:
+            
+            #finds first city that's in the citycache
+            for word in clean_sentence:
+                if word in citycache:
+                    self.city = word
+                    return self.city
+            
+        else:
+            #if non-appellate the first page will have the court location including city & state
+            for s in self.doc:
+                if s in citycache:
+                    self.city = s
+                    return self.city
+            
 
     def get_based_violence(self) -> List[str]:
         """
