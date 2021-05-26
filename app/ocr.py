@@ -499,12 +499,9 @@ class BIACase:
         
         for match in potential_grounds:
         # remove 'nationality act' from potential_grounds
-            if match.text.lower() == 'nationality':
-                if 'act' in match.sent.text.lower():
-            else:
-                if 'nationality' not in confirmed_matches:
+            if match.text.lower() == 'nationality' and 'act' not in match.sent.text.lower() and not in confirmed_matches:
                     confirmed_matches.append('nationality')
-
+ 
         # check for specified religion, replace with 'religion'
             elif match.text.lower() in religions:
                 if 'religion' not in confirmed_matches:
@@ -515,13 +512,10 @@ class BIACase:
                     confirmed_matches.append('political')
 
             else:
-                confirmed_matches.append(match.text.lower())
+                if match.text.lower() not in confirmed_matches:
+                    confirmed_matches.append(match.text.lower())
 
-        if confirmed_matches:
-            return list(set(confirmed_matches))
-
-        else:
-            return []
+        return confirmed_matches
 
 
     def get_application(self) -> str:
@@ -597,9 +591,9 @@ class BIACase:
 
     def is_appellate(self.doc):
         if self.judge_list:
-            self.appellate = True
+            return True
         else:
-            self.appellate = False
+            return False
     
 
     def get_state(self):
@@ -623,20 +617,18 @@ class BIACase:
         clean_sentence = sentence.replace(',', ' ').replace('\n', ' ')
 
         #if an appellate case the first page will have the location of the appellate court, NOT origin
-        if self.appellate == True:
+        if self.appellate:
             
             #finds first state that's in the citycache
             for abbrev in clean_sentence:
                 if abbrev in US_abbrev.keys():
-                    self.state = abbrev
-                    return self.state
+                    return abbrev
             
         else:
             #if non-appellate the first page will have the court location including city & state
             for s in self.doc:
                 if s in US_abbrev.keys():
-                    self.state = s
-                    return self.state
+                    return s
 
     def get_city(self, self.state):
         #uses the abbreviation from self.state and #gets the list of cities in a state
@@ -655,20 +647,18 @@ class BIACase:
         clean_sentence = sentence.replace(',', ' ').replace('\n', ' ').title()
 
         #if an appellate case the first page will have the location of the appellate court, NOT origin
-        if self.appellate == True:
+        if self.appellate:
             
             #finds first city that's in the citycache
             for word in clean_sentence:
                 if word in citycache:
-                    self.city = word
-                    return self.city
+                    return word
             
         else:
             #if non-appellate the first page will have the court location including city & state
             for s in self.doc:
                 if s in citycache:
-                    self.city = s
-                    return self.city
+                    return s
             
 
     def get_based_violence(self) -> List[str]:
