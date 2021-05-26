@@ -143,14 +143,7 @@ def in_parenthetical(match, doc):
             return False
     return False
 
-def get_ents(self, labels):
-        """
-        • Retrieves entitiess of a specified label(s) in the document,
-        if no label is specified, returns all entities
-        for example:
-            if you input dates into this function it will return all of the dates in the corpus
-        """
-        return (ent for ent in self.ents if ent.label_ in labels)
+
 """
 LISTS
 global info about judges; states and their court circuits
@@ -298,7 +291,16 @@ class BIACase:
         self.ents: Tuple[Span] = self.doc.ents
         self.state = None
         self.city = None
-
+    
+    def get_ents(self, labels):
+        """
+        • Retrieves entitiess of a specified label(s) in the document,
+        if no label is specified, returns all entities
+        for example:
+            if you input dates into this function it will return all of the dates in the corpus
+        """
+        return (ent for ent in self.ents if ent.label_ in labels)
+    
     def get_country_of_origin(self) -> Union[str, None]:
         """
         RETURNS the respondent's or respondents' country of origin:
