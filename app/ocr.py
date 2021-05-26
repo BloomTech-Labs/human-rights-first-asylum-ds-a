@@ -289,8 +289,27 @@ class BIACase:
         """
         self.doc: Doc = nlp(text)
         self.ents: Tuple[Span] = self.doc.ents
-        self.state = None
-        self.city = None
+        # !!!get_appellate() needs to be called before get_panel()
+        self.appellate = self.is_appellate(),
+        self.application = self.get_application(),
+        self.date = self.get_date(),
+        self.country_of_origin = self.get_country_of_origin(),
+        self.panel = self.get_panel(),
+        # !!!get_outcome() needs to be called before get_protected_grounds()
+        self.outcome = self.get_outcome(),
+        # !!!get_state() needs to be called before get_city() and get_circuit()
+        self.state = self.get_state(),
+        self.city = self.get_city()
+        self.circuit = self.get_circuit()
+        self.protected_grounds = self.get_protected_grounds(),
+        self.based_violence = self.get_based_violence(),
+        self.gender = self.get_gender(),
+        self.indigenous_status = self.get_indigenous_status(),
+        self.applicant_language = self.get_applicant_language(),
+        self.credibility = self.get_credibility(),
+        self.one_year = self.check_for_one_year(),
+        self.precedent_cases = self.get_precedent_cases(),
+        self.statutes = self.get_statutes(),
     
     def get_ents(self, labels):
         """
@@ -301,6 +320,10 @@ class BIACase:
         """
         return (ent for ent in self.ents if ent.label_ in labels)
     
+    def get_circuit(self):
+        '''returns the circuit the case started in.'''
+        return circuit_dict[self.state]
+
     def get_country_of_origin(self) -> Union[str, None]:
         """
         RETURNS the respondent's or respondents' country of origin:

@@ -148,3 +148,4 @@ cython_debug/
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
 manually_scrapped.csv
+*.csv
