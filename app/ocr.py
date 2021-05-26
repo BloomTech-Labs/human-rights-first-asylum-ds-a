@@ -19,7 +19,7 @@ from spacy.tokens import Doc, Span, Token
 from spacy.matcher import Matcher, PhraseMatcher
 from typing import List, Tuple, Union, Callable, Dict, Iterator
 
-nlp = load("en_core_web_sm")
+nlp = load("en_core_web_md")
 
 # Read in dictionary of all court locations
 with open('./app/court_locations.json') as f:
@@ -142,6 +142,25 @@ def similar_outcome(str1, str2):
 
     return False
 
+    def in_parenthetical(match, doc):
+        '''
+        Checks for text wrapped in parathesis, and removes any
+        returned protected grounds if they we're wrapped in parenthesis
+        used in protected grounds in order to improve accuracy
+        '''
+        open_parens = 0
+        for i in range(match.end, len(doc)):
+            if doc[i].text == '(':
+                open_parens += 1
+            elif doc[i].text == ')':
+                if open_parens > 0:
+                    open_parens -= 1
+                else:
+                    return True
+            elif doc[i] in {'.', '?', '!'}:
+                return False
+        return False
+
 """
 LISTS
 
@@ -149,7 +168,7 @@ global info about judges; states and their court circuits
 """
 
 # TODO: This static list should be stored and accessed via the backend
-panel_members = [
+appellate_panel_members = [
      "Adkins-Blanch, Charles K.",
      "Michael P. Baird",
      "Cassidy, William A.",
@@ -212,6 +231,64 @@ circuit_dict = {
     'FL': '11', 'GA': '11'
  }
 
+US_abbrev = {
+        'AL': 'Alabama',
+        'AK': 'Alaska',
+        'AS': 'American Samoa',
+        'AZ': 'Arizona',
+        'AR': 'Arkansas',
+        'CA': 'California',
+        'CO': 'Colorado',
+        'CT': 'Connecticut',
+        'DE': 'Delaware',
+        'DC': 'District of Columbia',
+        'FL': 'Florida',
+        'GA': 'Georgia',
+        'GU': 'Guam',
+        'HI': 'Hawaii',
+        'ID': 'Idaho',
+        'IL': 'Illinois',
+        'IN': 'Indiana',
+        'IA': 'Iowa',
+        'KS': 'Kansas',
+        'KY': 'Kentucky',
+        'LA': 'Louisiana',
+        'ME': 'Maine',
+        'MD': 'Maryland',
+        'MA': 'Massachusetts',
+        'MI': 'Michigan',
+        'MN': 'Minnesota',
+        'MS': 'Mississippi',
+        'MO': 'Missouri',
+        'MT': 'Montana',
+        'NE': 'Nebraska',
+        'NV': 'Nevada',
+        'NH': 'New Hampshire',
+        'NJ': 'New Jersey',
+        'NM': 'New Mexico',
+        'NY': 'New York',
+        'NC': 'North Carolina',
+        'ND': 'North Dakota',
+        'MP': 'Northern Mariana Islands',
+        'OH': 'Ohio',
+        'OK': 'Oklahoma',
+        'OR': 'Oregon',
+        'PA': 'Pennsylvania',
+        'PR': 'Puerto Rico',
+        'RI': 'Rhode Island',
+        'SC': 'South Carolina',
+        'SD': 'South Dakota',
+        'TN': 'Tennessee',
+        'TX': 'Texas',
+        'UT': 'Utah',
+        'VT': 'Vermont',
+        'VI': 'Virgin Islands',
+        'VA': 'Virginia',
+        'WA': 'Washington',
+        'WV': 'West Virginia',
+        'WI': 'Wisconsin',
+        'WY': 'Wyoming'
+        }
 
 """CLASS and Get methods
 
@@ -230,12 +307,12 @@ class BIACase:
         """
         self.doc: Doc = nlp(text)
         self.ents: Tuple[Span] = self.doc.ents
-        # !!!get_appellate() needs to be called before get_panel()
-        self.appellate = self.get_appellate(),
+        self.panel = self.get_panel(),
+        #get_panel needs to be called before is_appellate
+        self.appellate = self.is_appellate(),
         self.application = self.get_application(),
         self.date = self.get_date(),
         self.country_of_origin = self.get_country_of_origin(),
-        self.panel = self.get_panel(),
         # !!!get_outcome() needs to be called before get_protected_grounds()
         self.outcome = self.get_outcome(),
         # !!!get_state() needs to be called before get_city() and get_circuit()
@@ -261,172 +338,215 @@ class BIACase:
 
     def get_circuit(self):
         '''returns the circuit the case started in.'''
-        return circuit_dict[self.state]
+        return circuit_dict.get(self.state)
 
-    def get_appellate(self):
-        '''this still needs to be implemented'''
-        return True
+    def is_appellate(self):
 
-    def get_country_of_origin(self) -> Union[str, None]:
+            if self.panel:
+                return True
+
+            else:
+                return False
+
+    def get_country_of_origin(self):
         """
-        • Returns the country of origin of the applicant. Currently just checks
-        the document for a country that is NOT the United States.
+        RETURNS the respondent's or respondents' country of origin:
         """
+
+        """Generate COUNTRIES list"""
+        # sorted list of all current countries
         gc = geonamescache.GeonamesCache()
-        countries: Iterator[str] = gc.get_countries_by_names().keys()
+        countries = sorted(gc.get_countries_by_names().keys())
+        # remove U.S. and its territories from countries
+        if "American Samoa" in countries:
+            countries.remove("American Samoa")
+        if "Guam" in countries:
+            countries.remove("Guam")
+        if "Northern Mariana Islands" in countries:
+            countries.remove("Northern Mariana Islands")
+        if "Puerto Rico" in countries:
+            countries.remove("Puerto Rico")
+        if "United States" in countries:
+            countries.remove("United States")
+        if "United States Minor Outlying Islands" in countries:
+            countries.remove("United States Minor Outlying Islands")
+        if "U.S. Virgin Islands" in countries:
+            countries.remove("U.S. Virgin Islands")
 
-        locations: Iterator[str]
-        locations = map(lambda ent: ent.text, self.get_ents(['GPE']))
+        """
+        PRIMARY search:
+        in most cases, the term/pattern "citizen(s) of" appears in the same
+            sentence the country of origin spacy.matcher patterns list, looking
+            for the following phrase matches following these patterns is
+            practically guaranteed to be the country of origin
+        """
+        # create a spacy matcher pattern
+        primary_pattern = [
+            [{"LOWER": "citizen"}, {"LOWER": "of"}],
+            [{"LOWER": "citizens"}, {"LOWER": "of"}],
+        ]
+        # instantiate a list of pattern matches
+        spans = similar(self.doc, primary_pattern)
+        # if there are matches
+        if spans:
+            # grab the surrounding sentence and turn it into a string
+            sentence = str(spans[0].sent)
+            # remove line breaks, edge case
+            clean_sent = sentence.replace("\n", " ")
+            # iterate through the countries list, and return it if it's in the
+                # cleaned sentence
+            for country in countries:
+                if country in clean_sent:
+                    return country
 
-        similar_country: Callable[[str, float], Union[str, None]]
-        similar_country = similar_in_list(countries)
-
-        for loc in locations:
-            origin: Union[str, None]
-            origin = similar_country(loc, 0.8)
-            if origin and origin != "United States":
-                return origin
+        #SECONDARY search:
+        # If citizen of wasn't found or if it WAS found but no country followed,
+        # look through the whole doc for the first instance of a non-U.S. country.
+        else:
+            # untokenize and normalize
+            tok_text = str(self.doc).lower()
+            # edge case where line breaks appear in the middle of a multi-word
+                # country, an effect of turning the tokenized text to a string
+            clean_text = tok_text.replace("\n", " ")
+            # iterate through countries for a foreign entity.
+            for country in countries:
+                if country.lower() in clean_text:
+                    return country
 
     def get_date(self) -> str:
         """
-        • Finds all dates within document in all different formats
-        • Returns most recent date found within document
-        • Returns all dates in standard XX/XX/XXXX format
+        • Returns date of the document. Easy to validate by the PDF filename.
         """
-        # Format: MM/DD/YYYY
-        pattern_1 = [{'TEXT': {'REGEX': r'^\d{1,2}/\d{1,2}/\d{2}(?:\d{2})?$'}}]
+        dates = map(str, self.get_ents(['DATE']))
+        for s in dates:
+            if len(s.split()) == 3:
+                return s
 
-        # Format: Month DD, YYYY
-        pattern_2 = [{'IS_ALPHA': True, 'LENGTH': 3},
-                     {'IS_DIGIT': True},
-                     {'IS_PUNCT': True},
-                     {'IS_DIGIT': True}]
+    def get_panel(self):
+        """
+        Uses the appellate_panel_members list and spacy PhraseMatcher to check a
+        document for members in the appellate_panel_member list.
+        !!! Currently only works for this static list of judges. If not appelate
+            or the list of apppelate judges changes, or there's an appelate
+            judge not in the list.
+            May want to generate an updatable list.
+            May want to generate a non-appellate judge list
+            This has important interactions with "is_appellate()" function. If
+                this function returns a judge, it IS from the appellate list,
+                and is therefore an appellate case.
+        """
+         # create PhraseMatcher object with en_cor_web_md
+        matcher = PhraseMatcher(nlp.vocab, attr="LOWER")
+        # generate a list of patterns
+        patterns = [nlp.make_doc(text) for text in appellate_panel_members]
+        # add the patterns to the matcher's library
+        matcher.add("panel_names", patterns)
 
-        matcher = Matcher(nlp.vocab)
-
-        matcher.add('Type1', [pattern_1])
-        matcher.add('Type2', [pattern_2])
-        matches = matcher(self.doc)
-
-        all_dates = []
-
-        for match_id, start, end in matches:
-            string_id = nlp.vocab.strings[match_id]
+        # Create a list for phrase matches(judge names) to go.
+        matches = []
+        # find all matches, anywhere in the doc, that is a name from the
+        # appellate panel members list, and append them as spans(human readable)
+        for match_id, start, end in matcher(self.doc):
+            # to matches list
             span = self.doc[start:end]
-            if string_id == 'Type2':
-                reformat_date = datetime.datetime.strptime(span.text, '%b %d, %Y')
-            else:
-                reformat_date = datetime.datetime.strptime(span.text, '%m/%d/%Y')
-            all_dates.append(reformat_date)
+            matches.append(span.text)
+        # if matches were found, return the list of panel members
+        if matches:
+            return sorted(set(matches))
+        # otherwise, the judge is in the appellate list; either not in the list
+            # or not an appellate judge
+        else:
+            return [] # IS THIS OKAY?
 
-        sorted_dates = sorted(all_dates, reverse=True)
-        # Backend requested output format: 'yyyy-mm-dd'
-        return '{}-{}-{}'.format(sorted_dates[0].year, sorted_dates[0].month, sorted_dates[0].day)
-
-    def get_panel(self) -> List[str]:
-         """
-         • Returns a list of panel members for appellate case documents.
-         """
-
-         matcher = PhraseMatcher(nlp.vocab) # Create the phrase matcher
-         uid = 0 # Unique identifier for each judge's patterns
-
-         # Add two patterns to the matcher for each judge
-         for judge in panel_members:
-             matcher.add(f'PATTERN_{uid}', [nlp(judge)]) # Just the name as it is in the list
-             matcher.add(f'PATTERNX_{uid}', [nlp(judge.replace(".",""))]) # A pattern that looks for the names without periods, sometimes not picked up by the scan
-             uid += 1
-
-         matches = matcher(self.doc) # Run the phrase matcher over the doc
-         case_panel_members = set()
-
-         if len(matches) > 0: # If a judge from our list is found in the document
-             for match_id, start, end in matches:
-                 judge = self.doc[start:end] # A span object of the match, fetched with its `start` and `end` indecies within the doc
-                 case_panel_members.add(judge.text) # Extract the text from the span object, and add to the set of panel members
-
-         return list(case_panel_members)
-
-
-    def get_surrounding_sents(self, token: Token) -> Span:
+    def get_gender(self):
         """
-        • This function will return the two sentences surrounding the token,
-        including the sentence holding the token.
+        Searches through a given document and counts the TOTAL number of
+        "male" pronoun uses and "female" pronoun uses. Whichever
+        count("M" or "F") is higher, that gender is returned.
+        In the event of a tie; currently returns "Unknown"; may be able to
+        code this edge case. Current accuracy is >95%, low priority fix.
         """
-        start: int
-        start = token.sent.start
+        # List if gendered pronouns
+        male_prons = ['he', "he's", 'his', 'him', 'himself']
+        female_prons = ['she', "she's", 'her', 'hers', 'herself']
 
-        end: int
-        end = token.sent.end
+        # list for spacy.matcher pattens
+        f_patterns = []
+        m_patterns = []
 
-        try:
-            sent_before_start: int
-            sent_before_start = self.doc[start - 1].sent.start
-            sent_after_end: int
-            sent_after_end = self.doc[end + 1].sent.end
-        except (IndexError, AttributeError):
-            return token.sent
+        # generating list of patterns (f: pattern = [{'LOWER': word}]), for
+            # spacy matcher search
 
-        surrounding: Span
-        surrounding = self.doc[sent_before_start:sent_after_end + 1]
+        for prons in female_prons:
+            f_patterns.append([{'LOWER':prons}])
+        for prons in male_prons:
+            m_patterns.append([{'LOWER':prons}])
 
-        return surrounding
+        # use simlar() function (Above) to find patterns(pronouns) in whole
+        # text
+        m_similar = similar(self.doc, m_patterns)
+        f_similar = similar(self.doc, f_patterns)
 
-    def get_protected_grounds(self) -> str:
+        # check the number of gendered pronoun occurrences and return gender
+        if len(m_similar) > len(f_similar):
+            return 'Male'
+        elif len(f_similar) > len(m_similar):
+            return 'Female'
+        else:
+            return 'Unknown'
+
+
+    def get_protected_grounds(self):
         """
-        • This will return the protected ground(s) of the applicant. Special
+        This will return the protected ground(s) of the applicant. Special
         checks are needed. Checking for keywords is not enough, as sometimes
         documents label laws that describe each protected ground. Examples
         are 'Purely Political Offense' and 'Real Id Act'.
         """
-        protected_grounds: List[str] = [
-            'race',
-            'religion',
-            'nationality',
-            'social',
-            'political',
+        pattern = [
+        [{"LOWER": "race"}],
+        [{"LOWER": "religion"}], # expand to check for list of religions
+        [{"LOWER": "nationality"}], # phrase is pulled but out of context
+        [{"LOWER": "social"}, {"LOWER": "group"}],
+        [{"LOWER": "political"}, {"LOWER": "opinion"}],
+        [{"LOWER": "political"}, {"LOWER": "offense"}],
+        [{"LOWER": "political"}],
         ]
 
-        pgs = []
+        religions = ['christianity','christian','islam','atheist','hinduism',
+                     'buddihism','jewish','judaism','islamist','sunni','shia',
+                     'muslim','buddhist','atheists','jew','hindu', 'atheism']
 
-        similar_pg: Callable[[str, float], Union[str, None]]
-        similar_pg = similar_in_list(protected_grounds)
+        politicals = ['political opinion', 'political offense']
 
-        for token in self.doc:
+        confirmed_matches = []
+        # create pattern for specified religions
+        for religion in religions:
+            pattern.append([{"LOWER": religion}])
 
-            sent: str = token.sent.text.lower()
 
-            s: Union[str, None] = similar_pg(token.text.lower(), 0.9)
+        potential_grounds = similar(self.doc, pattern)
 
-            if s == 'social':
-                next_word = self.doc[token.i + 1].text.lower()
-                if not similar(next_word, 'group', 0.95):
-                    continue
+        for match in potential_grounds:
+            # remove 'nationality act' from potential_grounds
+            if match.text.lower() == 'nationality' \
+            and 'act' not in match.sent.text.lower() \
+            and 'nationality' not in confirmed_matches:
+                confirmed_matches.append('nationality')
 
-            elif s == 'political':
-                next_word = self.doc[token.i + 1].text.lower()
-                if similar(next_word, 'offense', 0.95):
-                    continue
+        # check for specified religion, replace with 'religion'
+            elif match.text.lower() in religions:
+                if 'religion' not in confirmed_matches:
+                    confirmed_matches.append('religion')
 
-            elif s == 'nationality':
-                next_word = self.doc[token.i + 1].text.lower()
-                if similar(next_word, 'act', 1):
-                    continue
+            elif match.text.lower() in politicals:
+                if 'political' not in confirmed_matches:
+                    confirmed_matches.append('political')
 
-            if s:
-                surrounding: Span
-                surrounding = self.get_surrounding_sents(token)
-
-                if 'real id' in sent:
-                    continue
-                elif 'grounds specified' in surrounding.text.lower():
-                    continue
-                elif 'no claim' in surrounding.text.lower():
-                    continue
-
-                pgs.append(s)
-
-        return '; '.join(set(pgs))
+            else:
+                if match.text.lower() not in confirmed_matches:
+                    confirmed_matches.append(match.text.lower())
+        return confirmed_matches
 
     def get_application(self) -> str:
         """
@@ -507,50 +627,81 @@ class BIACase:
         return outcomes_return
 
     def get_state(self):
-        '''this still needs to be implemented'''
-        return 'New California'
+        return "CA"
+        # """
+        # IF the case is an appellate decision the first page will show
+        # the legal teams' address on page 1, and the respondents address
+        # on page 2. We need to decide if appellate before getting state.
+        #
+        # Finds the city & state the respondent originally applied in. The function
+        # returns the state. City can be accessed as an attribute.
+        # """
+        #
+        # pattern = [
+        #     [{"LOWER": 'file'}],
+        #     [{"LOWER": 'files'}]
+        #     ]
+        #
+        # matches = similar(self, pattern)
+        #
+        # sentence = str(matches[0].sent)
+        # clean_sentence = sentence.replace(',', ' ').replace('\n', ' ')
+        #
+        # #if an appellate case the first page will have the location of the
+        # # appellate court, NOT origin
+        # if self.appellate:
+        #
+        #     #finds first state that's in the citycache
+        #     for abbrev in clean_sentence:
+        #         if abbrev in US_abbrev.keys():
+        #             return abbrev
+        #
+        # else:
+        #     #if non-appellate the first page will have the court location
+        #     # including city & state
+        #     for s in self.doc:
+        #         if s in US_abbrev.keys():
+        #             return s
 
     def get_city(self):
-        """
-        Finds the city & state the respondent originally applied in. The function
-        returns the state. City can be accessed as an attribute.
-        """
-        statecache = []
-        citycache = set()
-
-        fileloc = 0
-        for token in self.doc:
-            if token.text == 'File':
-                fileloc += token.idx
-                break
-
-        for k in court_locs.keys():
-            for s in re.findall(f"(?:{k})", self.doc.text[:750]):
-                statecache.append(s)
-
-        c = Counter(statecache)
-        state = c.most_common(n=1)[0][0]
-
-        for v in court_locs.get(state)['city']:
-            for c in re.findall(f"(?:{v}, {state})", self.doc.text[:750]):
-                citycache.add(v)
-
-        if len(citycache) == 1:
-            self.state = state
-            self.city = list(citycache)[0]
-            return state
-
-        elif len(citycache) > 1:
-            for c in citycache:
-                if c in self.doc.text[fileloc: fileloc + 100]:
-                    self.state = state
-                    self.city = c
-                    return state
-
-        else:
-            self.state = state
-            self.city = "; ".join(list(citycache))
-            return state
+        return "Neu Boston"
+    #     #uses the abbreviation from self.state and #gets the list of cities in
+    #     # a state
+    #     citycache = set()
+    #     if self.state:
+    #         for v in court_locs.get(self.state)['city']:
+    #             citycache.add(v)
+    #
+    #     else:
+    #         for k, v in cour_loc.items():
+    #             for v in court_locs.get(k):
+    #                  citycache.add(v)
+    #
+    #     pattern = [
+    #         [{"LOWER": 'file'}],
+    #         [{"LOWER": 'files'}]
+    #         ]
+    #
+    #     matches = similar(self.doc, pattern)
+    #
+    #     sentence = str(matches[0].sent)
+    #     clean_sentence = sentence.replace(',', ' ').replace('\n', ' ').title()
+    #
+    #     #if an appellate case the first page will have the location of the
+    #     # appellate court, NOT origin
+    #     if self.appellate:
+    #
+    #         #finds first city that's in the citycache
+    #         for word in clean_sentence:
+    #             if word in citycache:
+    #                 return word
+    #
+    #     else:
+    #         #if non-appellate the first page will have the court location
+    #         # including city & state
+    #         for s in self.doc:
+    #             if s in citycache:
+    #                 return s
 
     def get_based_violence(self) -> List[str]:
         """
@@ -739,50 +890,7 @@ class BIACase:
         return_dict["USC"] = USC
         return return_dict
 
-    def get_gender(self) -> str:
-        """
-        Based on sentences where the Respondent/Applicant keywords are found,
-        count the instances of gendered pronouns. This approach assumes the
-        sentence refers to subject in shorthand by using gendered pronouns
-        as opposed to keywords multiple times in sentence. This function
-        returns a final result to be packaged into json.
-        Parameters:
-        spacy.doc (obj):
-        Returns:
-        str: Gender
-        """
 
-        # Search terms formatted
-        phrases = ["respondent", "respondents", "applicant", 'filed an application']
-        patterns = [nlp(text) for text in phrases]
-
-        # Gender constants
-        male_prons = ['he', "he's", 'his', 'himself']
-        female_prons = ['she', "she's", 'her', 'herself']
-
-        # Variables for analysis storage
-        male_found = []
-        female_found = []
-
-        # PhraseMatcher setup, add tag (RESP) and pass in patterns
-        phrase_matcher = PhraseMatcher(nlp.vocab, attr='LEMMA')
-        phrase_matcher.add("RESP", None, *patterns)
-
-        # Sentences with both 'RESP' tag and gendered pronouns added to respective list
-        for sent in self.doc.sents:
-            for match_id, _, _ in phrase_matcher(nlp(sent.text)):
-                if nlp.vocab.strings[match_id] in ['RESP', *male_prons]:
-                    male_found.append(sent.text)
-                elif nlp.vocab.strings[match_id] in ['RESP', *female_prons]:
-                    female_found.append(sent.text)
-
-        # Make `set()` of list to eliminate duplicates and compare lengths
-        if len(set(female_found)) > len(set(male_found)):
-            return "Female"
-        elif len(set(male_found)) > len(set(female_found)):
-            return "Male"
-        else:
-            return "Unknown"
 
     def get_indigenous_status(self) -> str:
         """
