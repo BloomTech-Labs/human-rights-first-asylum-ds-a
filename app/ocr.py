@@ -1,7 +1,7 @@
 """
 IMPORTS/LIBS
 Imports of libraries and packages, including spacy nlp library, and reading in
-court location dictionary
+court location dictionary.
 """
 
 import datetime
