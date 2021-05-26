@@ -1,29 +1,35 @@
-import time
-import json
-from collections import Counter
-from typing import List, Tuple, Union, Callable, Dict, Iterator
-from collections import defaultdict
-from difflib import SequenceMatcher
-import re
-import datetime
-import pytesseract
-from pdf2image import convert_from_bytes
-from bs4 import BeautifulSoup
-import geonamescache
-import requests
-from spacy import load
-from spacy.tokens.doc import Doc
-from spacy.tokens.span import Span
-from spacy.tokens.token import Token
-from spacy.matcher import Matcher, PhraseMatcher
-from fuzzywuzzy import process
+"""
+IMPORTS/LIBS
+Imports of libraries and packages, including spacy nlp library, and reading in
+court location dictionary
+"""
 
+
+import datetime
+import json
+import time
+import geonamescache
+import re
+import requests
+import pytesseract
+from collections import Counter, defaultdict
+from pdf2image import convert_from_bytes
+from spacy import load
+from spacy.tokens import Doc, Span, Token
+from spacy.matcher import Matcher, PhraseMatcher
+from typing import List, Tuple, Union, Callable, Dict, Iterator
 
 nlp = load("en_core_web_sm")
 
 # Read in dictionary of all court locations
 with open('./app/court_locations.json') as f:
     court_locs = json.load(f)
+
+"""
+MAKE FILEDS
+This is the main overall function that creates a dictionary of the desired
+fields and their respective values; info that goes into those fields.
+"""
 
 
 def make_fields(file) -> dict:
@@ -55,37 +61,39 @@ def make_fields(file) -> dict:
     case_data["time to process"] = f"{time_taken:.2f} seconds"
     return case_data
 
+"""
+SIMILAR/Matcher functions
+functions that search court document texts for phrases or specific words; used
+in get_outcome, get_country_of_origin, get_outcome
+"""
 
-def similar(a: str, return_b: str, min_score: float) -> Union[str, None]:
+
+def similar(self, matcher_pattern):
     """
-    • Returns 2nd string if similarity score is above supplied
-    minimum score. Else, returns None.
+    A function that uses a spacy Matcher object to search for words or
+    consecutive words as a phrase.
+
+    Format: pattern = [{"LOWER": <word>}, {"LOWER": <the next word>}, ...etc]
+    Can look for multiple patterns simultaneously using list of patterns;
+        [[{"ARG": word}], [{"ARG": word}], [{"ARG": word}]]
+
+    DOC: https://spacy.io/usage/rule-based-matching
     """
-    if SequenceMatcher(None, a, return_b).ratio() >= min_score:
-        return return_b
+    # create matcher object
+    matcher = Matcher(nlp.vocab)
 
+    # Add the pattern that will be searched for
+    matcher.add('matcher_pattern', matcher_pattern)
 
-def similar_in_list(lst: Union[List[str], Iterator[str]]) -> Callable:
-    """
-    • Uses a closure on supplied list to return a function that iterates over
-    the list in order to search for the first similar term. It's used widely
-    in the scraper.
-    """
-
-    def impl(item: str, min_score: float) -> Union[str, None]:
-        for s in lst:
-            s = similar(item, s, min_score)
-            if s:
-                return s
-
-    return impl
+    # return the "matcher" objects; as Span objects(human readable text)
+    return matcher(self.doc, as_spans=True)
 
 def similar_outcome(str1, str2):
     """
-    Returns True if the strings are off by a single character, and that 
-    character is not a 'd' at the end. That 'd' at the end of a word is highly 
+    Returns True if the strings are off by a single character, and that
+    character is not a 'd' at the end. That 'd' at the end of a word is highly
     indicative of whether something is actually an outcome.
-    
+
     This is used in the get_outcome() method.
     """
     if abs(len(str1) - len(str2)) > 1:
@@ -98,14 +106,14 @@ def similar_outcome(str1, str2):
     # We've reached the end of one string, the other is one character longer
     if i == min_len:
         # If that character is a 'd', return False, otherwise True
-        if ((len(str1) > len(str2) and str1[-1] == 'd') 
+        if ((len(str1) > len(str2) and str1[-1] == 'd')
             or (len(str2) > len(str1) and str2[-1] == 'd')):
             return False
         else:
             return True
 
     # We're looking at a substitution that is 'd' at the end
-    if (i == len(str1) -1 and len(str1) == len(str2) 
+    if (i == len(str1) -1 and len(str1) == len(str2)
         and (str1[-1] == 'd' or str2[-1] == 'd')):
         return False
 
@@ -134,7 +142,13 @@ def similar_outcome(str1, str2):
 
     return False
 
-# TODO: This static list should be stored and accessed via the backend 
+"""
+LISTS
+
+global info about judges; states and their court circuits
+"""
+
+# TODO: This static list should be stored and accessed via the backend
 panel_members = [
      "Adkins-Blanch, Charles K.",
      "Michael P. Baird",
@@ -187,16 +201,24 @@ panel_members = [
 
 circuit_dict = {
     '''used by get_circuit'''
-    'DC': 'DC', 'ME': '1', 'MA': '1', 'VT': '1', 'RI': '1', 'PR': '1', 
+    'DC': 'DC', 'ME': '1', 'MA': '1', 'VT': '1', 'RI': '1', 'PR': '1',
     'CT': '2', 'NY': '2', 'VT': '2', 'DE': '3', 'PA': '3', 'NJ': '3', 'VI': '3',
     'MD': '4', 'VA': '4', 'NC': '4', 'SC': '4', 'WV': '4', 'LA': '5', 'MS': '5',
     'TX': '5', 'KY': '6', 'OH': '6', 'TN': '6', 'MI': '6', 'IL': '7', 'IN': '7',
     'WI': '7', 'AK': '8', 'IA': '8', 'MN': '8', 'MO': '8', 'NE': '8', 'ND': '8',
     'SD': '8', 'AK': '9', 'AZ': '9', 'CA': '9', 'GU': '9', 'HI': '9', 'ID': '9',
-    'MT': '9', 'NV': '9', 'MP': '9', 'OR': '9', 'WA': '9', 'CO': '10', 
+    'MT': '9', 'NV': '9', 'MP': '9', 'OR': '9', 'WA': '9', 'CO': '10',
     'KS': '10', 'NM': '10', 'OK': '10', 'UT': '10', 'WY': '10', 'AL': '11',
     'FL': '11', 'GA': '11'
  }
+
+
+"""CLASS and Get methods
+
+The following defines the BIACase Class. When receiving a court doc, we use this
+Class and the algorithms/methods to extract info for the desired fields/info
+that are scraped from the text of the court docs.
+"""
 
 class BIACase:
     def __init__(self, text: str):
@@ -208,16 +230,16 @@ class BIACase:
         """
         self.doc: Doc = nlp(text)
         self.ents: Tuple[Span] = self.doc.ents
-        # get_appellate() needs to be called before get_panel()
-        self.appellate = self.get_appellate(), 
+        # !!!get_appellate() needs to be called before get_panel()
+        self.appellate = self.get_appellate(),
         self.application = self.get_application(),
         self.date = self.get_date(),
         self.country_of_origin = self.get_country_of_origin(),
         self.panel = self.get_panel(),
-        # get_outcome() needs to be called before get_protected_grounds()
-        self.outcome = self.get_outcome(), 
-        # get_state() needs to be called before get_city() and get_circuit()
-        self.state = self.get_state(), 
+        # !!!get_outcome() needs to be called before get_protected_grounds()
+        self.outcome = self.get_outcome(),
+        # !!!get_state() needs to be called before get_city() and get_circuit()
+        self.state = self.get_state(),
         self.city = self.get_city()
         self.circuit = self.get_circuit()
         self.protected_grounds = self.get_protected_grounds(),
@@ -240,7 +262,7 @@ class BIACase:
     def get_circuit(self):
         '''returns the circuit the case started in.'''
         return circuit_dict[self.state]
-    
+
     def get_appellate(self):
         '''this still needs to be implemented'''
         return True
@@ -269,7 +291,7 @@ class BIACase:
         """
         • Finds all dates within document in all different formats
         • Returns most recent date found within document
-        • Returns all dates in standard XX/XX/XXXX format 
+        • Returns all dates in standard XX/XX/XXXX format
         """
         # Format: MM/DD/YYYY
         pattern_1 = [{'TEXT': {'REGEX': r'^\d{1,2}/\d{1,2}/\d{2}(?:\d{2})?$'}}]
@@ -610,7 +632,7 @@ class BIACase:
                 if str(self.doc[vs_start:vs_end]) not in cases_with_dupes:
                     cases_with_dupes.append(str(self.doc[vs_start:vs_end]))
 
-            # Append 'Matter of X' precedent cases 
+            # Append 'Matter of X' precedent cases
             if str(token) == 'Matter':
                 start_index = token.i
                 false_flag = False
@@ -773,7 +795,8 @@ class BIACase:
         # indigenous = [
         #     'indigenous'
         # ]
-        #
+        # !!! Would need to change this code to use SIMLAR/spacy matcher
+            # INSTEAD of similar_in_list
         # similar_indig: Callable[[str, float], Union[str, None]]
         # similar_indig = similar_in_list(indigenous)
         #
@@ -857,6 +880,8 @@ class BIACase:
         # credibility = [
         #     'credible'
         # ]
+        # !!! NO Longer using similar_in_list, Use the new SIMLIlAR function
+            # and SPACY matcher or PhraseMatcher
         # similar_cred: Callable[[str, float], Union[str, None]]
         # similar_cred = similar_in_list(credibility)
         # for token in self.doc:
@@ -884,7 +909,6 @@ class BIACase:
         If it does, and one of the five terms ("year", "delay", "time",
         "period", "deadline") is within 10 lemmas, then the function
         returns True.  Otherwise, it returns False.
-
         If one of the four context words are w/in 100 characters of the
         phrase, we conclude that it is related to the one-year rule
         """
