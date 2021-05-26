@@ -322,25 +322,73 @@ class BIACase:
         '''this still needs to be implemented'''
         return True
 
-    def get_country_of_origin(self) -> Union[str, None]:
+    def get_country_of_origin(self):
         """
-        • Returns the country of origin of the applicant. Currently just checks
-        the document for a country that is NOT the United States.
+        RETURNS the respondent's or respondents' country of origin:
         """
+
+        """Generate COUNTRIES list"""
+        # sorted list of all current countries
         gc = geonamescache.GeonamesCache()
-        countries: Iterator[str] = gc.get_countries_by_names().keys()
+        countries = sorted(gc.get_countries_by_names().keys())
+        # remove U.S. and its territories from countries
+        if "American Samoa" in countries:
+            countries.remove("American Samoa")
+        if "Guam" in countries:
+            countries.remove("Guam")
+        if "Northern Mariana Islands" in countries:
+            countries.remove("Northern Mariana Islands")
+        if "Puerto Rico" in countries:
+            countries.remove("Puerto Rico")
+        if "United States" in countries:
+            countries.remove("United States")
+        if "United States Minor Outlying Islands" in countries:
+            countries.remove("United States Minor Outlying Islands")
+        if "U.S. Virgin Islands" in countries:
+            countries.remove("U.S. Virgin Islands")
 
-        locations: Iterator[str]
-        locations = map(lambda ent: ent.text, self.get_ents(['GPE']))
 
-        similar_country: Callable[[str, float], Union[str, None]]
-        similar_country = similar_in_list(countries)
+        """
+        PRIMARY search:
+        in most cases, the term/pattern "citizen(s) of" appears in the same
+            sentence the country of origin spacy.matcher patterns list, looking
+            for the following phrase matches following these patterns is
+            practically guaranteed to be the country of origin
+        """
+        # create a spacy matcher pattern
+        primary_pattern = [
+            [{"LOWER": "citizen"}, {"LOWER": "of"}],
+            [{"LOWER": "citizens"}, {"LOWER": "of"}],
+        ]
 
-        for loc in locations:
-            origin: Union[str, None]
-            origin = similar_country(loc, 0.8)
-            if origin and origin != "United States":
-                return origin
+        # instantiate a list of pattern matches
+        spans = similar(primary_pattern, self.doc)
+        # if there are matches
+        if spans:
+            # grab the surrounding sentence and turn it into a string
+            sentence = str(spans[0].sent)
+            # remove line breaks, edge case
+            clean_sent = sentence.replace("\n", " ")
+            # iterate through the countries list, and return it if it's in the
+                # cleaned sentence
+            for country in countries:
+                if country in clean_sent:
+                    return country
+
+
+        #SECONDARY search:
+        # If citizen of wasn't found or if it WAS found but no country followed,
+        # look through the whole doc for the first instance of a non-U.S. country.
+        else:
+            # untokenize and normalize
+            tok_text = str(self.doc).lower()
+            # edge case where line breaks appear in the middle of a multi-word
+                # country, an effect of turning the tokenized text to a string
+            clean_text = tok_text.replace("\n", " ")
+            # iterate through countries for a foreign entity.
+            for country in countries:
+                if country.lower() in clean_text:
+                    return country
 
     def get_date(self) -> str:
         """
