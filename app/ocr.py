@@ -591,7 +591,7 @@ class BIACase:
             if state_matches[0].text in court_locs.keys():
                 return state_matches[0]
             else:
-                return "No Matches"
+                return "Please select state"
             
 
     def get_city(self):
