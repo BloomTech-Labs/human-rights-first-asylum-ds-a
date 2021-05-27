@@ -118,27 +118,16 @@ def similar_outcome(str1, str2):
         return False
 
     # We're looking at a substitution other than 'd' at the end
-    i2 = i + 1
-    while i2 < min_len and str1[i2] == str2[i2]:
-        i2 += 1
-    if i2 == len(str1) and i2 == len(str2):
+    if str1[i+1:] == str2[i+1:]:
         return True
 
     # We're in the middle, str1 has an extra character
-    if len(str1) == len(str2) + 1:
-        i2 = i
-        while i2 < min_len and str1[i2+1] == str2[i2]:
-            i2 += 1
-        if i2 + 1 == len(str1) and i2 == len(str2):
-            return True
-
+    if str1[i+1:] == str2[i:]:
+        return True
+    
     # We're in the middle, str2 has an extra character
-    if len(str1) + 1 == len(str2):
-        i2 = i
-        while i2 < min_len and str1[i2] == str2[i2+1]:
-            i2 += 1
-        if i2 == len(str1) and i2 + 1 == len(str2):
-            return True
+    if str1[i:] == str2[i+1:]:
+        return True
 
     return False
 
@@ -218,13 +207,13 @@ appellate_panel_members = [
  ]
 
 
+'''used by get_circuit'''
 circuit_dict = {
-    '''used by get_circuit'''
-    'DC': 'DC', 'ME': '1', 'MA': '1', 'VT': '1', 'RI': '1', 'PR': '1',
+    'DC': 'DC', 'ME': '1', 'MA': '1', 'NH': '1', 'RI': '1', 'PR': '1',
     'CT': '2', 'NY': '2', 'VT': '2', 'DE': '3', 'PA': '3', 'NJ': '3', 'VI': '3',
     'MD': '4', 'VA': '4', 'NC': '4', 'SC': '4', 'WV': '4', 'LA': '5', 'MS': '5',
     'TX': '5', 'KY': '6', 'OH': '6', 'TN': '6', 'MI': '6', 'IL': '7', 'IN': '7',
-    'WI': '7', 'AK': '8', 'IA': '8', 'MN': '8', 'MO': '8', 'NE': '8', 'ND': '8',
+    'WI': '7', 'AR': '8', 'IA': '8', 'MN': '8', 'MO': '8', 'NE': '8', 'ND': '8',
     'SD': '8', 'AK': '9', 'AZ': '9', 'CA': '9', 'GU': '9', 'HI': '9', 'ID': '9',
     'MT': '9', 'NV': '9', 'MP': '9', 'OR': '9', 'WA': '9', 'CO': '10',
     'KS': '10', 'NM': '10', 'OK': '10', 'UT': '10', 'WY': '10', 'AL': '11',
@@ -1009,40 +998,41 @@ class BIACase:
         #             return 'N/A to case'
         return "Test"
 
-    def check_for_one_year(self) -> bool:
+    def check_for_one_year_new(self) -> bool:
         """
         Checks whether or not the asylum-seeker argued to be exempt from the
-        one-year guideline.  Specifically, it checks to see if the document
-        contains either "changed circumstance" or "extraordinary circumstance".
-        If it does, and one of the five terms ("year", "delay", "time",
-        "period", "deadline") is within 10 lemmas, then the function
-        returns True.  Otherwise, it returns False.
-        If one of the four context words are w/in 100 characters of the
-        phrase, we conclude that it is related to the one-year rule
+        one-year guideline.
+        
+        Returns true if the phrase "within one-year" appears in the document.
+        Also returns true if a time-based word appears in the same sentence
+        with "extraordinary circumstances" or "changed circumstances" or
+        "untimely application". Otherwise, returns False.
+        
         """
-        terms = ('year', 'delay', 'time', 'period', 'deadline')
-        lemma_list = [token.lemma_.lower() for token in self.doc]
-
-        for idx in range(0, len(lemma_list)):
-            if lemma_list[idx] == 'change' and \
-                    lemma_list[idx + 1] == 'circumstance':
-                idx_start = lemma_list.index('change')
-                idx_end = idx_start + 1
-                search_list = [
-                    lemma for lemma in lemma_list[idx_start - 10: idx_end + 10]
-                ]
-                if any(term in search_list for term in terms):
+        year_pattern = [
+            [{'LOWER':'within'}, {'LOWER': {'IN':['1', 'one']}}, 
+             {'LOWER': '-', 'OP': '?'}, {'LOWER': 'year'}]
+        ]
+        matcher = Matcher(nlp.vocab)
+        matcher.add('year pattern', year_pattern)
+        matches = matcher(self.doc, as_spans=True)
+        if matches:
+            return True
+        matcher.remove('year pattern')
+        
+        secondary_terms = {'year', 'delay', 'time', 'period', 'deadline'}
+        circumstance_pattern = [
+            [{'LEMMA': {'IN':['change', 'extraordinary']}}, 
+             {'LOWER': {'IN':['"', '”']}, 'OP': '?'}, {'LEMMA': 'circumstance'}]
+        ]
+        application_pattern = [
+            [{'LOWER':'untimely'}, {'LOWER':'application'}]
+        ]
+        matcher.add('circumstance pattern', circumstance_pattern)
+        matcher.add('application pattern', application_pattern)
+        matches = matcher(self.doc, as_spans=True)
+        for match in matches:
+            for token in match.sent:
+                if token.lemma_ in secondary_terms:
                     return True
-
-        for idx in range(0, len(lemma_list)):
-            if lemma_list[idx] == 'extraordinary' and \
-                    lemma_list[idx + 1] == 'circumstance':
-                idx_start = lemma_list.index('extraordinary')
-                idx_end = idx_start + 1
-                search_list = [
-                    lemma for lemma in lemma_list[idx_start - 10: idx_end + 10]
-                ]
-                if any(term in search_list for term in terms):
-                    return True
-
         return False
