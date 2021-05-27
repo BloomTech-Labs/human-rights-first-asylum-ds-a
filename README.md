@@ -22,7 +22,7 @@ Uses Python and Tesseract for optical character recognition (OCR) to convert pdf
 
 ## Our Role
 
-See this team's history [here]().
+See this team's history [here](ProjectHistory.md).
 
 
 ## Files
@@ -30,14 +30,14 @@ See this team's history [here]().
 The **app** folder contains the FastAPI application which creates an endpoint for processing a single `.pdf` file stored in the AWS S3 bucket. 
 
 ### Additional Readmes
-- [SCRAPER_INFO](https://github.com/Lambda-School-Labs/human-rights-first-asylum-ds-a/blob/main/SCRAPER_INFO.md) contains important information about the status of each function used to extract fields from documents.
-- [KnownDefects](https://github.com/Lambda-School-Labs/human-rights-first-asylum-ds-a/blob/main/KnownDefects.md) contains information about potential issues to be aware of.
-- [NOTEBOOKS]() contains helpful information about the notebooks and scripts used to explore solutions.
+- [SCRAPER_INFO](SCRAPER_INFO.md) contains important information about the status of each function used to extract fields from documents.
+- [KnownDefects](KnownDefects.md) contains information about potential issues to be aware of.
+- [NOTEBOOKS](notebooks/NOTEBOOKS.md) contains helpful information about the notebooks and scripts used to explore solutions.
 
 ## Tools
 
  * [Pytesseract](https://github.com/madmaze/pytesseract) - package for converting pdfs to text
- * [FastAPI](https://github.com/tiangolo/fastapi) - API for endpoint that processes pdfs
+ * [FastAPI](https://github.com/tiangolo/fastapi) - API for endpoint that processes pdfs and data visualizations
  * [AWS Elastic Beanstalk](https://aws.amazon.com/elasticbeanstalk/) - Service for app deployment
 
 ## API Installation
@@ -52,9 +52,16 @@ docker run -it -p 5000:5000 <name> uvicorn app.main:app --host=0.0.0.0 --port=50
 NOTE: An error may be thrown when trying to run the app if you have not added the .env file with aws credentials
 ```
 
-Then open http://0.0.0.0:5000 in your browser. The application should be running. 
-
+Then open http://0.0.0.0:5000 in your browser. The application should be running.   
+*If `0.0.0.0` does not work, try `http://localhost:5000`*
+  
 ## Contributors
+
+###### Labs 34
+[Jacob Bohlen](https://github.com/JRBOH)
+[Kevin Weatherwalks](https://github.com/KWeatherwalks)  
+
+
 ###### Labs 33
 [Michael Kolek](https://github.com/InqM)  
 [Francis LaBounty](https://github.com/francislabountyjr)  
