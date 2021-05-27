@@ -58,9 +58,9 @@ Then open http://0.0.0.0:5000 in your browser. The application should be running
 ## Contributors
 
 ###### Labs 34
-[Jacob Bohlen](https://github.com/JRBOH)
+[Jacob Bohlen](https://github.com/JRBOH)  
 [Kevin Weatherwalks](https://github.com/KWeatherwalks)  
-[River Bellamy](https://github.com/RiverBellamy)
+[River Bellamy](https://github.com/RiverBellamy)  
 
 
 ###### Labs 33
