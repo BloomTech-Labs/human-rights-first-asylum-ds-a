@@ -49,16 +49,16 @@
 ### Outcomes
 - **Function name: **`get_outcome()`
 - **Details:** Returns outcome of case
-- **Returns:** One or more of the following:
-            'reversal',
-			'remanded',
+- **Returns:** A string consisting of one or more of the following:
+            'reversed',
+	    'remanded',
             'dismissed',
             'sustained',
             'terminated',
             'granted',
             'denied',
-            'returned',
-- **Current Status:** Correctly pulling fields as of 4/28. Need to communicate with backend team to make sure output is formatted correctly.
+            'affirmed',
+- **Current Status:** Currently getting 100% accuracy on training data. Contact River Bellamy with any questions.
 
 ### Protected Grounds
 - **Function name: **`get_protected_grounds()`
@@ -85,5 +85,8 @@
 ### Credibility
 
 ### If Applicant Met Filing Deadline
-
+- **Function name: **`check_for_one_year()`
+- **Details:** An applicant for asylum is required to file their request for asylum within one year of arriving in the US, unless there are extraordinary or changed circumstances that justify the delay. This method determines whether the issue of this filing deadline is discussed in the case.
+- **Returns:** Bool
+- **Current Status:** Currently getting 100% accuracy on the trainign data. Contact River Bellamy with any questions.
 ### Statutes
