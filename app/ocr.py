@@ -220,65 +220,6 @@ circuit_dict = {
     'FL': '11', 'GA': '11'
  }
 
-US_abbrev = {
-        'AL': 'Alabama',
-        'AK': 'Alaska',
-        'AS': 'American Samoa',
-        'AZ': 'Arizona',
-        'AR': 'Arkansas',
-        'CA': 'California',
-        'CO': 'Colorado',
-        'CT': 'Connecticut',
-        'DE': 'Delaware',
-        'DC': 'District of Columbia',
-        'FL': 'Florida',
-        'GA': 'Georgia',
-        'GU': 'Guam',
-        'HI': 'Hawaii',
-        'ID': 'Idaho',
-        'IL': 'Illinois',
-        'IN': 'Indiana',
-        'IA': 'Iowa',
-        'KS': 'Kansas',
-        'KY': 'Kentucky',
-        'LA': 'Louisiana',
-        'ME': 'Maine',
-        'MD': 'Maryland',
-        'MA': 'Massachusetts',
-        'MI': 'Michigan',
-        'MN': 'Minnesota',
-        'MS': 'Mississippi',
-        'MO': 'Missouri',
-        'MT': 'Montana',
-        'NE': 'Nebraska',
-        'NV': 'Nevada',
-        'NH': 'New Hampshire',
-        'NJ': 'New Jersey',
-        'NM': 'New Mexico',
-        'NY': 'New York',
-        'NC': 'North Carolina',
-        'ND': 'North Dakota',
-        'MP': 'Northern Mariana Islands',
-        'OH': 'Ohio',
-        'OK': 'Oklahoma',
-        'OR': 'Oregon',
-        'PA': 'Pennsylvania',
-        'PR': 'Puerto Rico',
-        'RI': 'Rhode Island',
-        'SC': 'South Carolina',
-        'SD': 'South Dakota',
-        'TN': 'Tennessee',
-        'TX': 'Texas',
-        'UT': 'Utah',
-        'VT': 'Vermont',
-        'VI': 'Virgin Islands',
-        'VA': 'Virginia',
-        'WA': 'Washington',
-        'WV': 'West Virginia',
-        'WI': 'Wisconsin',
-        'WY': 'Wyoming'
-        }
-
 """CLASS and Get methods
 
 The following defines the BIACase Class. When receiving a court doc, we use this
@@ -314,7 +255,7 @@ class BIACase:
         self.indigenous_status = self.get_indigenous_status(),
         self.applicant_language = self.get_applicant_language(),
         self.credibility = self.get_credibility(),
-        self.one_year = self.check_for_one_year(),
+        self.one_year = self.check_for_one_year_new(),
         self.precedent_cases = self.get_precedent_cases(),
         self.statutes = self.get_statutes(),
 
@@ -615,82 +556,100 @@ class BIACase:
 
         return outcomes_return
 
-    def get_state(self):
-        return "CA"
-        # """
-        # IF the case is an appellate decision the first page will show
-        # the legal teams' address on page 1, and the respondents address
-        # on page 2. We need to decide if appellate before getting state.
-        #
-        # Finds the city & state the respondent originally applied in. The function
-        # returns the state. City can be accessed as an attribute.
-        # """
-        #
-        # pattern = [
-        #     [{"LOWER": 'file'}],
-        #     [{"LOWER": 'files'}]
-        #     ]
-        #
-        # matches = similar(self, pattern)
-        #
-        # sentence = str(matches[0].sent)
-        # clean_sentence = sentence.replace(',', ' ').replace('\n', ' ')
-        #
-        # #if an appellate case the first page will have the location of the
-        # # appellate court, NOT origin
-        # if self.appellate:
-        #
-        #     #finds first state that's in the citycache
-        #     for abbrev in clean_sentence:
-        #         if abbrev in US_abbrev.keys():
-        #             return abbrev
-        #
-        # else:
-        #     #if non-appellate the first page will have the court location
-        #     # including city & state
-        #     for s in self.doc:
-        #         if s in US_abbrev.keys():
-        #             return s
+    def get_state(doc):
+        #Create list to hold matcher patterns from state dictionary
+        state_patterns = []
+        
+        for k in court_locs.keys():
+            state_patterns.append([{"LOWER": k.lower()}])
+        
+        #create matcher pattern for the key phrase file
+        file_pattern = [
+            [{"LOWER": 'file'}],
+            [{"LOWER": 'files'}]
+        ]
+        
+        #instantiate file pattern using the doc, this returns a span object that lists all the words pulled from the doc and their sentence and the index positions of the start of that sentence and end
+        file_matches = similar(doc, file_pattern) 
+        
+        #if spacy finds 'file' or 'files' we can grab the sentence that it contains. if not we can search the entire document for the state abbrev
+        if file_matches:
+            file_sentence = nlp(str(file_matches[0].sent))
+            #searches the sentence containing file for a state abbrev and returns the first one listed
+            state_matches = similar(file_sentence, state_patterns)
+            if state_matches:
+                return state_matches[0].text
+
+            #if file
+            else:
+                #if you change this output you need to change get_city to reflect that change.
+                return "Please select state"
+        
+        else:
+            #Searches entire document for states using matcher, returns them as a list that we can index. 
+            state_matches = similar(doc, state_patterns)
+            if state_matches[0].text in court_locs.keys():
+                return state_matches[0]
+            else:
+                return "Please select state"
+            
 
     def get_city(self):
-        return "Neu Boston"
-    #     #uses the abbreviation from self.state and #gets the list of cities in
-    #     # a state
-    #     citycache = set()
-    #     if self.state:
-    #         for v in court_locs.get(self.state)['city']:
-    #             citycache.add(v)
-    #
-    #     else:
-    #         for k, v in cour_loc.items():
-    #             for v in court_locs.get(k):
-    #                  citycache.add(v)
-    #
-    #     pattern = [
-    #         [{"LOWER": 'file'}],
-    #         [{"LOWER": 'files'}]
-    #         ]
-    #
-    #     matches = similar(self.doc, pattern)
-    #
-    #     sentence = str(matches[0].sent)
-    #     clean_sentence = sentence.replace(',', ' ').replace('\n', ' ').title()
-    #
-    #     #if an appellate case the first page will have the location of the
-    #     # appellate court, NOT origin
-    #     if self.appellate:
-    #
-    #         #finds first city that's in the citycache
-    #         for word in clean_sentence:
-    #             if word in citycache:
-    #                 return word
-    #
-    #     else:
-    #         #if non-appellate the first page will have the court location
-    #         # including city & state
-    #         for s in self.doc:
-    #             if s in citycache:
-    #                 return s
+        """
+        This function uses the get_state to filter the potential cities to find, then looks for the keywords file or files. 
+            In most cases the city comes right after the keyword. 
+        If the keyword isn't there it then creates a new matcher search for the entire corpus that finds the first city. 
+            This needs to be revised since it will return Falls Church more than it should
+         
+        """
+        #uses the abbreviation from self.state and #gets the list of cities in a state
+        citycache = []
+        city_pattern = []
+        # if get_state() function was unable to find a state it will return "Please select state". If you change this return in get_state you have to change this phrase here to correspond.
+        if self.state == "Please select state":
+            for i in court_locs.keys():
+                temp = court_locs.get(i)['city']
+                citycache.append(temp)
+            
+            
+        #if get_state() function does return a state this function will filter the court_loc dictionary by that state and return the corresponding cities.
+        else:
+            if self.state in court_locs.keys():
+                temp = court_locs.get(self.state)['city']
+                citycache.append(temp)
+            else:
+                for i in court_locs.keys():
+                    temp = court_locs.get(i)['city']
+                    citycache.append(temp)
+
+        #The length of this list is at most 72, and most of the time will be less than 15. The time complexity is negligble. This creates a spacy.matcher pattern 
+        for i in citycache:
+            city_pattern.append([{"LOWER":i}])
+        
+        #The court location is almost always in the sentence following these two phrases. 
+        pattern = [
+            [{"LOWER": 'file'}],
+            [{"LOWER": 'files'}]
+        ]
+
+        #instantiation of the above pattern using spacy.matcher, this returns a list of span objects that notes the pattern returned and it's index location. 
+        matches = similar(self.doc, pattern)
+        
+        #if no matches are found (file or files) this function searches the entire corpus for the citys in court_locs.
+        if not matches:
+            matches = similar(self.doc, city_pattern)
+
+        #The first matcher return sentence for either option is stored here. .sent grabs the sentence of that matcher pattern. 
+        sentence = str(matches[0].sent)
+        clean_sentence = sentence.replace(',', ' ').replace('\n', ' ').title()
+        
+        #finds first city that's in the citycache
+        for word in clean_sentence:
+            if word in citycache:
+                return word
+            else:
+                return citycache
+
 
     def get_based_violence(self) -> List[str]:
         """
