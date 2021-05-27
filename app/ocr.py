@@ -142,24 +142,24 @@ def similar_outcome(str1, str2):
 
     return False
 
-    def in_parenthetical(match, doc):
-        '''
-        Checks for text wrapped in parathesis, and removes any
-        returned protected grounds if they we're wrapped in parenthesis
-        used in protected grounds in order to improve accuracy
-        '''
-        open_parens = 0
-        for i in range(match.end, len(doc)):
-            if doc[i].text == '(':
-                open_parens += 1
-            elif doc[i].text == ')':
-                if open_parens > 0:
-                    open_parens -= 1
-                else:
-                    return True
-            elif doc[i] in {'.', '?', '!'}:
-                return False
-        return False
+def in_parenthetical(match, doc):
+    '''
+    Checks for text wrapped in parathesis, and removes any
+    returned protected grounds if they we're wrapped in parenthesis
+    used in protected grounds in order to improve accuracy
+    '''
+    open_parens = 0
+    for i in range(match.end, len(doc)):
+        if doc[i].text == '(':
+            open_parens += 1
+        elif doc[i].text == ')':
+            if open_parens > 0:
+                open_parens -= 1
+            else:
+                return True
+        elif doc[i] in {'.', '?', '!'}:
+            return False
+    return False
 
 """
 LISTS
