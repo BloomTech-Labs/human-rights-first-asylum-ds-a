@@ -131,7 +131,7 @@ def similar_outcome(str1, str2):
 
     return False
 
-def in_parenthetical(match, doc):
+def in_parenthetical(match):
     '''
     Checks for text wrapped in parathesis, and removes any
     returned protected grounds if they we're wrapped in parenthesis
@@ -140,9 +140,9 @@ def in_parenthetical(match, doc):
     open_parens = 0
     #search the rest of the sentence
     for i in range(match.end, match.sent.end):
-        if doc[i].text == '(':
+        if match.doc[i].text == '(':
             open_parens += 1
-        elif doc[i].text == ')':
+        elif match.doc[i].text == ')':
             if open_parens > 0:
                 open_parens -= 1
             else:
@@ -459,7 +459,7 @@ class BIACase:
         for match in potential_grounds:
             # skip matches that appear in parenthesis, the opinion is probably
             # just quoting a list of all the protected grounds in the statute
-            if in_parenthetical(match, self.doc):
+            if in_parenthetical(match):
                 continue
             # remove 'nationality act' from potential_grounds
             if match.text.lower() == 'nationality' \
