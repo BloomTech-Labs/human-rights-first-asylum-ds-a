@@ -131,23 +131,22 @@ def similar_outcome(str1, str2):
 
     return False
 
-def in_parenthetical(match, doc):
+def in_parenthetical(match):
     '''
     Checks for text wrapped in parathesis, and removes any
     returned protected grounds if they we're wrapped in parenthesis
     used in protected grounds in order to improve accuracy
     '''
     open_parens = 0
-    for i in range(match.end, len(doc)):
-        if doc[i].text == '(':
+    #search the rest of the sentence
+    for i in range(match.end, match.sent.end):
+        if match.doc[i].text == '(':
             open_parens += 1
-        elif doc[i].text == ')':
+        elif match.doc[i].text == ')':
             if open_parens > 0:
                 open_parens -= 1
             else:
                 return True
-        elif doc[i] in {'.', '?', '!'}:
-            return False
     return False
 
 """
@@ -255,7 +254,7 @@ class BIACase:
         self.indigenous_status = self.get_indigenous_status(),
         self.applicant_language = self.get_applicant_language(),
         self.credibility = self.get_credibility(),
-        self.one_year = self.check_for_one_year_new(),
+        self.one_year = self.check_for_one_year(),
         self.precedent_cases = self.get_precedent_cases(),
         self.statutes = self.get_statutes(),
 
@@ -458,6 +457,10 @@ class BIACase:
         potential_grounds = similar(self.doc, pattern)
 
         for match in potential_grounds:
+            # skip matches that appear in parenthesis, the opinion is probably
+            # just quoting a list of all the protected grounds in the statute
+            if in_parenthetical(match):
+                continue
             # remove 'nationality act' from potential_grounds
             if match.text.lower() == 'nationality' \
             and 'act' not in match.sent.text.lower() \
@@ -957,41 +960,37 @@ class BIACase:
         #             return 'N/A to case'
         return "Test"
 
-    def check_for_one_year_new(self) -> bool:
+    def check_for_one_year(self) -> bool:
         """
         Checks whether or not the asylum-seeker argued to be exempt from the
         one-year guideline.
-        
-        Returns true if the phrase "within one-year" appears in the document.
-        Also returns true if a time-based word appears in the same sentence
-        with "extraordinary circumstances" or "changed circumstances" or
-        "untimely application". Otherwise, returns False.
-        
+
+        Returns true if the phrases "within one-year", "untimely application",
+        "extraordinary circumstances" or "changed circumstances" appeaer in the
+        same sentence as a time-based word. Otherwise returns False.
         """
-        year_pattern = [
-            [{'LOWER':'within'}, {'LOWER': {'IN':['1', 'one']}}, 
-             {'LOWER': '-', 'OP': '?'}, {'LOWER': 'year'}]
-        ]
-        matcher = Matcher(nlp.vocab)
-        matcher.add('year pattern', year_pattern)
-        matches = matcher(self.doc, as_spans=True)
-        if matches:
-            return True
-        matcher.remove('year pattern')
-        
-        secondary_terms = {'year', 'delay', 'time', 'period', 'deadline'}
+        time_terms = {'year', 'delay', 'time', 'period', 'deadline'}
+        # The 'OP':'?' notation means this token is optional, it will match
+        # sequences with the token and without the token.
         circumstance_pattern = [
-            [{'LEMMA': {'IN':['change', 'extraordinary']}}, 
+            [{'LEMMA': {'IN':['change', 'extraordinary']}},
              {'LOWER': {'IN':['"', '”']}, 'OP': '?'}, {'LEMMA': 'circumstance'}]
         ]
         application_pattern = [
             [{'LOWER':'untimely'}, {'LOWER':'application'}]
         ]
+        year_pattern = [
+            [{'LOWER':'within'}, {'LOWER': {'IN':['1', 'one']}},
+             {'LOWER': '-', 'OP': '?'}, {'LOWER': 'year'}]
+        ]
+        matcher = Matcher(nlp.vocab)
+        matcher.add('year pattern', year_pattern)
         matcher.add('circumstance pattern', circumstance_pattern)
         matcher.add('application pattern', application_pattern)
-        matches = matcher(self.doc, as_spans=True)
+        matches = matcher(self.doc, as_spans=True)   
+
         for match in matches:
             for token in match.sent:
-                if token.lemma_ in secondary_terms:
+                if token.lemma_ in time_terms:
                     return True
         return False
