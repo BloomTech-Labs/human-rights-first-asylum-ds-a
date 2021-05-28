@@ -932,10 +932,15 @@ class BIACase:
 
     def get_credibility(self) -> str:
         """
-        Returns whether or not the Respondent was identified as credible by their assigned judge / court. 
+        Returns whether or not the Respondent was identified as credible by the assigned judge / court.
+        The process starts by adding rules/phrases to SpaCy's Matcher, they were obtained by manually 
+        parsing through case files and finding all sentences related to credibility. 
+        There are three separate rules, narrow, medium and wide, which decrease in the phrasing
+        specificity, this allows for some wiggle room as opposed to searching for exact matches. 
+        All instances of a match are returned by Matcher, so checking whether these objects are empty 
+        or not dictates the output of this function.
         """
-        # Phrase patterns which SpaCy will use as template. 
-        # Split into scopes for usability, and if logic needs to be re-worked
+        # Speciifying phrase patterns / rules to use in SpaCy's Matcher
         narrow_scope = [[{"LOWER": "court"}, {"LOWER": "finds"},
                          {"LOWER": "respondent"}, {"LOWER": "generally"},
                          {"LOWER": "credible"}],
@@ -958,8 +963,11 @@ class BIACase:
                                         "credible", 
                                         "consistent"]}}]
         
+        # instantiating Matcher
         matcher = Matcher(nlp.vocab)
-
+        
+        # adding each rule to Matcher, then using global function similar() to find 
+        # and store matches in similar_****** variables
         matcher.add('narrow_cred', narrow_scope)
         similar_narrow = similar(target_phrases=narrow_scope, file=self.doc)
 
@@ -968,7 +976,8 @@ class BIACase:
 
         matcher.add('wide_cred', wide_scope)
         similar_wide = similar(target_phrases=wide_scope, file=self.doc)
-
+        
+        # output logic checks wheteher similar_***** variables are empty or not
         if similar_narrow:
             return 'Respondent was found credible'
 
