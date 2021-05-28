@@ -932,33 +932,52 @@ class BIACase:
 
     def get_credibility(self) -> str:
         """
-        • Returns the judge's decision on whether the applicant is a credible witness.
-        Curently, the field's output is dependent on occurance of specific tokens
-        in the document; this method needs to be fine-tuned and validated.
+        Returns whether or not the Respondent was identified as credible by their assigned judge / court. 
         """
-        # credibility = [
-        #     'credible'
-        # ]
-        # !!! NO Longer using similar_in_list, Use the new SIMLIlAR function
-            # and SPACY matcher or PhraseMatcher
-        # similar_cred: Callable[[str, float], Union[str, None]]
-        # similar_cred = similar_in_list(credibility)
-        # for token in self.doc:
-        #     sent: str
-        #     sent = token.sent.text.lower()
-        #     s: Union[str, None]
-        #     s = similar_cred(token.text.lower(), 0.9)
-        #     if s == 'credible':
-        #         prev_word = self.doc[token.i-1].text.lower()
-        #         next_word = self.doc[token.i+1].text.lower()
-        #         if not similar(prev_word, 'not', 0.95) \
-        #             and not similar(next_word, 'witness', 0.95):
-        #             return 'Yes'
-        #         else:
-        #             return 'No'
-        #         if s not in self.doc:
-        #             return 'N/A to case'
-        return "Test"
+        # Phrase patterns which SpaCy will use as template. 
+        # Split into scopes for usability, and if logic needs to be re-worked
+        narrow_scope = [[{"LOWER": "court"}, {"LOWER": "finds"},
+                         {"LOWER": "respondent"}, {"LOWER": "generally"},
+                         {"LOWER": "credible"}],
+                        [{"LOWER": "court"}, {"LOWER": "finds"},
+                         {"LOWER": "respondent"}, {"LOWER": "testimony"},
+                         {"LOWER": "credible"}],
+                        [{"LOWER": "court"}, {"LOWER": "finds"}, 
+                         {"LOWER": "respondent"}, {"LOWER": "credible"}]]
+
+        medium_scope = [[{"LOWER": "credible"}, {"LOWER": "witness"}],
+                        [{"LOWER": "generally"}, {"LOWER": "consistent"}],
+                        [{"LOWER": "internally"}, {"LOWER": "consistent"}],
+                        [{"LOWER": "sufficiently"}, {"LOWER": "consistent"}],
+                        [{"LOWER": "testified"}, {"LOWER": "credibly"}],
+                        [{"LOWER": "testimony"}, {"LOWER": "credible"}],
+                        [{"LOWER": "testimony"}, {"LOWER": "consistent"}]]
+
+        wide_scope = [{"LEMMA": {"IN": ["coherent", 
+                                        "possible", 
+                                        "credible", 
+                                        "consistent"]}}]
+        
+        matcher = Matcher(nlp.vocab)
+
+        matcher.add('narrow_cred', narrow_scope)
+        similar_narrow = similar(target_phrases=narrow_scope, file=self.doc)
+
+        matcher.add('medium_cred', medium_scope)
+        similar_medium = similar(target_phrases=medium_scope, file=self.doc)
+
+        matcher.add('wide_cred', wide_scope)
+        similar_wide = similar(target_phrases=wide_scope, file=self.doc)
+
+        if similar_narrow:
+            return 'Respondent was found credible'
+
+        elif similar_medium and similar_wide:
+            return 'Respondent was found credible'
+
+        else:
+            return 'Respondent was not found credible'
+
 
     def check_for_one_year(self) -> bool:
         """
