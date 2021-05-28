@@ -33,6 +33,7 @@ The **app** folder contains the FastAPI application which creates an endpoint fo
 - [SCRAPER_INFO](SCRAPER_INFO.md) contains important information about the status of each function used to extract fields from documents.
 - [KnownDefects](KnownDefects.md) contains information about potential issues to be aware of.
 - [NOTEBOOKS](notebooks/NOTEBOOKS.md) contains helpful information about the notebooks and scripts used to explore solutions.
+- [visualizations/README](visualizations/README.md) contains helpful information about notebooks, scripts, and data used to explore visualizations.
 
 ## Tools
 
