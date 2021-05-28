@@ -62,7 +62,12 @@ Then open http://0.0.0.0:5000 in your browser. The application should be running
 [Jacob Bohlen](https://github.com/JRBOH)  
 [Kevin Weatherwalks](https://github.com/KWeatherwalks)  
 [River Bellamy](https://github.com/RiverBellamy)  
-
+[Patrick Raborn](https://github.com/PatrickRaborn)  
+[Ricardo Rodriguez](https://github.com/reesh19)  
+[Filipe Collares](https://github.com/fcollares)  
+[Nicholas Major](https://github.com/SophistryDude)  
+[Evan Grinalds](https://github.com/evangrinalds)    
+[Joe Sasson](https://github.com/j0sephsasson)  
 
 ###### Labs 33
 [Michael Kolek](https://github.com/InqM)  
