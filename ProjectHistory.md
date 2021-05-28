@@ -40,3 +40,17 @@ Labs 33 chose to work collaboratively and accomplished:
   * updates to the `get_panel`, `get_gender`, `get_date` functions in `ocr.py`
   * creation of `court_locations.json`
   * reorganization of documentation
+
+Labs 34 chose to work collaboratively, split into scraper and visualization teams, to:
+  ### Visualization
+  * create an API endpoint for taking in case data and responding with Plotly schema JSON so the front-end can recreate charts and get stakeholder and user feedback
+
+### Scraper
+  * create `similar` function that utilizes SpaCy Matcher class which is implemented in several functions
+  * create methods `is_appellate`, `get_circuit`
+  * split `get_citystate` into methods `get_city` and `get_state`
+  * improved accuracy of `get_panel`, `get_outcome`, `get_gender`, `check_for_one_year`, `get_protected_grounds`, `get_country_of_origin`
+  * improved readability of code to facilitate future work
+  * rewrote some methods to consistently use SpaCy matcher rather than matchers used in the past
+  * restructure `BIACase` class to facilitate interactions with different scraping methods 
+  
