@@ -11,11 +11,15 @@ def get_stacked_bar_chart(df, feature):
     fig_data = []
     for outcome in outcomes_list:
         if outcome in df.columns:
+            # attempt to change y-axis from floats to ints
+            # set y axis start at 0, step by 10
+            # Look for NaNs and replace with zeroes. 
+
             temp = go.Bar(name= outcome,
                             x=list(df.index),
-                            y=df[outcome])
+                            y=df[outcome], y0=0, dy=10)
             fig_data.append(temp)
-
+    
     fig = go.Figure(fig_data)
     fig.update_layout(barmode='stack')
 
