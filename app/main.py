@@ -1,9 +1,10 @@
 """
 Local Docker Setup:
-docker build . -t <name>
+docker build . -t asylum
 
 Run Docker Locally:
-docker run -it -p 5000:5000 <name> uvicorn app.main:app --host=0.0.0.0 --port=5000
+docker run -it -p 5000:5000 asylum uvicorn app.main:app --host=0.0.0.0 --port=5000
+
 Run Locally using Windows:
 winpty docker run -it -p 5000:5000 <name> uvicorn app.main:app --host=0.0.0.0 --port=5000
 
@@ -26,7 +27,8 @@ import json
 app = FastAPI(
     title="DS API for HRF Asylum",
     description="PDF OCR",
-    docs_url="/"
+    docs_url="/",
+    version="0.35.2",
 )
 
 load_dotenv()
@@ -40,12 +42,13 @@ app.add_middleware(
 )
 
 
-@app.post("/pdf-ocr/{uuid}")
+@app.get("/pdf-ocr/{uuid}")
 async def pdf_ocr(uuid: str):
     """
     Small Test UUID: <b>084d0556-5748-4687-93e3-394707be6cc0</b><br>
     Large Test UUID: <b>477307493-V-J-M-AXXX-XXX-639-BIA-Aug-17-2020</b>
     """
+    print("Updated")
     try:
         s3 = Session(
             aws_access_key_id=os.getenv('ACCESS_KEY'),
@@ -66,7 +69,7 @@ async def pdf_ocr(uuid: str):
         return {"status": f"File not found: {uuid}.pdf"}
 
 
-@app.post("/vis/judges/{judge_id}")
+@app.post("/vis/judges/")
 async def vis_judges(request: Request):
     """
     Receives judge_data from BE and stores it in a dataframe.  
