@@ -19,8 +19,7 @@ def get_stacked_bar_chart(df, feature):
                             x=list(df.index),
                             y=df[outcome], y0=0, dy=10)
             fig_data.append(temp)
-    
-    fig = go.Figure(fig_data)
-    fig.update_layout(barmode='stack')
+
+    fig = go.Figure(fig_data, layout=go.Layout(barmode='stack', yaxis={'tickformat': ',d'}))
 
     return fig.to_json()
