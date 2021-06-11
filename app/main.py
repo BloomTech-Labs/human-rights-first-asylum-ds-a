@@ -6,7 +6,7 @@ Run Docker Locally:
 docker run -it -p 5000:5000 asylum uvicorn app.main:app --host=0.0.0.0 --port=5000
 
 Run Locally using Windows:
-winpty docker run -it -p 5000:5000 <name> uvicorn app.main:app --host=0.0.0.0 --port=5000
+winpty docker run -it -p 5000:5000 asylum uvicorn app.main:app --host=0.0.0.0 --port=5000
 
 """
 import os
@@ -48,7 +48,6 @@ async def pdf_ocr(uuid: str):
     Small Test UUID: <b>084d0556-5748-4687-93e3-394707be6cc0</b><br>
     Large Test UUID: <b>477307493-V-J-M-AXXX-XXX-639-BIA-Aug-17-2020</b>
     """
-    print("Updated")
     try:
         s3 = Session(
             aws_access_key_id=os.getenv('ACCESS_KEY'),
