@@ -19,7 +19,9 @@ from spacy.tokens import Doc, Span, Token
 from spacy.matcher import Matcher, PhraseMatcher
 from typing import List, Tuple, Union, Callable, Dict, Iterator
 
-nlp = load("en_core_web_md")
+# change to small
+# nlp = load("en_core_web_md")
+nlp = load("en_core_web_sm")
 
 # Read in dictionary of all court locations
 with open('./app/court_locations.json') as f:
@@ -287,20 +289,24 @@ class BIACase:
         gc = geonamescache.GeonamesCache()
         countries = sorted(gc.get_countries_by_names().keys())
         # remove U.S. and its territories from countries
-        if "American Samoa" in countries:
-            countries.remove("American Samoa")
-        if "Guam" in countries:
-            countries.remove("Guam")
-        if "Northern Mariana Islands" in countries:
-            countries.remove("Northern Mariana Islands")
-        if "Puerto Rico" in countries:
-            countries.remove("Puerto Rico")
-        if "United States" in countries:
-            countries.remove("United States")
-        if "United States Minor Outlying Islands" in countries:
-            countries.remove("United States Minor Outlying Islands")
-        if "U.S. Virgin Islands" in countries:
-            countries.remove("U.S. Virgin Islands")
+        countries = set(countries)
+        non_matches = {"American Samoa", "Guam", "Northern Mariana Islands", "Puerto Rico", 
+                       "United States", "United States Minor Outlying Islands", "U.S. Virgin Islands"}
+        countries = countries.difference(non_matches)
+        # if "American Samoa" in countries:
+        #     countries.remove("American Samoa")
+        # if "Guam" in countries:
+        #     countries.remove("Guam")
+        # if "Northern Mariana Islands" in countries:
+        #     countries.remove("Northern Mariana Islands")
+        # if "Puerto Rico" in countries:
+        #     countries.remove("Puerto Rico")
+        # if "United States" in countries:
+        #     countries.remove("United States")
+        # if "United States Minor Outlying Islands" in countries:
+        #     countries.remove("United States Minor Outlying Islands")
+        # if "U.S. Virgin Islands" in countries:
+        #     countries.remove("U.S. Virgin Islands")
 
         """
         PRIMARY search:
