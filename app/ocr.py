@@ -233,21 +233,6 @@ class BIACase:
                        "United States", "United States Minor Outlying Islands", "U.S. Virgin Islands"}
         countries = countries.difference(non_matches)
 
-        # if "American Samoa" in countries:
-        #     countries.remove("American Samoa")
-        # if "Guam" in countries:
-        #     countries.remove("Guam")
-        # if "Northern Mariana Islands" in countries:
-        #     countries.remove("Northern Mariana Islands")
-        # if "Puerto Rico" in countries:
-        #     countries.remove("Puerto Rico")
-        # if "United States" in countries:
-        #     countries.remove("United States")
-        # if "United States Minor Outlying Islands" in countries:
-        #     countries.remove("United States Minor Outlying Islands")
-        # if "U.S. Virgin Islands" in countries:
-        #     countries.remove("U.S. Virgin Islands")
-
         """
         PRIMARY search:
         in most cases, the term/pattern "citizen(s) of" appears in the same
