@@ -19,8 +19,6 @@ from spacy.tokens import Doc, Span, Token
 from spacy.matcher import Matcher, PhraseMatcher
 from typing import List, Tuple, Union, Callable, Dict, Iterator
 
-# change to small
-# nlp = load("en_core_web_md")
 nlp = load("en_core_web_sm")
 
 # Read in dictionary of all court locations
