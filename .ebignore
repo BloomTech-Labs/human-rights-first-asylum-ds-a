@@ -1,0 +1,12 @@
+/assets/
+/aws/
+/data_parsing/
+/notebooks/
+/streamlit/
+/visualisations/
+KnownDefects.md
+Labs32README.md
+LICENSE
+ProjectHistory.md
+README.md
+SCRAPER_INFO.md

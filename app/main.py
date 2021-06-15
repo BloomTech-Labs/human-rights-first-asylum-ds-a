@@ -1,12 +1,12 @@
 """
 Local Docker Setup:
-docker build . -t <name>
+docker build . -t asylum
 
 Run Docker Locally:
-docker run -it -p 5000:5000 <name> uvicorn app.main:app --host=0.0.0.0 --port=5000
-Run Locally using Windows:
-winpty docker run -it -p 5000:5000 <name> uvicorn app.main:app --host=0.0.0.0 --port=5000
+docker run -it -p 5000:5000 asylum uvicorn app.main:app --host=0.0.0.0 --port=5000
 
+Run Locally using Windows:
+winpty docker run -it -p 5000:5000 asylum uvicorn app.main:app --host=0.0.0.0 --port=5000
 """
 import os
 
@@ -26,7 +26,8 @@ import json
 app = FastAPI(
     title="DS API for HRF Asylum",
     description="PDF OCR",
-    docs_url="/"
+    docs_url="/",
+    version="0.35.1",
 )
 
 load_dotenv()
@@ -40,7 +41,7 @@ app.add_middleware(
 )
 
 
-@app.post("/pdf-ocr/{uuid}")
+@app.get("/pdf-ocr/{uuid}")
 async def pdf_ocr(uuid: str):
     """
     Small Test UUID: <b>084d0556-5748-4687-93e3-394707be6cc0</b><br>
@@ -66,7 +67,7 @@ async def pdf_ocr(uuid: str):
         return {"status": f"File not found: {uuid}.pdf"}
 
 
-@app.post("/vis/judges/{judge_id}")
+@app.post("/vis/judges/")
 async def vis_judges(request: Request):
     """
     Receives judge_data from BE and stores it in a dataframe.  
@@ -92,11 +93,11 @@ async def vis_judges(request: Request):
 
 
 @app.get("/vis/circuits/{circuit_id}")
-def vis_circuits(circuit_name: str):
+def vis_circuits(circuit_id: str):
     pass
 
 
-@app.get("/vis/correlations")
+@app.get("/vis/correlations/")
 def correlations():
     """ Correlation Matrix Heat Map """
     pass
