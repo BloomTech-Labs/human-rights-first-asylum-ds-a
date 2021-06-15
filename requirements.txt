@@ -1,7 +1,6 @@
 boto3~=1.17.45
-botocore~=1.20.45
 dnspython~=2.1.0
-fastapi~=0.63.0
+fastapi~=0.65.2
 geonamescache~=1.2.0
 pandas~=1.1.5
 pdf2image~=1.14.0
@@ -13,4 +12,4 @@ python-multipart~=0.0.5
 requests~=2.25.1
 spacy~=3.0.6
 uvicorn[standard]~=0.13.4
-en-core-web-md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.0.0/en_core_web_md-3.0.0.tar.gz
+en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.0.0/en_core_web_sm-3.0.0.tar.gz
