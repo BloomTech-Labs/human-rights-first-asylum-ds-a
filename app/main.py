@@ -40,7 +40,7 @@ app.add_middleware(
 )
 
 
-@app.post("/pdf-ocr/{uuid}")
+@app.get("/pdf-ocr/{uuid}")
 async def pdf_ocr(uuid: str):
     """
     Small Test UUID: <b>084d0556-5748-4687-93e3-394707be6cc0</b><br>
@@ -66,7 +66,7 @@ async def pdf_ocr(uuid: str):
         return {"status": f"File not found: {uuid}.pdf"}
 
 
-@app.post("/vis/judges/{judge_id}")
+@app.post("/vis/judges/")
 async def vis_judges(request: Request):
     """
     Receives judge_data from BE and stores it in a dataframe.  
