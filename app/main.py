@@ -1,12 +1,12 @@
 """
 Local Docker Setup:
-docker build . -t <name>
+docker build . -t asylum
 
 Run Docker Locally:
-docker run -it -p 5000:5000 <name> uvicorn app.main:app --host=0.0.0.0 --port=5000
-Run Locally using Windows:
-winpty docker run -it -p 5000:5000 <name> uvicorn app.main:app --host=0.0.0.0 --port=5000
+docker run -it -p 5000:5000 asylum uvicorn app.main:app --host=0.0.0.0 --port=5000
 
+Run Locally using Windows:
+winpty docker run -it -p 5000:5000 asylum uvicorn app.main:app --host=0.0.0.0 --port=5000
 """
 import os
 
@@ -21,12 +21,14 @@ from app.visualizations import get_stacked_bar_chart
 
 import pandas as pd
 import json
+import psycopg2
 
 
 app = FastAPI(
     title="DS API for HRF Asylum",
     description="PDF OCR",
-    docs_url="/"
+    docs_url="/",
+    version="0.35.1",
 )
 
 load_dotenv()
@@ -40,7 +42,7 @@ app.add_middleware(
 )
 
 
-@app.post("/pdf-ocr/{uuid}")
+@app.get("/pdf-ocr/{uuid}")
 async def pdf_ocr(uuid: str):
     """
     Small Test UUID: <b>084d0556-5748-4687-93e3-394707be6cc0</b><br>
@@ -66,7 +68,23 @@ async def pdf_ocr(uuid: str):
         return {"status": f"File not found: {uuid}.pdf"}
 
 
-@app.post("/vis/judges/{judge_id}")
+@app.get("/visual/judges/{column_to_graph}/{judge_id}")
+async def vis_judges(column_to_graph : str, judge_id):
+    """
+    Queries judge_data from BE database, return ONE plotly express graph
+    """
+    db = os.getenv('DATABASE_URI')
+    query = f"SELECT {column_to_graph}, outcome FROM cases WHERE judge_id = {judge_id};"
+    
+    conn = psycopg2.connect(db, sslmode="require")
+    curs = conn.cursor()
+
+    df = pd.read_sql(query,conn)
+    
+    return get_stacked_bar_chart(df, column_to_graph)
+
+
+@app.post("/vis/judges/")
 async def vis_judges(request: Request):
     """
     Receives judge_data from BE and stores it in a dataframe.  
@@ -80,23 +98,31 @@ async def vis_judges(request: Request):
     jsondata = json.loads(jsonstring)['data']
     df = pd.DataFrame.from_dict(jsondata)
 
-    chart_1 = get_stacked_bar_chart(df, 'protected_grounds')
-    chart_2 = get_stacked_bar_chart(df, 'gender')
-    chart_3 = get_stacked_bar_chart(df, 'country_of_origin')
+    columns_to_graph = ['country_of_origin', 'protected_grounds', 'gender']
+    charts_dict = {}
+    
+    for column in columns_to_graph:
+        get_stacked_bar_chart(df,column)
+        charts_dict[column] = get_stacked_bar_chart(df, column)
 
-    charts_dict = {'bar_protected_grounds': chart_1,
-                   'bar_gender': chart_2,
-                   'bar_country_of_origin': chart_3}
 
-    return json.dumps(charts_dict)
+    # chart_1 = get_stacked_bar_chart(df, 'protected_grounds')
+    # chart_2 = get_stacked_bar_chart(df, 'gender')
+    # chart_3 = get_stacked_bar_chart(df, 'country_of_origin')
+
+    # charts_dict = {'bar_protected_grounds': chart_1,
+    #                'bar_gender': chart_2,
+    #                'bar_country_of_origin': chart_3}
+
+    return charts_dict
 
 
 @app.get("/vis/circuits/{circuit_id}")
-def vis_circuits(circuit_name: str):
+def vis_circuits(circuit_id: str):
     pass
 
 
-@app.get("/vis/correlations")
+@app.get("/vis/correlations/")
 def correlations():
     """ Correlation Matrix Heat Map """
     pass
