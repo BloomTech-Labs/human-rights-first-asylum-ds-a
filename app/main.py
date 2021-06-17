@@ -80,7 +80,7 @@ async def vis_judges(column_to_graph : str, judge_id):
     curs = conn.cursor()
 
     df = pd.read_sql(query,conn)
-    
+    conn.close()
     return get_stacked_bar_chart(df, column_to_graph)
 
 
