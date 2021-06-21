@@ -71,25 +71,83 @@ async def pdf_ocr(uuid: str):
 async def vis_judges(request: Request):
     """
     Receives judge_data from BE and stores it in a dataframe.  
-    Creates a dictionary with multiple graphs, one graph for each feature.  
-    Features: protected grounds, gender, country_of_origin.  
-    returns the graphs in json format.  
+    Creates and returns stacked bar charts or historgrams based
+    on User selected features for x-axis and y-axis, as well
+    as hearing type (initial hearings vs appellate)
+    One graph returned per post request  
     """
 
+    columns = [
+        'gender', 'credible', 'outcome', 'judge_id', 'filed_in_one_year',
+        'applicant_language', 'country_of_origin', 'case_origin_state',
+        'case_origin_city', 'protected_grounds', 'type_of_violence',
+        'indigenous_group',
+    ]
+    if request.values:
+        col_1, col_2, case_type, bar_type, *_ = request.values.values()
+        df = get_cases_df(case_type)
+        df_cross = pd.crosstab(df[col_1], df[col_2])
+        col_1_name = col_1.title().replace('_', ' ')
+        col_2_name = col_2.title().replace('_', ' ')
+        if col_1 == col_2:
+            title = f"{col_1_name} Totals"
+        else:
+            title = f"{col_2_name} by {col_1_name}"
+        bar_lookup = {
+            "Stacked": "stack",
+            "Grouped": "group",
+        }
+        data = [
+            go.Bar(name=col, x=df_cross.index, y=df_cross[col])
+            for col in df_cross.columns
+        ]
+        layout = go.Layout(
+            title=title,
+            template="simple_white", # changed from plotly-dark
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            colorway=px.colors.qualitative.Antique,
+            height=600,
+            width=820,
+            barmode=bar_lookup[bar_type],
+            yaxis={"tickformat": ",", "title": col_2_name}, # changed from People
+            xaxis={'title': col_1_name}
+        )
+        figure = go.Figure(data, layout)
+        # thinking only need to return graph_json???
+        return render_template(
+            "bars.html",
+            options=columns,
+            graph_json=figure.to_json(),
+            selector_1=col_1,
+            selector_2=col_2,
+            case_type=case_type,
+            bar_type=bar_type,
+        )
+    else:
+        return render_template(
+            "bars.html",
+            options=columns,
+            selector_1="gender",
+            selector_2="outcome",
+            bar_type="Stacked",
+        )
+
+
     # Receive data from backend and convert to dataframe
-    jsonstring = await request.body()
-    jsondata = json.loads(jsonstring)['data']
-    df = pd.DataFrame.from_dict(jsondata)
+    # jsonstring = await Request.body()
+    # jsondata = json.loads(jsonstring)['data']
+    # df = pd.DataFrame.from_dict(jsondata)
 
-    chart_1 = get_stacked_bar_chart(df, 'protected_grounds')
-    chart_2 = get_stacked_bar_chart(df, 'gender')
-    chart_3 = get_stacked_bar_chart(df, 'country_of_origin')
+    # chart_1 = get_stacked_bar_chart(df, 'protected_grounds')
+    # chart_2 = get_stacked_bar_chart(df, 'gender')
+    # chart_3 = get_stacked_bar_chart(df, 'country_of_origin')
 
-    charts_dict = {'bar_protected_grounds': chart_1,
-                   'bar_gender': chart_2,
-                   'bar_country_of_origin': chart_3}
+    # charts_dict = {'bar_protected_grounds': chart_1,
+    #                'bar_gender': chart_2,
+    #                'bar_country_of_origin': chart_3}
 
-    return json.dumps(charts_dict)
+    # return json.dumps(charts_dict)
 
 
 @app.get("/vis/circuits/{circuit_id}")
