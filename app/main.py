@@ -117,21 +117,6 @@ async def vis_judges(request: Request):
         # thinking only need to return graph_json???
         return figure.to_json()
 
-    # Receive data from backend and convert to dataframe
-    # jsonstring = await Request.body()
-    # jsondata = json.loads(jsonstring)['data']
-    # df = pd.DataFrame.from_dict(jsondata)
-
-    # chart_1 = get_stacked_bar_chart(df, 'protected_grounds')
-    # chart_2 = get_stacked_bar_chart(df, 'gender')
-    # chart_3 = get_stacked_bar_chart(df, 'country_of_origin')
-
-    # charts_dict = {'bar_protected_grounds': chart_1,
-    #                'bar_gender': chart_2,
-    #                'bar_country_of_origin': chart_3}
-
-    # return json.dumps(charts_dict)
-
 
 @app.get("/vis/circuits/{circuit_id}")
 def vis_circuits(circuit_id: str):
