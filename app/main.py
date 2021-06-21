@@ -103,18 +103,18 @@ async def vis_judges(request: Request):
         ]
         layout = go.Layout(
             title=title,
-            template="simple_white", # changed from plotly-dark
+            template="simple_white", 
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             colorway=px.colors.qualitative.Antique,
             height=600,
             width=820,
             barmode=bar_lookup[bar_type],
-            yaxis={"tickformat": ",", "title": col_2_name}, # changed from People
+            yaxis={"tickformat": ",", "title": col_2_name}, 
             xaxis={'title': col_1_name}
         )
         figure = go.Figure(data, layout)
-        # thinking only need to return graph_json???
+        # return graph as json object
         return figure.to_json()
 
 
