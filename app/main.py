@@ -115,24 +115,7 @@ async def vis_judges(request: Request):
         )
         figure = go.Figure(data, layout)
         # thinking only need to return graph_json???
-        return render_template(
-            "bars.html",
-            options=columns,
-            graph_json=figure.to_json(),
-            selector_1=col_1,
-            selector_2=col_2,
-            case_type=case_type,
-            bar_type=bar_type,
-        )
-    else:
-        return render_template(
-            "bars.html",
-            options=columns,
-            selector_1="gender",
-            selector_2="outcome",
-            bar_type="Stacked",
-        )
-
+        return figure.to_json()
 
     # Receive data from backend and convert to dataframe
     # jsonstring = await Request.body()
