@@ -190,23 +190,23 @@ class BIACase:
 
     def to_dict(self):
         return {
-            'panel members': self.get_panel(),
-            'application': self.get_application(),
+            'panel_members': self.get_panel(),
+            'application_type': self.get_application(),
             'date': self.get_date(),
-            'country of origin': self.get_country_of_origin(),
+            'country_of_origin': self.get_country_of_origin(),
             'outcome': self.get_outcome(),
-            'state of origin': self.get_state(),
-            'city of origin': self.get_city(),
-            'circuit of origin': self.get_circuit(),
-            'protected grounds': self.get_protected_grounds(),
-            'based violence': self.get_based_violence(),
+            'case_origin_state': self.get_state(),
+            'city_of_origin': None,
+            # 'circuit of origin': self.get_circuit(),
+            'protected_grounds': self.get_protected_grounds(),
+            'type_of_violence': self.get_based_violence(),
             'gender': self.get_gender(),
-            'indigenous': self.get_indigenous_status(),
-            'applicant language': self.get_applicant_language(),
+            'indigenous_group': self.get_indigenous_status(),
+            'applicant_language': self.get_applicant_language(),
             'credibility': self.get_credibility(),
-            'check for one year': self.check_for_one_year(),
-            'precedent cases': self.get_precedent_cases(),
-            'statutes': self.get_statutes(),
+            'check_for_one_year': self.check_for_one_year(),
+            # 'precedent cases': self.get_precedent_cases(),
+            # 'statutes': self.get_statutes(),
         }
 
     def get_ents(self, labels: List[str]) -> Iterator[Span]:
