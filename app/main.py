@@ -21,6 +21,7 @@ from app.visualizations import get_stacked_bar_chart
 
 import pandas as pd
 import json
+import psycopg2
 
 
 app = FastAPI(
@@ -65,6 +66,22 @@ async def pdf_ocr(uuid: str):
         return {"status": "Connection refused!"}
     except ClientError:
         return {"status": f"File not found: {uuid}.pdf"}
+
+
+@app.get("/visual/judges/{column_to_graph}/{judge_id}")
+async def vis_judges(column_to_graph : str, judge_id):
+    """
+    Queries judge_data from BE database, return ONE plotly express graph
+    """
+    db = os.getenv('DATABASE_URI')
+    query = f"SELECT {column_to_graph}, outcome FROM cases WHERE judge_id = {judge_id};"
+    
+    conn = psycopg2.connect(db, sslmode="require")
+    curs = conn.cursor()
+
+    df = pd.read_sql(query,conn)
+    conn.close()
+    return get_stacked_bar_chart(df, column_to_graph)
 
 
 @app.post("/vis/judges/")
