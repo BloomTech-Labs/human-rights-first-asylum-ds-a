@@ -12,22 +12,19 @@ import os
 
 from boto3.session import Session
 from botocore.exceptions import ClientError, ConnectionError
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
+from app.db_ops import insert_case
 from app.ocr import make_fields
-from app.visualizations import get_stacked_bar_chart
-
-import pandas as pd
-import json
 
 
 app = FastAPI(
     title="DS API for HRF Asylum",
     description="PDF OCR",
     docs_url="/",
-    version="0.35.1",
+    version="0.35.2",
 )
 
 load_dotenv()
@@ -44,8 +41,17 @@ app.add_middleware(
 @app.get("/pdf-ocr/{uuid}")
 async def pdf_ocr(uuid: str):
     """
-    Small Test UUID: <b>084d0556-5748-4687-93e3-394707be6cc0</b><br>
-    Large Test UUID: <b>477307493-V-J-M-AXXX-XXX-639-BIA-Aug-17-2020</b>
+    084d0556-5748-4687-93e3-394707be6cc0<br>
+    477307493-V-J-M-AXXX-XXX-639-BIA-Aug-17-2020<br>
+    004dcaad-8c41-403f-96cc-ff4db68c45d7<br>
+    00c46a50-84ee-4717-97bf-929d3a767501<br>
+    00c76f3f-c4e2-49b8-9adf-c1044302627d<br>
+    00ef179e-ad1d-474f-bd36-97b18aac452e<br>
+    01108e14-b94a-4f59-9a76-9f8cb2f002c2<br>
+    012604c9-fdf5-4452-8cb2-de7a594354fa<br>
+    013a6a6a-40d1-4c29-97c4-5aa865ca5a42<br>
+    01881766-7409-43a9-a6bd-fa392c87cbe4<br>
+    01bd5d82-ddb7-4a92-993b-fe5c798f0984<br>
     """
     try:
         s3 = Session(
@@ -57,47 +63,9 @@ async def pdf_ocr(uuid: str):
             Key=f"{uuid}.pdf",
         )
         fields = make_fields(response['Body'].read())
-        return {
-            "status": f"File received: {uuid}.pdf",
-            "body": fields,
-        }
+        insert_case(fields)
+        return {"status": "Success"}
     except ConnectionError:
         return {"status": "Connection refused!"}
     except ClientError:
         return {"status": f"File not found: {uuid}.pdf"}
-
-
-@app.post("/vis/judges/")
-async def vis_judges(request: Request):
-    """
-    Receives judge_data from BE and stores it in a dataframe.  
-    Creates a dictionary with multiple graphs, one graph for each feature.  
-    Features: protected grounds, gender, country_of_origin.  
-    returns the graphs in json format.  
-    """
-
-    # Receive data from backend and convert to dataframe
-    jsonstring = await request.body()
-    jsondata = json.loads(jsonstring)['data']
-    df = pd.DataFrame.from_dict(jsondata)
-
-    chart_1 = get_stacked_bar_chart(df, 'protected_grounds')
-    chart_2 = get_stacked_bar_chart(df, 'gender')
-    chart_3 = get_stacked_bar_chart(df, 'country_of_origin')
-
-    charts_dict = {'bar_protected_grounds': chart_1,
-                   'bar_gender': chart_2,
-                   'bar_country_of_origin': chart_3}
-
-    return json.dumps(charts_dict)
-
-
-@app.get("/vis/circuits/{circuit_id}")
-def vis_circuits(circuit_id: str):
-    pass
-
-
-@app.get("/vis/correlations/")
-def correlations():
-    """ Correlation Matrix Heat Map """
-    pass
