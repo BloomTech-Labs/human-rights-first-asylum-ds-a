@@ -177,7 +177,7 @@ class BIACase:
 
     def to_dict(self):
         return {
-            'panel_members': '; '.join(self.get_panel()) or 'Unknown',
+            'panel_members': '; '.join(self.get_panel()).replace("'", "&#39;") or 'Unknown',
             'hearing_type': self.get_hearing_type() or 'Unknown',
             'application_type': self.get_application() or "Unknown",
             'date': self.get_date() or 'Unknown',
