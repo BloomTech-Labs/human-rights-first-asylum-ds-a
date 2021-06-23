@@ -29,16 +29,21 @@ def db_query(sql_query) -> list:
     return results
 
 
+def fix_str(s):
+    return repr(s.replace("'", "’"))
+
+
 def insert_case(case_data: dict):
     db_action(f"""INSERT INTO ds_cases
     ({', '.join(case_data.keys())})
-    VALUES ({', '.join(map(repr, case_data.values()))});""")
+    VALUES ({', '.join(map(fix_str, case_data.values()))});""")
 
 
 def initialize_db():
     """ Database table initialization - only required once """
     db_action(f"""CREATE TABLE IF NOT EXISTS ds_cases (
     id SERIAL PRIMARY KEY NOT NULL,
+    uuid TEXT,
     panel_members TEXT,
     hearing_type TEXT,
     application_type TEXT,

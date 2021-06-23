@@ -57,7 +57,7 @@ async def pdf_ocr(uuid: str):
             Bucket=os.getenv('BUCKET_NAME'),
             Key=f"{uuid}.pdf",
         )
-        fields = make_fields(response['Body'].read())
+        fields = make_fields(uuid, response['Body'].read())
         insert_case(fields)
         return {"status": "Success"}
     except ConnectionError:

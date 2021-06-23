@@ -13,14 +13,14 @@ from app.state_lookup import StateLookup
 nlp = load("en_core_web_sm")
 
 
-def make_fields(file) -> dict:
+def make_fields(uuid, file) -> dict:
     """ This is the main overall function that creates a dictionary of the
     desired fields and their respective values; info that goes into those fields.
     """
     pages = convert_from_bytes(file, dpi=90)
     text = map(pytesseract.image_to_string, pages)
     string = " ".join(text)
-    case_data = BIACase(string).to_dict()
+    case_data = BIACase(uuid, string).to_dict()
     return case_data
 
 
@@ -166,7 +166,7 @@ class BIACase:
         "Wilson, Earle B."
     ]
 
-    def __init__(self, text: str):
+    def __init__(self, uuid: str, text: str):
         """
         • Input will be text from a BIA case pdf file, after the pdf has
         been converted from PDF to text.
@@ -174,10 +174,12 @@ class BIACase:
         token by token searching for matching keywords.
         """
         self.doc: Doc = nlp(text)
+        self.uuid = uuid
 
     def to_dict(self):
         return {
-            'panel_members': '; '.join(self.get_panel()).replace("'", "&#39;") or 'Unknown',
+            'uuid': self.uuid,
+            'panel_members': ', '.join(self.get_panel()) or 'Unknown',
             'hearing_type': self.get_hearing_type() or 'Unknown',
             'application_type': self.get_application() or "Unknown",
             'date': self.get_date() or 'Unknown',
@@ -282,7 +284,7 @@ class BIACase:
         matches = set()
         for match_id, start, end in matcher(self.doc):
             span = self.doc[start:end]
-            matches.add(span.text)
+            matches.add(' '.join(span.text.split(", ")[-1::-1]))
         return sorted(list(matches))
 
     def get_gender(self):
