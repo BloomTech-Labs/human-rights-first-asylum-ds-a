@@ -24,7 +24,7 @@ app = FastAPI(
     title="DS API for HRF Asylum",
     description="PDF OCR",
     docs_url="/",
-    version="0.35.2",
+    version="0.35.3",
 )
 
 load_dotenv()
@@ -41,8 +41,6 @@ app.add_middleware(
 @app.get("/pdf-ocr/{uuid}")
 async def pdf_ocr(uuid: str):
     """
-    084d0556-5748-4687-93e3-394707be6cc0<br>
-    477307493-V-J-M-AXXX-XXX-639-BIA-Aug-17-2020<br>
     004dcaad-8c41-403f-96cc-ff4db68c45d7<br>
     00c46a50-84ee-4717-97bf-929d3a767501<br>
     00c76f3f-c4e2-49b8-9adf-c1044302627d<br>
@@ -51,7 +49,6 @@ async def pdf_ocr(uuid: str):
     012604c9-fdf5-4452-8cb2-de7a594354fa<br>
     013a6a6a-40d1-4c29-97c4-5aa865ca5a42<br>
     01881766-7409-43a9-a6bd-fa392c87cbe4<br>
-    01bd5d82-ddb7-4a92-993b-fe5c798f0984<br>
     """
     try:
         s3 = Session(
