@@ -9,6 +9,7 @@ from typing import List, Iterator
 
 from app.state_lookup import StateLookup
 
+
 nlp = load("en_core_web_sm")
 
 
