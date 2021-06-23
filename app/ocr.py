@@ -17,7 +17,7 @@ def make_fields(file) -> dict:
     """ This is the main overall function that creates a dictionary of the
     desired fields and their respective values; info that goes into those fields.
     """
-    pages = convert_from_bytes(file, dpi=150)
+    pages = convert_from_bytes(file, dpi=90)
     text = map(pytesseract.image_to_string, pages)
     string = " ".join(text)
     case_data = BIACase(string).to_dict()
