@@ -1,5 +1,14 @@
 Known Defects:
 
+1. ocr.py file
+    - Some methods in ocr.py return a list and they don’t need to be a list, requires
+      unnecessary step of using .join()
+    - get_city() function in ocr.py is broken and needs to be fixed
+    - We are no longer using the precendents nor statutes field, this has been commented out in the make_fields() so the
+      get_precedents function is no longer being used
+    - the current version of the DS API is deployed from the db_refactor branch, this needs to be merged with main
+    - the backend team needs to make sure to change the table they are using to db_cases for uploading case files
+
 1. Fields
     - All fields should be validated and fine-tuned for accuracy
     - Field `get_credibility` could be improved, because the field's output is dependent on occurrence of specific tokens in the document
