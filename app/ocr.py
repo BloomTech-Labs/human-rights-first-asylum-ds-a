@@ -1,5 +1,4 @@
 import json
-import time
 import geonamescache
 import pytesseract
 from pdf2image import convert_from_bytes
@@ -8,24 +7,24 @@ from spacy.tokens import Doc, Span
 from spacy.matcher import Matcher, PhraseMatcher
 from typing import List, Iterator
 
+from app.state_lookup import StateLookup
+
+
 nlp = load("en_core_web_sm")
 
 
-def make_fields(file) -> dict:
+def make_fields(uuid, file) -> dict:
     """ This is the main overall function that creates a dictionary of the
     desired fields and their respective values; info that goes into those fields.
     """
-    start = time.perf_counter()
     pages = convert_from_bytes(file, dpi=90)
     text = map(pytesseract.image_to_string, pages)
     string = " ".join(text)
-    case_data = BIACase(string).to_dict()
-    time_taken = time.perf_counter() - start
-    case_data["time to process"] = f"{time_taken:.2f} seconds"
+    case_data = BIACase(uuid, string).to_dict()
     return case_data
 
 
-def similar(self, matcher_pattern):
+def similar(doc, matcher_pattern):
     """
     A function that uses a spacy Matcher object to search for words or
     consecutive words as a phrase.
@@ -43,7 +42,7 @@ def similar(self, matcher_pattern):
     matcher.add('matcher_pattern', matcher_pattern)
 
     # return the "matcher" objects; as Span objects(human readable text)
-    return matcher(self.doc, as_spans=True)
+    return matcher(doc, as_spans=True)
 
 
 def similar_outcome(str1, str2):
@@ -166,20 +165,8 @@ class BIACase:
         "Wetmore, David H.",
         "Wilson, Earle B."
     ]
-    circuit_dict = {
-        'DC': 'DC', 'ME': '1', 'MA': '1', 'NH': '1', 'RI': '1', 'PR': '1',
-        'CT': '2', 'NY': '2', 'VT': '2', 'DE': '3', 'PA': '3', 'NJ': '3',
-        'VI': '3', 'MD': '4', 'VA': '4', 'NC': '4', 'SC': '4', 'WV': '4',
-        'LA': '5', 'MS': '5', 'TX': '5', 'KY': '6', 'OH': '6', 'TN': '6',
-        'MI': '6', 'IL': '7', 'IN': '7', 'WI': '7', 'AR': '8', 'IA': '8',
-        'MN': '8', 'MO': '8', 'NE': '8', 'ND': '8', 'SD': '8', 'AK': '9',
-        'AZ': '9', 'CA': '9', 'GU': '9', 'HI': '9', 'ID': '9', 'MT': '9',
-        'NV': '9', 'MP': '9', 'OR': '9', 'WA': '9', 'CO': '10', 'KS': '10',
-        'NM': '10', 'OK': '10', 'UT': '10', 'WY': '10', 'AL': '11', 'FL': '11',
-        'GA': '11'
-    }
 
-    def __init__(self, text: str):
+    def __init__(self, uuid: str, text: str):
         """
         • Input will be text from a BIA case pdf file, after the pdf has
         been converted from PDF to text.
@@ -187,26 +174,26 @@ class BIACase:
         token by token searching for matching keywords.
         """
         self.doc: Doc = nlp(text)
+        self.uuid = uuid
 
     def to_dict(self):
         return {
-            'panel_members': self.get_panel(),
-            'application_type': self.get_application(),
-            'date': self.get_date(),
-            'country_of_origin': self.get_country_of_origin(),
-            'outcome': self.get_outcome(),
+            'uuid': self.uuid,
+            'panel_members': ', '.join(self.get_panel()) or 'Unknown',
+            'hearing_type': self.get_hearing_type() or 'Unknown',
+            'application_type': self.get_application() or "Unknown",
+            'date': self.get_date() or 'Unknown',
+            'country_of_origin': self.get_country_of_origin() or 'Unknown',
+            'outcome': self.get_outcome() or 'Unknown',
             'case_origin_state': self.get_state(),
-            'city_of_origin': None,
-            # 'circuit of origin': self.get_circuit(),
-            'protected_grounds': self.get_protected_grounds(),
-            'type_of_violence': self.get_based_violence(),
-            'gender': self.get_gender(),
-            'indigenous_group': self.get_indigenous_status(),
-            'applicant_language': self.get_applicant_language(),
-            'credibility': self.get_credibility(),
-            'check_for_one_year': self.check_for_one_year(),
-            # 'precedent cases': self.get_precedent_cases(),
-            # 'statutes': self.get_statutes(),
+            'case_origin_city': "Unknown",
+            'protected_grounds': ', '.join(self.get_protected_grounds()) or 'Unknown',
+            'type_of_violence': ', '.join(self.get_based_violence()) or 'Unknown',
+            'gender': self.get_gender() or 'Unknown',
+            'indigenous_group': self.get_indigenous_status() or 'Unknown',
+            'applicant_language': self.get_applicant_language() or 'Unknown',
+            'credibility': self.get_credibility() or 'Unknown',
+            'check_for_one_year': str(self.check_for_one_year()) or 'Unknown',
         }
 
     def get_ents(self, labels: List[str]) -> Iterator[Span]:
@@ -215,10 +202,6 @@ class BIACase:
         if no label is specified, returns all entities
         """
         return (ent for ent in self.doc.ents if ent.label_ in labels)
-
-    def get_circuit(self):
-        """returns the circuit the case started in."""
-        return self.circuit_dict.get(self.get_state())
 
     def get_country_of_origin(self):
         """
@@ -275,7 +258,7 @@ class BIACase:
 
     def get_date(self) -> str:
         """
-        • Returns date of the document. Easy to validate by the PDF filename.
+        • Returns date of the document.
         """
         dates = map(str, self.get_ents(['DATE']))
         for s in dates:
@@ -295,28 +278,14 @@ class BIACase:
                 this function returns a judge, it IS from the appellate list,
                 and is therefore an appellate case.
         """
-        # create PhraseMatcher object with en_cor_web_md
         matcher = PhraseMatcher(nlp.vocab, attr="LOWER")
-        # generate a list of patterns
         patterns = [nlp.make_doc(text) for text in self.appellate_panel_members]
-        # add the patterns to the matcher's library
         matcher.add("panel_names", patterns)
-
-        # Create a list for phrase matches(judge names) to go.
-        matches = []
-        # find all matches, anywhere in the doc, that is a name from the
-        # appellate panel members list, and append them as spans(human readable)
+        matches = set()
         for match_id, start, end in matcher(self.doc):
-            # to matches list
             span = self.doc[start:end]
-            matches.append(span.text)
-        # if matches were found, return the list of panel members
-        if matches:
-            return sorted(set(matches))
-        # otherwise, the judge is in the appellate list; either not in the list
-        # or not an appellate judge
-        else:
-            return []  # IS THIS OKAY?
+            matches.add(' '.join(span.text.split(", ")[-1::-1]))
+        return sorted(list(matches))
 
     def get_gender(self):
         """
@@ -372,11 +341,9 @@ class BIACase:
         ]
 
         religions = ['christianity', 'christian', 'islam', 'atheist',
-                     'hinduism',
-                     'buddihism', 'jewish', 'judaism', 'islamist', 'sunni',
-                     'shia',
-                     'muslim', 'buddhist', 'atheists', 'jew', 'hindu',
-                     'atheism']
+                     'hinduism', 'buddihism', 'jewish', 'judaism', 'islamist',
+                     'sunni', 'shia', 'muslim', 'buddhist', 'atheists', 'jew',
+                     'hindu', 'atheism']
 
         politicals = ['political opinion', 'political offense']
 
@@ -445,158 +412,44 @@ class BIACase:
                         outcome.add(k)
         return "; ".join(list(outcome))
 
-    def get_outcome(self) -> List[str]:
-        """
-        • Returns list of outcome terms from the case in a list.
-          These will appear after 'ORDER' at the end of the document.
-        """
+    def get_hearing_type(self):
+        return "Appellate" if len(self.get_panel()) > 1 else "Initial"
 
-        outcomes_return = []
-        ordered_outcome = {'ORDER', 'ORDERED'}
-        outcomes_list = ['denied', 'dismissed', 'granted', 'remanded',
-                         'returned', 'sustained', 'terminated',
-                         'vacated', 'affirmed']
-        two_before_exclusion = {'may', 'any', 'has'}
-        one_before_exclusion = {'it', 'has'}
-
-        # locate where in the document the orders start
-        order_start_i = -1
+    def get_outcome(self) -> str:
+        """
+        • Returns the outcome of the case. This will appear after 'ORDER'
+        at the end of the document.
+        """
+        outcomes = {
+            'remanded',
+            'reversal',
+            'dismissed',
+            'sustained',
+            'terminated',
+            'granted',
+            'denied',
+            'returned',
+        }
         for token in self.doc:
-            if token.text in ordered_outcome:
-                order_start_i = token.i
-                break
-
-        # If we can't find where the orders start, check the whole opinion
-        if order_start_i == -1:
-            order_start_i = 0
-
-        # Locate where in the document the orders end
-        order_end_i = len(self.doc)
-        # Orders end when we see "FOR THE BOARD" or "WARNING"
-        # - this avoids finding keywords in footnotes or warnings
-        for i in range(order_start_i + 1, min(order_end_i, len(self.doc) - 2)):
-            if (self.doc[i:i + 3].text == "FOR THE BOARD" or
-                    self.doc[i].text == "WARNING"):
-                order_end_i = i
-                break
-
-        # Check the range for each type of outcome
-        for outcome in outcomes_list:
-            for i in range(order_start_i, order_end_i):
-                if (similar_outcome(self.doc[i].text, outcome) and
-                        self.doc[i - 2].text not in two_before_exclusion and
-                        self.doc[i - 1].text not in one_before_exclusion):
-                    outcomes_return.append(outcome)
-                    break
-
-        return outcomes_return
+            if token.text in {"ORDER", 'ORDERED'}:
+                start, stop = token.sent.start, token.sent.end + 280
+                outcome = self.doc[start:stop].text.strip().replace("\n", " ")
+                outcome = outcome.split('.')[0].lower()
+                for result in outcomes:
+                    if result in outcome:
+                        return result.title()
 
     def get_state(self):
-        # Create list to hold matcher patterns from state dictionary
-        state_patterns = []
-
-        for k in self.court_locs.keys():
-            state_patterns.append([{"LOWER": k.lower()}])
-
-        # create matcher pattern for the key phrase file
-        file_pattern = [
-            [{"LOWER": 'file'}],
-            [{"LOWER": 'files'}]
-        ]
-
-        # instantiate file pattern using the doc, this returns a span object
-        # that lists all the words pulled from the doc and their sentence and
-        # the index positions of the start of that sentence and end
-        file_matches = similar(self, file_pattern)
-
-        # if spacy finds 'file' or 'files' we can grab the sentence that it
-        # contains. if not we can search the entire document for the state abbrev
-        if file_matches:
-            file_sentence = nlp(str(file_matches[0].sent))
-            # searches the sentence containing file for a state abbrev and
-            # returns the first one listed
-            state_matches = similar(file_sentence, state_patterns)
-            if state_matches:
-                return state_matches[0].text
-            else:
-                # if you change this output you need to change get_city to
-                # reflect that change.
-                return "Please select state"
-        else:
-            # Searches entire document for states using matcher, returns
-            # them as a list that we can index.
-            state_matches = similar(self, state_patterns)
-            if state_matches[0].text in self.court_locs.keys():
-                return state_matches[0]
-            else:
-                return "Please select state"
+        for place in self.doc:
+            place = place.text
+            if place in StateLookup.states.keys():
+                return place
+            elif place in StateLookup.states.values():
+                return StateLookup.abbrev_lookup(place)
+        return "Unknown"
 
     def get_city(self):
-        """
-        This function uses the get_state to filter the potential cities to find,
-        then looks for the keywords file or files.
-            In most cases the city comes right after the keyword. 
-        If the keyword isn't there it then creates a new matcher search for
-        the entire corpus that finds the first city.
-            This needs to be revised since it will return Falls Church more than it should
-         
-        """
-        # uses the abbreviation from self.state and #gets the list of cities in a state
-        citycache = []
-        city_pattern = []
-        # if get_state() function was unable to find a state it will return
-        # "Please select state". If you change this return in get_state you
-        # have to change this phrase here to correspond.
-        state = self.get_state()
-        if state == "Please select state":
-            for i in self.court_locs.keys():
-                temp = self.court_locs.get(i)['city']
-                citycache.append(temp)
-
-        # if get_state() function does return a state this function will
-        # filter the court_loc dictionary by that state and return the corresponding cities.
-        else:
-            if state in self.court_locs.keys():
-                temp = self.court_locs.get(state)['city']
-                citycache.append(temp)
-            else:
-                for i in self.court_locs.keys():
-                    temp = self.court_locs.get(i)['city']
-                    citycache.append(temp)
-
-        # The length of this list is at most 72, and most of the time
-        # will be less than 15. The time complexity is negligible.
-        # This creates a spacy.matcher pattern
-        for i in citycache:
-            city_pattern.append([{"LOWER": i}])
-
-        # The court location is almost always in the sentence following these two phrases.
-        pattern = [
-            [{"LOWER": 'file'}],
-            [{"LOWER": 'files'}]
-        ]
-
-        # instantiation of the above pattern using spacy.matcher, this returns
-        # a list of span objects that notes the pattern returned and
-        # it's index location.
-        matches = similar(self.doc, pattern)
-
-        # if no matches are found (file or files) this function searches
-        # the entire corpus for the citys in court_locs.
-        if not matches:
-            matches = similar(self.doc, city_pattern)
-
-        # The first matcher return sentence for either option is stored
-        # here. .sent grabs the sentence of that matcher pattern.
-        sentence = str(matches[0].sent)
-        clean_sentence = sentence.replace(',', ' ').replace('\n', ' ').title()
-
-        # finds first city that's in the citycache
-        for word in clean_sentence:
-            if word in citycache:
-                return word
-            else:
-                return citycache
+        return "Unknown"
 
     def get_based_violence(self) -> List[str]:
         """
@@ -619,10 +472,9 @@ class BIACase:
         # Lists of keywords that fall within a bucket to search for
         terms_list = []
         violent_list = ['abduct', 'abuse', 'assassinate', 'assault', 'coerce',
-                        'exploit',
-                        'fear', 'harm', 'hurt', 'kidnap', 'kill', 'murder',
-                        'persecute',
-                        'rape', 'scare', 'shoot', 'suffer', 'threat', 'torture']
+                        'exploit', 'fear', 'harm', 'hurt', 'kidnap', 'kill',
+                        'murder', 'persecute', 'rape', 'scare', 'shoot',
+                        'suffer', 'threat', 'torture']
         family_list = ['child', 'daughter', 'family', 'husband', 'parent',
                        'partner', 'son', 'wife', 'woman']
         gender_list = ['fgm', 'gay', 'gender', 'homosexual', 'homosexuality',
@@ -648,173 +500,6 @@ class BIACase:
             terms_list.append('Gang')
         return terms_list
 
-    def get_precedent_cases(self) -> List[str]:
-        """"
-        Returns a list of court cases mentioned within the document, i.e.
-        'Matter of A-B-' and 'Urbina-Mejia v. Holder'
-         """
-        # These lists were largely gotten through trial and error & don't
-        # work as well on non-GCP documents initially set rules were broken &
-        # hardcoded stops made most sense when considering punctuation & mis-reads by OCR
-        cases_with_dupes = []
-        ok_words = {'&', "'", ',', '-', '.', 'al', 'et', 'ex', 'n', 'rel'}
-        reverse_break_words = {'(', '(IJ', 'Cf', 'Compare', 'He', 'I&N', 'IN',
-                               'In', 'Section', 'See', 'She', 'Under',
-                               'While', 'and', 'as', 'at', 'because', 'cf',
-                               'e.g.', 'in', 'is', 'procedural', 'section',
-                               'see', 'was'}
-        break_words = {'(', '(IJ', ',', '.', '....', 'Compare', 'He', 'I&N',
-                       'IN', 'In', 'Section', 'See', 'She',
-                       'Under', 'While', 'and', 'as', 'at', 'because', 'e.g.',
-                       'in', 'is', 'procedural', 'section',
-                       'see', 'was'}
-        for token in self.doc:
-            # Append 'X v. Y' precedent case: k loop extracts X, l loop extracts Y
-            if str(token) == 'v.':
-                test_index = token.i
-                vs_start = 0
-                vs_end = 0
-                for k in range(test_index - 1, test_index - 15, -1):
-                    if (not str(self.doc[k])[0].isupper() and str(
-                            self.doc[k]) not in ok_words):
-                        vs_start = k + 1
-                        break
-                    if (str(self.doc[k])[0].isupper() and str(
-                            self.doc[k]) in reverse_break_words):
-                        vs_start = k + 1
-                        break
-                for i in range(test_index, test_index + 15):
-                    if (str(self.doc[i]) == ',' or
-                            str(self.doc[i]).isnumeric() or
-                            str(self.doc[i]) in break_words):
-                        vs_end = i
-                        break
-                if str(self.doc[vs_start:vs_end]) not in cases_with_dupes:
-                    cases_with_dupes.append(str(self.doc[vs_start:vs_end]))
-
-            # Append 'Matter of X' precedent cases
-            if str(token) == 'Matter':
-                start_index = token.i
-                false_flag = False
-                end_index = 0
-                for j in range(start_index, start_index + 15):
-                    # OCR misclassified 'Matter of Z-Z-O-' as
-                    # 'Matter of 2-2-0' enough times to need to hardcode this in
-                    if str(self.doc[j]).isnumeric():
-                        if (str(self.doc[j])) == '2' or (
-                                str(self.doc[j]) == '0'):
-                            continue
-                        else:
-                            end_index += 1
-                            break
-                    if (str(self.doc[j])) in break_words or (
-                            str(self.doc[j]).isnumeric()):
-                        end_index = j
-                        break
-                    if str(self.doc[j]) == ':':
-                        false_flag = True
-                        break
-                if not false_flag:
-                    temp_var = str(self.doc[start_index:end_index])
-                    if temp_var not in cases_with_dupes:
-                        cases_with_dupes.append(temp_var)
-        cases_with_dupes = sorted(cases_with_dupes)
-
-        # k loop removes incorrect suffixes, l loop removes incorrect
-        # prefixes & prevents duplicates from being added.
-        clean_cases = []
-        final_cases = []
-        for k in range(0, len(cases_with_dupes)):
-            if (cases_with_dupes[k][0:-1] not in clean_cases and
-                    cases_with_dupes[k][0:-1] != ''):
-                clean_cases.append(cases_with_dupes[k])
-        for i in range(0, len(clean_cases)):
-            if clean_cases[i][0:2] == '. ' or clean_cases[i][0:2] == ', ':
-                if clean_cases[i][0:2] not in final_cases:
-                    final_cases.append(clean_cases[i][2:])
-            elif clean_cases[i][0:3] == '., ':
-                if clean_cases[i][0:2] not in final_cases:
-                    final_cases.append(clean_cases[i][3:])
-            elif clean_cases[i] not in final_cases:
-                final_cases.append(clean_cases[i])
-        return [s.replace('\n', ' ').replace('  ', ' ') for s in final_cases]
-
-    def get_statutes(self) -> dict:
-        """Returns statutes mentioned in a given .txt document as a dictionary: {"""
-        # Removes patterns with only words instead of numbers,
-        # and matches known statute patterns' shape using spacy to be added
-        not_in_test = {'Xxx', 'xxx', 'XXX'}
-        statutes_list = []
-        for token in self.doc:
-            word_shape_match = str(token.shape_)
-            if word_shape_match[0:3] not in not_in_test:
-
-                # Matches shape of statutes- these can have 3-4 prefixes, 0-2 suffixes,
-                # and extracts all subsections if there isn't a space between any of them
-                statute_shape_match = str(token.shape_).replace('x',
-                                                                'd').replace(
-                    'X', 'd')
-                if (statute_shape_match[0:4] == 'ddd(' or
-                        statute_shape_match[0:4] == 'ddd.' or
-                        statute_shape_match[0:5] == 'dddd.' or
-                        statute_shape_match[0:5] == 'dddd(' or
-                        statute_shape_match[0:6] == 'ddddd.' or
-                        statute_shape_match[0:6] == 'ddddd('):
-                    # Close any open parentheses & append if not already present
-                    has_open_paren = False
-                    temp_token3 = str(token)
-                    for i in range(0, len(temp_token3)):
-                        if temp_token3[i] == "(":
-                            has_open_paren = True
-                        if temp_token3[i] == ")":
-                            has_open_paren = False
-                    if has_open_paren:
-                        temp_token3 = temp_token3 + ')'
-                    if temp_token3 not in statutes_list:
-                        statutes_list.append(temp_token3)
-        statutes_list = sorted(statutes_list)
-
-        # Creates a dictionary with the key being the type of statute,
-        # and value being the listed statutes determined by the first 4 numbers in a statute.
-        return_dict = {}
-        cfr = []
-        ina = []
-        other = []
-        usc = []
-        for j in range(0, len(statutes_list)):
-            if statutes_list[j][0:4].isnumeric():
-                if (int(statutes_list[j][0:4]) >= 1000 and int(
-                        statutes_list[j][0:4]) <= 1003):
-                    cfr.append(statutes_list[j])
-                    continue
-                elif (int(statutes_list[j][0:4]) >= 1100 and int(
-                        statutes_list[j][0:4]) <= 1999):
-                    usc.append(statutes_list[j])
-                    continue
-                else:
-                    other.append(statutes_list[j])
-                    continue
-            elif statutes_list[j][0:3].isnumeric():
-                if (int(statutes_list[j][0:3]) >= 100 and int(
-                        statutes_list[j][0:3]) <= 199):
-                    usc.append(statutes_list[j])
-                    continue
-                elif (int(statutes_list[j][0:3]) >= 200 and int(
-                        statutes_list[j][0:3]) <= 399):
-                    ina.append(statutes_list[j])
-                    continue
-                else:
-                    other.append(statutes_list[j])
-                    continue
-            else:
-                other.append(statutes_list[j])
-
-        return_dict["CFR"] = cfr
-        return_dict["INA"] = ina
-        return_dict["Other"] = other
-        return_dict["USC"] = usc
-        return return_dict
-
     def get_indigenous_status(self) -> str:
         """
         • If the term "indigenous" appears in the document, the field will return
@@ -822,7 +507,7 @@ class BIACase:
         the two tokens that precede "indigenous;" this method needs to be fine-tuned and
         validated.
         """
-        return "Test"
+        return "Unknown"
 
     def get_applicant_language(self) -> str:
         """
@@ -831,17 +516,7 @@ class BIACase:
         the two tokens that precede "native speaker;" this method needs to be fine-tuned and
         validated.
         """
-        return "Test"
-
-    def get_access_interpeter(self) -> str:
-        """
-        • If the terms "interpreter" or "translator" appear in the document,
-        the field will return whether the asylum seeker had access to an
-        interpreter during their hearings. Currently, the field's output is
-        dependent on occurrence of specific tokens in the document; this method
-        needs to be fine-tuned and validated.
-        """
-        return "Test"
+        return "Unknown"
 
     def get_credibility(self) -> str:
         """
@@ -849,7 +524,7 @@ class BIACase:
         Curently, the field's output is dependent on occurance of specific tokens
         in the document; this method needs to be fine-tuned and validated.
         """
-        return "Test"
+        return "Unknown"
 
     def check_for_one_year(self) -> bool:
         """
