@@ -70,6 +70,10 @@ def reset_table():
     initialize_db()
 
 
+def delete_by_id(_id):
+    db_action(f"""DELETE FROM ds_cases WHERE id = {_id};""")
+
+
 if __name__ == '__main__':
     reset_table()
     print(get_table())
