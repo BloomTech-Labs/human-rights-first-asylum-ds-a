@@ -75,5 +75,5 @@ def delete_by_id(_id):
 
 
 if __name__ == '__main__':
-    reset_table()
+    # reset_table()
     print(get_table())
