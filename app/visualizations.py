@@ -1,26 +1,19 @@
 import plotly.graph_objects as go
 import plotly.express as px
 
-def get_stacked_bar_chart(df, feature):
-    """Takes dataframe and feature name (str) and returns a graph figure
-    in json format for that feature as the x-axis"""
+from app.db_ops import get_judge_df
 
-    fig = px.histogram(df, x=feature, color='outcome', barmode='group')
 
-    # outcomes_list = ['Denied', 'Granted', 'Remanded', 'Sustained', 'Terminated']
-    # df = df.groupby(feature)['case_outcome'].value_counts().unstack(fill_value=0)
-
-    # fig_data = []
-    # for outcome in outcomes_list:
-    #     if outcome in df.columns:
-            # attempt to change y-axis from floats to ints
-            # set y axis start at 0, step by 10
-            # Look for NaNs and replace with zeroes. 
-
-            # temp = go.Bar(name= outcome,
-            #                 x=list(df.index),
-            #                 y=df[outcome], y0=0, dy=10)
-            # fig_data.append(temp)
-
-    # fig = go.Figure(fig_data, layout=go.Layout(barmode='stack', yaxis={'tickformat': ',d'}))
-    return fig.to_json()
+def get_judge_plot(judge_name: str) -> go.Figure:
+    """ Takes a judge name and returns the plot of their decisions """
+    df = get_judge_df(judge_name)['outcome'].value_counts()
+    labels = df.index
+    values = df.values
+    data = go.Pie(labels=labels, values=values, hole=0.5)
+    layout = go.Layout(
+        title="Outcome by Judge",
+        colorway=px.colors.qualitative.Antique,
+        height=500,
+        width=600,
+    )
+    return go.Figure(data, layout)

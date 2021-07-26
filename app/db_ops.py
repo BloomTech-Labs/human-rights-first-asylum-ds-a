@@ -1,5 +1,6 @@
 import os
 
+import pandas as pd
 import psycopg2
 from dotenv import load_dotenv
 
@@ -74,6 +75,14 @@ def delete_by_id(_id):
     db_action(f"""DELETE FROM ds_cases WHERE id = {_id};""")
 
 
-if __name__ == '__main__':
-    # reset_table()
-    print(get_table())
+def get_judge_df(judge_name: str) -> pd.DataFrame:
+    conn = psycopg2.connect(db_url)
+    curs = conn.cursor()
+    curs.execute(f"""SELECT * FROM ds_cases
+    WHERE panel_members = {fix_str(judge_name)};""")
+    cols = [k[0] for k in curs.description]
+    rows = curs.fetchall()
+    df = pd.DataFrame(rows, columns=cols)
+    curs.close()
+    conn.close()
+    return df
