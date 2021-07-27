@@ -1,5 +1,5 @@
 import plotly.graph_objects as go
-import ployly.express as px
+import plotly.express as px
 
 from app.db_ops import get_judge_df
 

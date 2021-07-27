@@ -59,8 +59,8 @@ async def pdf_ocr(uuid: str):
 
 
 @app.get("/vis/outcome-by-judge/{judge_name}")
-"""
-Endpoint for visualizations on outcome by judge using plotly
-"""
 async def outcome_by_judge(judge_name: str):
+    """
+    Endpoint for visualizations on outcome by judge using plotly
+    """
     return get_judge_plot(judge_name).to_json()
