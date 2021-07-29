@@ -3,7 +3,7 @@ Local Docker Setup:
 docker build . -t asylum
 
 Run Docker Locally:
-docker run -it -p 5000:5000 asylum uvicorn app.main:app --host=0.0.0.0 --port=5000
+docker run -it -p 3000:3000 asylum uvicorn app.main:app --host=0.0.0.0 --port=3000
 
 Run Locally using Windows:
 winpty docker run -it -p 5000:5000 asylum uvicorn app.main:app --host=0.0.0.0 --port=5000
@@ -24,7 +24,7 @@ app = FastAPI(
     title="DS API for HRF Asylum",
     description="PDF OCR",
     docs_url="/",
-    version="0.35.6",
+    version="0.36.0",
 )
 
 load_dotenv()
@@ -56,3 +56,11 @@ async def pdf_ocr(uuid: str):
         return {"status": "Connection refused!"}
     except ClientError:
         return {"status": f"File not found: {uuid}.pdf"}
+
+
+@app.get("/vis/outcome-by-judge/{judge_name}")
+async def outcome_by_judge(judge_name: str):
+    """
+    Endpoint for visualizations on outcome by judge using plotly
+    """
+    return get_judge_plot(judge_name).to_json()
