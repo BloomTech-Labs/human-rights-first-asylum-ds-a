@@ -190,8 +190,6 @@ class BIACase:
             'protected_grounds': ', '.join(self.get_protected_grounds()) or 'Unknown',
             'type_of_violence': ', '.join(self.get_based_violence()) or 'Unknown',
             'gender': self.get_gender() or 'Unknown',
-            'indigenous_group': self.get_indigenous_status() or 'Unknown',
-            'applicant_language': self.get_applicant_language() or 'Unknown',
             'credibility': self.get_credibility() or 'Unknown',
             'check_for_one_year': str(self.check_for_one_year()) or 'Unknown',
         }
@@ -499,24 +497,6 @@ class BIACase:
         if len(gang_match) != 0:
             terms_list.append('Gang')
         return terms_list
-
-    def get_indigenous_status(self) -> str:
-        """
-        • If the term "indigenous" appears in the document, the field will return
-        the name of asylum seeker's tribe/nation/group. Currently, the field will return
-        the two tokens that precede "indigenous;" this method needs to be fine-tuned and
-        validated.
-        """
-        return "Unknown"
-
-    def get_applicant_language(self) -> str:
-        """
-        • If the term "native speaker" appears in the document, the field will return
-        the asylum seeker's stated native language. Currently, the field will return
-        the two tokens that precede "native speaker;" this method needs to be fine-tuned and
-        validated.
-        """
-        return "Unknown"
 
     def get_credibility(self) -> str:
         """
