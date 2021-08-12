@@ -20,7 +20,10 @@ def make_fields(uuid, file) -> dict:
     pages = convert_from_bytes(file, dpi=90)
     text = map(pytesseract.image_to_string, pages)
     string = " ".join(text)
+    print(string) # for comparing with case data 
     case_data = BIACase(uuid, string).to_dict()
+    print('**********')
+    print(case_data)
     return case_data
 
 

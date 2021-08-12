@@ -88,4 +88,3 @@ def get_judge_df(judge_name: str) -> pd.DataFrame:
     curs.close()
     conn.close()
     return df
-

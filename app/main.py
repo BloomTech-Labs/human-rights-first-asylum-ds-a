@@ -18,6 +18,7 @@ from dotenv import load_dotenv
 
 from app.db_ops import insert_case
 from app.ocr import make_fields
+from app.visualizations import get_judge_plot
 
 
 app = FastAPI(
