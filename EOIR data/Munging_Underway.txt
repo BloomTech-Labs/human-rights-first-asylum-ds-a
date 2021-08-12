@@ -1,0 +1,5 @@
+The current plan is to create a database of the EOIR data separate from the production database. If the data prove useable we can merge the databases.
+
+This file is here to demonstrate that work is being done. 
+
+
