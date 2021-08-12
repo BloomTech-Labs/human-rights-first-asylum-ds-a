@@ -77,11 +77,6 @@
 - **Details:** Returns gender of applicant or unknown. Uses `PhraseMatcher` with 'LEMMA' attribute activated to match to root word. Suffers accuracy when refugee is a family or more than one.
 - **Returns:** String example 'Male'
 - **Current Status:** Updates were made 4/30/21 Labs 33. 
-
-### Indigenous Status
-
-### Applicant Language
-
 ### Credibility
 
 ### If Applicant Met Filing Deadline
