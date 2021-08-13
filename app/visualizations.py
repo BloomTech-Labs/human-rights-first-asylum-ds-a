@@ -3,7 +3,7 @@ import plotly.express as px
 
 from app.db_ops import get_judge_df
 
-def get_judge_plot(judge_name: str) -> go.figure:
+def get_judge_plot(judge_name: str) -> go.Figure:
         ''' 
         Takes a judge name and returns a plot of decisions
         '''
@@ -17,4 +17,4 @@ def get_judge_plot(judge_name: str) -> go.figure:
                 height = 500,
                 width = 600
         )
-        return go.figure(data, layout)
+        return go.Figure(data, layout)
