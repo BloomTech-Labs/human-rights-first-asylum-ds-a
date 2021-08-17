@@ -412,8 +412,8 @@ class BIACase:
 
     def get_decision_type(self):
         return "Appellate" if len(self.get_panel()) > 1 else "Initial"
-        # Seems this category is looking for appellate decision instead,
-        # not immigration court decision.
+        # It seems decision_type is looking for appellate decision or else
+        # intial decision, not immigration court decision.
 
     def get_outcome(self) -> str:
         """
