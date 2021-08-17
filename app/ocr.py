@@ -180,7 +180,7 @@ class BIACase:
         return {
             'uuid': self.uuid,
             'panel_members': ', '.join(self.get_panel()) or 'Unknown',
-            'hearing_type': self.get_hearing_type() or 'Unknown',
+            'decision_type': self.get_decision_type() or 'Unknown',
             'application_type': self.get_application() or "Unknown",
             'date': self.get_date() or 'Unknown',
             'country_of_origin': self.get_country_of_origin() or 'Unknown',
@@ -410,8 +410,10 @@ class BIACase:
                         outcome.add(k)
         return "; ".join(list(outcome))
 
-    def get_hearing_type(self):
+    def get_decision_type(self):
         return "Appellate" if len(self.get_panel()) > 1 else "Initial"
+        # Seems this category is looking for appellate decision instead,
+        # not immigration court decision.
 
     def get_outcome(self) -> str:
         """
