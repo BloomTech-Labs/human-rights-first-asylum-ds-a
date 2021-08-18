@@ -18,3 +18,11 @@ def get_judge_plot(judge_name: str) -> go.Figure:
                 width = 600
         )
         return go.Figure(data, layout)
+
+
+def get_judge_bar(judge_name: str) -> go.Figure:
+        df = get_judge_df(judge_name)
+        df["count"] = 1
+        grouped_df = df.groupby(by=["protected_grounds", "outcome"]).agg({"count": ["sum"]}).reset_index()
+        fig = px.bar(grouped_df, x="protected_grounds", y="count", color="outcome", title="Stack Bar Chart")
+        return fig
