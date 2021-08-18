@@ -3,6 +3,7 @@ import os
 import pandas as pd
 import psycopg2
 from dotenv import load_dotenv
+import plotly.express as px
 
 
 load_dotenv()
@@ -78,10 +79,13 @@ def get_judge_df(judge_name: str) -> pd.DataFrame:
     """
     Returns judge case data based on judge name as a dataframe.
     """
+    judge_name = "%" + judge_name + "%"
     conn = psycopg2.connect(db_url)
     curs = conn.cursor()
+    # hearing_type = "Initial" filters out appellate cases
     curs.execute(f"""SELECT * FROM ds_cases
-                 WHERE panel_members = {fix_str(judge_name)};""")
+                 WHERE panel_members LIKE {fix_str(judge_name)}
+                 AND hearing_type = 'Initial';""")
     cols = [k[0] for k in curs.description]
     rows = curs.fetchall()
     df = pd.DataFrame(rows, columns = cols)
