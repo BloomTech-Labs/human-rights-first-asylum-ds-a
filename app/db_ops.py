@@ -75,6 +75,7 @@ def reset_table():
 def delete_by_id(_id):
     db_action(f"""DELETE FROM ds_cases WHERE id = {_id};""")
 
+
 def get_judge_df(judge_name: str) -> pd.DataFrame:
     """
     Returns judge case data based on judge name as a dataframe.
