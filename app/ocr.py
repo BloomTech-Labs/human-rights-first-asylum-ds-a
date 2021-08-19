@@ -1,6 +1,7 @@
 import json
 import geonamescache
 import pytesseract
+import pickle
 from pdf2image import convert_from_bytes
 from spacy import load
 from spacy.tokens import Doc, Span
@@ -117,54 +118,8 @@ class BIACase:
     with open('./app/court_locations.json') as f:
         court_locs = json.load(f)
 
-    appellate_panel_members = [
-        "Adkins-Blanch, Charles K.",
-        "Michael P. Baird",
-        "Cassidy, William A.",
-        "Cole, Patricia A.",
-        "Couch, V. Stuart",
-        "Creppy, Michael J.",
-        "Crossett, John P.",
-        "Donovan, Teresa L.",
-        "Foote, Megan E.",
-        "Geller, Joan B.",
-        "Gemoets, Marcos",
-        "Gonzalez, Gabriel",
-        "Goodwin, Deborah K.",
-        "Gorman, Stephanie E.",
-        "Grant, Edward R.",
-        "Greer, Anne J.",
-        "Guendelsberger, John",
-        "Hunsucker, Keith E.",
-        "Kelly, Edward F.",
-        "Kendall Clark, Molly",
-        "Liebmann, Beth S.",
-        "Liebowitz, Ellen C.",
-        "Mahtabfar, Sunita B.",
-        "Malphrus, Garry D.",
-        "Mann, Ana",
-        "Miller, Neil P.",
-        "Monsky, Megan Foote",
-        "Montante Jr., Phillip J.",
-        "Morris, Daniel",
-        "Mullane, Hugh G.",
-        "Neal, David L.",
-        "Noferi, Mark",
-        "O'Connor, Blair",
-        "O'Herron, Margaret M.",
-        "O'Leary, Brian M.",
-        "Owen, Sirce E.",
-        "Pauley, Roger",
-        "Petty, Aaron R.",
-        "Pepper, S. Kathleen",
-        "RILEY, KEVIN W.",
-        "Rosen, Scott",
-        "Snow, Thomas G.",
-        "Swanwick, Daniel L.",
-        "Wendtland, Linda S.",
-        "Wetmore, David H.",
-        "Wilson, Earle B."
-    ]
+    with open('./app/judge_names.pkl', 'rb') as j:
+        appellate_panel_members = pickle.load(j)
 
     def __init__(self, uuid: str, text: str):
         """
