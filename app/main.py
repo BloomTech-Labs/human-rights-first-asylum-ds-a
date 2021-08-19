@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 
 from app.db_ops import insert_case
 from app.ocr import make_fields
-from app.visualizations import get_judge_plot, get_judge_bar
+from app.visualizations import get_judge_side_bar
 
 
 app = FastAPI(
@@ -64,4 +64,4 @@ async def outcome_by_judge(judge_name: str):
     """
     Endpoint for visualizations on outcome by judge using plotly
     """
-    return get_judge_bar(judge_name).to_json()
+    return get_judge_side_bar(judge_name).to_json()
