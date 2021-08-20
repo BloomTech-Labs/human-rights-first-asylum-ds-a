@@ -57,8 +57,6 @@ def initialize_db():
     protected_grounds TEXT,
     type_of_violence TEXT,
     gender TEXT,
-    indigenous_group TEXT,
-    applicant_language TEXT,
     credibility TEXT,
     check_for_one_year TEXT);""")
 
