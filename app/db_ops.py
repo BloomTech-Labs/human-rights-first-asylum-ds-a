@@ -47,7 +47,7 @@ def initialize_db():
     id SERIAL PRIMARY KEY NOT NULL,
     uuid TEXT,
     panel_members TEXT,
-    hearing_type TEXT,
+    decision_type TEXT,
     application_type TEXT,
     date TEXT,
     country_of_origin TEXT,
