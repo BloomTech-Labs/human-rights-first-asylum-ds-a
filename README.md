@@ -59,11 +59,11 @@ Then open http://0.0.0.0:5000 in your browser. The application should be running
 ## Contributors
   
 ###### Labs 37
-[Minh Nguyen](https://github.com/minh14496)
-[Waqas Khwaja](https://github.com/WaqasKhwaja)
-[Jason Young](https://github.com/yaobviously)
-[Andrew Lee](https://github.com/andrewlee977)
-[Michael Carrier](https://github.com/mikecarrier4)
+[Minh Nguyen](https://github.com/minh14496)   
+[Waqas Khwaja](https://github.com/WaqasKhwaja)   
+[Jason Young](https://github.com/yaobviously)   
+[Andrew Lee](https://github.com/andrewlee977)   
+[Michael Carrier](https://github.com/mikecarrier4)   
 
 ###### Labs 35
 [Dylan Sivori](https://github.com/Dylan-Sivori)  
