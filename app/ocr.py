@@ -211,11 +211,13 @@ class BIACase:
 
     def get_date(self) -> str:
         """
-        • Returns date of the document.
+        • Returns decision date of the document.
+        To return hearing date of the case change 
+        s.split('/') to s.split()
         """
         dates = map(str, self.get_ents(['DATE']))
         for s in dates:
-            if len(s.split()) == 3:
+            if len(s.split('/')) == 3:
                 return s
 
     def get_panel(self):
