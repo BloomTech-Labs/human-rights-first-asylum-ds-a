@@ -19,7 +19,7 @@ from dotenv import load_dotenv
 
 from app.db_ops import insert_case
 from app.ocr import make_fields
-from app.visualizations import get_judge_plot, get_judge_bar
+from app.visualizations import get_judge_side_bar
 
 
 app = FastAPI(
@@ -43,8 +43,8 @@ app.add_middleware(
 @app.get("/pdf-ocr/{uuid}")
 async def pdf_ocr(uuid: str):
     """
-    Endpoint for uploading case and pass scrape data to ds_case table
-    and also pass uuid to case table
+    Endpoint for uploading cases and passing scraped data to the ds_case 
+    table. Also passes uuid to the case table
     """
     try:
         s3 = Session(
@@ -57,7 +57,7 @@ async def pdf_ocr(uuid: str):
         )
         fields = make_fields(uuid, response['Body'].read())
         insert_case(fields)
-        get_text_url = f"https://asylum-a-api.herokuapp.com/upload/scape/{uuid}"
+        get_text_url = f"https://asylum-a-api.herokuapp.com/upload/scrape/{uuid}"
         re.get(get_text_url)
         return {"status": "Success"}
     except ConnectionError:
@@ -71,4 +71,4 @@ async def outcome_by_judge(judge_name: str):
     """
     Endpoint for visualizations on outcome by judge using plotly
     """
-    return get_judge_bar(judge_name).to_json()
+    return get_judge_side_bar(judge_name).to_json()
