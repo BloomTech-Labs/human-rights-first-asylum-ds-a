@@ -47,7 +47,7 @@ def initialize_db():
     id SERIAL PRIMARY KEY NOT NULL,
     uuid TEXT,
     panel_members TEXT,
-    hearing_type TEXT,
+    decision_type TEXT,
     application_type TEXT,
     date TEXT,
     country_of_origin TEXT,
@@ -77,15 +77,15 @@ def delete_by_id(_id):
 
 def get_judge_df(judge_name: str) -> pd.DataFrame:
     """
-    Returns judge case data based on judge name as a dataframe.
+    Returns judge case data from ds_cases table based on judge
+    name as a filter.
     """
     judge_name = "%" + judge_name + "%"
     conn = psycopg2.connect(db_url)
     curs = conn.cursor()
-    # hearing_type = "Initial" filters out appellate cases
     curs.execute(f"""SELECT * FROM ds_cases
                  WHERE panel_members LIKE {fix_str(judge_name)}
-                 AND hearing_type = 'Initial';""")
+                 AND decision_type = 'Initial';""")
     cols = [k[0] for k in curs.description]
     rows = curs.fetchall()
     df = pd.DataFrame(rows, columns = cols)
