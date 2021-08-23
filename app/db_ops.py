@@ -57,8 +57,6 @@ def initialize_db():
     protected_grounds TEXT,
     type_of_violence TEXT,
     gender TEXT,
-    indigenous_group TEXT,
-    applicant_language TEXT,
     credibility TEXT,
     check_for_one_year TEXT);""")
 
@@ -74,6 +72,7 @@ def reset_table():
 
 def delete_by_id(_id):
     db_action(f"""DELETE FROM ds_cases WHERE id = {_id};""")
+
 
 def get_judge_df(judge_name: str) -> pd.DataFrame:
     """
