@@ -211,12 +211,36 @@ class BIACase:
 
     def get_date(self) -> str:
         """
-        • Returns date of the document.
-        """
+        • Returns decision date of the document.
+
+        This is the code to return hearing date 
+        # get_ents function only use in this function
+        # can be deleted from BIA class if not use 
+
         dates = map(str, self.get_ents(['DATE']))
         for s in dates:
             if len(s.split()) == 3:
                 return s
+        """
+        primary_pattern = [
+            [{"LOWER": "date"}, {"LOWER": "of"}, 
+            {"LOWER": "this"}, {"LOWER": "notice"}]
+        ]
+        primary_pattern = [[{"LOWER": "date"}, {"LOWER": "of"}, 
+                     {"LOWER": "this"}, {"LOWER": "notice"}]]
+        # instantiate a list of pattern matches
+        spans = similar(self.doc, primary_pattern)
+        # if there are matches
+        if spans:
+            # grab the surrounding sentence and turn it into a string
+            sentence = str(spans[0].sent)
+            # remove line breaks, edge case
+            clean_sent = sentence.replace("\n", " ")
+            # iterate through the list of tokens in sentence
+            # pick out the date in format xxxx/xx/xx
+            for i in clean_sent.split():
+                if len(i.split('/')) == 3:
+                    return i
 
     def get_panel(self):
         """
