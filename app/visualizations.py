@@ -4,6 +4,12 @@ from app.db_ops import get_judge_df
 
 
 def get_judge_side_bar(judge_name: str) -> go.Figure:
+        """
+        Function grabs data from database by judge and creates a
+        side-by-side bar chart for visualization.
+        Input: judge_name (name of judge to filter by)
+        Output: fig (object with visualization data)
+        """
         df = get_judge_df(judge_name)
         df["count"] = 1
         grouped_df = df.groupby(by=["protected_grounds",
