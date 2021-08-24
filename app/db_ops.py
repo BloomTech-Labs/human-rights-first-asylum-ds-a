@@ -55,7 +55,7 @@ def initialize_db():
     case_origin_state TEXT,
     case_origin_city TEXT,
     protected_grounds TEXT,
-    type_of_violence TEXT,
+    type_of_persecution TEXT,
     gender TEXT,
     credibility TEXT,
     check_for_one_year TEXT);""")
