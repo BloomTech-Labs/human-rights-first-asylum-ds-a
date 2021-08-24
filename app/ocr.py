@@ -222,8 +222,10 @@ class BIACase:
             if len(s.split()) == 3:
                 return s
         """
-        primary_pattern = [[{"LOWER": "date"}, {"LOWER": "of"}, 
-                     {"LOWER": "this"}, {"LOWER": "notice"}]]
+        primary_pattern = [
+            [{"LOWER": "date"}, {"LOWER": "of"}, 
+            {"LOWER": "this"}, {"LOWER": "notice"}]
+        ]
         # instantiate a list of pattern matches
         spans = similar(self.doc, primary_pattern)
         # if there are matches
@@ -432,7 +434,10 @@ class BIACase:
                 return StateLookup.abbrev_lookup(place)
         return "Unknown"
         """
-        primary_pattern = [[{"LOWER": "file"}, {"LOWER": ":"}]]
+        primary_pattern = [
+            [{"LOWER": "file"}, {"LOWER": ":"}],
+            [{"LOWER": "files"}, {"LOWER": ":"}]
+        ]
         # instantiate a list of pattern matches
         spans = similar(self.doc, primary_pattern)
         # if there are matches
@@ -453,7 +458,10 @@ class BIACase:
 
         Returns: The name of the city
         """
-        primary_pattern = [[{"LOWER": "file"}, {"LOWER": ":"}]]
+        primary_pattern = [
+            [{"LOWER": "file"}, {"LOWER": ":"}],
+            [{"LOWER": "files"}, {"LOWER": ":"}]
+        ]
         # instantiate a list of pattern matches
         spans = similar(self.doc, primary_pattern)
         # if there are matches
