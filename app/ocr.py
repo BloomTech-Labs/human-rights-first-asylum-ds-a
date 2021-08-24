@@ -140,8 +140,8 @@ class BIACase:
             'date': self.get_date() or 'Unknown',
             'country_of_origin': self.get_country_of_origin() or 'Unknown',
             'outcome': self.get_outcome() or 'Unknown',
-            'case_origin_state': self.get_state(),
-            'case_origin_city': "Unknown",
+            'case_origin_state': self.get_state() or 'Unknown',
+            'case_origin_city': self.get_city() or "Unknown",
             'protected_grounds': ', '.join(self.get_protected_grounds()) or 'Unknown',
             'type_of_violence': ', '.join(self.get_based_violence()) or 'Unknown',
             'gender': self.get_gender() or 'Unknown',
@@ -226,8 +226,6 @@ class BIACase:
             [{"LOWER": "date"}, {"LOWER": "of"}, 
             {"LOWER": "this"}, {"LOWER": "notice"}]
         ]
-        primary_pattern = [[{"LOWER": "date"}, {"LOWER": "of"}, 
-                     {"LOWER": "this"}, {"LOWER": "notice"}]]
         # instantiate a list of pattern matches
         spans = similar(self.doc, primary_pattern)
         # if there are matches
@@ -419,6 +417,15 @@ class BIACase:
                         return result.title()
 
     def get_state(self):
+        """
+        get_state: Get the state of the original hearing location
+        Find the "File:" pattern in the document and after that
+        pattern is the State 
+
+        Returns: The name of the state
+        """
+        """
+        Previous code to find state defeciency
         for place in self.doc:
             place = place.text
             if place in StateLookup.states.keys():
@@ -426,8 +433,45 @@ class BIACase:
             elif place in StateLookup.states.values():
                 return StateLookup.abbrev_lookup(place)
         return "Unknown"
+        """
+        primary_pattern = [
+            [{"LOWER": "file"}, {"LOWER": ":"}],
+            [{"LOWER": "files"}, {"LOWER": ":"}]
+        ]
+        # instantiate a list of pattern matches
+        spans = similar(self.doc, primary_pattern)
+        # if there are matches
+        if spans:
+            # grab the surrounding sentence and turn it into a string
+            sentence = str(spans[0].sent)
+            # remove line breaks, edge case
+            clean_sent = sentence.replace("\n", " ")
+            state = clean_sent.split(',')[1].split()[0].strip()
+            return state
+        return "Unknown"
 
     def get_city(self):
+        """
+        get_city: Get the state of the original hearing location
+        Find the "File:" pattern in the document and after that
+        pattern is the City 
+
+        Returns: The name of the city
+        """
+        primary_pattern = [
+            [{"LOWER": "file"}, {"LOWER": ":"}],
+            [{"LOWER": "files"}, {"LOWER": ":"}]
+        ]
+        # instantiate a list of pattern matches
+        spans = similar(self.doc, primary_pattern)
+        # if there are matches
+        if spans:
+            # grab the surrounding sentence and turn it into a string
+            sentence = str(spans[0].sent)
+            # remove line breaks, edge case
+            clean_sent = sentence.replace("\n", " ")
+            city = clean_sent.split(',')[0].split()[-1].strip()
+            return city
         return "Unknown"
 
     def get_based_violence(self) -> List[str]:
