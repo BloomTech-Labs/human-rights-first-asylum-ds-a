@@ -504,13 +504,13 @@ class BIACase:
         
         # output logic checks wheteher similar_***** variables are empty or not
         if similar_narrow:
-            return 'Respondent was found credible'
+            return True
 
         elif similar_medium and similar_wide:
-            return 'Respondent was found credible'
+            return True
 
         else:
-            return 'Respondent was not found credible'
+            return False
 
     def check_for_one_year(self) -> bool:
         """
