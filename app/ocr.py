@@ -137,7 +137,7 @@ class BIACase:
             'panel_members': ', '.join(self.get_panel()) or 'Unknown',
             'decision_type': self.get_decision_type() or 'Unknown',
             'application_type': self.get_application() or "Unknown",
-            'date': self.get_date() or 'Unknown',
+            'decision_date': self.get_date() or 'Unknown',
             'country_of_origin': self.get_country_of_origin() or 'Unknown',
             'outcome': self.get_outcome() or 'Unknown',
             'case_origin_state': self.get_state(),

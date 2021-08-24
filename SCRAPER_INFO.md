@@ -11,7 +11,7 @@
 - **Current Status:** Currently is pulled correctly by scraper.
 
 ### Date
-- **Function name: ** `get_date()`
+- **Function name: ** `decision_date()`
 - **Details:** Returns date of case in format M-DD-YYYY. Specified as ‘date of notice’ within page 1 of an appeal
 - **Returns:** String in format 'YYYY-DD-M'
 - **Current Status:** Currently is pulled correctly by scraper.

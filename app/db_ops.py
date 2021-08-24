@@ -49,7 +49,7 @@ def initialize_db():
     panel_members TEXT,
     decision_type TEXT,
     application_type TEXT,
-    date TEXT,
+    decision_date TEXT,
     country_of_origin TEXT,
     outcome TEXT,
     case_origin_state TEXT,
