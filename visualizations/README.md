@@ -1,8 +1,10 @@
 # HRF Asylum DS Notebooks
 
-## Description
-This folder contains `.ipynb` notebooks and `.py` scripts exploring various visualizations.
+## Important
+The current dynamic judge visualization (side-by-side bar chart) that's being rendered on the frontend of the application was created by Labs 37, and can be found in app/visualizations.py.
 
+## Description
+This folder contains experimental `.ipynb` notebooks and `.py` scripts exploring various mock visualizations. All visualizations in this directory aren't in production.
 
 ## Notebooks
 
