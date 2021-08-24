@@ -211,12 +211,36 @@ class BIACase:
 
     def get_date(self) -> str:
         """
-        • Returns date of the document.
-        """
+        • Returns decision date of the document.
+
+        This is the code to return hearing date 
+        # get_ents function only use in this function
+        # can be deleted from BIA class if not use 
+
         dates = map(str, self.get_ents(['DATE']))
         for s in dates:
             if len(s.split()) == 3:
                 return s
+        """
+        primary_pattern = [
+            [{"LOWER": "date"}, {"LOWER": "of"}, 
+            {"LOWER": "this"}, {"LOWER": "notice"}]
+        ]
+        primary_pattern = [[{"LOWER": "date"}, {"LOWER": "of"}, 
+                     {"LOWER": "this"}, {"LOWER": "notice"}]]
+        # instantiate a list of pattern matches
+        spans = similar(self.doc, primary_pattern)
+        # if there are matches
+        if spans:
+            # grab the surrounding sentence and turn it into a string
+            sentence = str(spans[0].sent)
+            # remove line breaks, edge case
+            clean_sent = sentence.replace("\n", " ")
+            # iterate through the list of tokens in sentence
+            # pick out the date in format xxxx/xx/xx
+            for i in clean_sent.split():
+                if len(i.split('/')) == 3:
+                    return i
 
     def get_panel(self):
         """
@@ -457,11 +481,60 @@ class BIACase:
 
     def get_credibility(self) -> str:
         """
-        • Returns the judge's decision on whether the applicant is a credible witness.
-        Curently, the field's output is dependent on occurance of specific tokens
-        in the document; this method needs to be fine-tuned and validated.
+        Returns the judge's decision on whether the applicant is a credible witness.
+        The process starts by adding rules/phrases to SpaCy's Matcher, they were obtained by manually 
+        parsing through case files and finding all sentences related to credibility. 
+        There are three separate rules, narrow, medium and wide, which decrease in the phrasing
+        specificity, this allows for some wiggle room as opposed to searching for exact matches. 
+        All instances of a match are returned by Matcher, so checking whether these objects are empty 
+        or not dictates the output of this function.
         """
-        return "Unknown"
+        # Speciifying phrase patterns / rules to use in SpaCy's Matcher
+        narrow_scope = [[{"LOWER": "court"}, {"LOWER": "finds"},
+                         {"LOWER": "respondent"}, {"LOWER": "generally"},
+                         {"LOWER": "credible"}],
+                        [{"LOWER": "court"}, {"LOWER": "finds"},
+                         {"LOWER": "respondent"}, {"LOWER": "testimony"},
+                         {"LOWER": "credible"}],
+                        [{"LOWER": "court"}, {"LOWER": "finds"}, 
+                         {"LOWER": "respondent"}, {"LOWER": "credible"}]]
+
+        medium_scope = [[{"LOWER": "credible"}, {"LOWER": "witness"}],
+                        [{"LOWER": "generally"}, {"LOWER": "consistent"}],
+                        [{"LOWER": "internally"}, {"LOWER": "consistent"}],
+                        [{"LOWER": "sufficiently"}, {"LOWER": "consistent"}],
+                        [{"LOWER": "testified"}, {"LOWER": "credibly"}],
+                        [{"LOWER": "testimony"}, {"LOWER": "credible"}],
+                        [{"LOWER": "testimony"}, {"LOWER": "consistent"}]]
+
+        wide_scope = [{"LEMMA": {"IN": ["coherent", 
+                                        "possible", 
+                                        "credible", 
+                                        "consistent"]}}]
+        
+        # instantiating Matcher
+        matcher = Matcher(nlp.vocab)
+        
+        # adding each rule to Matcher, then using global function similar() to find 
+        # and store matches in similar_****** variables
+        matcher.add('narrow_cred', narrow_scope)
+        similar_narrow = similar(target_phrases=narrow_scope, file=self.doc)
+
+        matcher.add('medium_cred', medium_scope)
+        similar_medium = similar(target_phrases=medium_scope, file=self.doc)
+
+        matcher.add('wide_cred', wide_scope)
+        similar_wide = similar(target_phrases=wide_scope, file=self.doc)
+        
+        # output logic checks wheteher similar_***** variables are empty or not
+        if similar_narrow:
+            return True
+
+        elif similar_medium and similar_wide:
+            return True
+
+        else:
+            return False
 
     def check_for_one_year(self) -> bool:
         """
