@@ -141,9 +141,9 @@ class BIACase:
             'case_origin_state': self.get_state() or 'Unknown',
             'case_origin_city': self.get_city() or "Unknown",
             'protected_grounds': ', '.join(self.get_protected_grounds()) or 'Unknown',
-            'type_of_violence': ', '.join(self.get_based_violence()) or 'Unknown',
+            'type_of_persecution': ', '.join(self.get_based_violence()) or 'Unknown',
             'gender': self.get_gender() or 'Unknown',
-            'credibility': self.get_credibility() or 'Unknown',
+            'credibility': str(self.get_credibility()) or 'Unknown',
             'check_for_one_year': str(self.check_for_one_year()) or 'Unknown',
         }
 
@@ -154,7 +154,7 @@ class BIACase:
         """
         return (ent for ent in self.doc.ents if ent.label_ in labels)
 
-    def get_country_of_origin(self):
+    def get_country_of_origin(self) -> str:
         """
         RETURNS the respondent's or respondents' country of origin:
         """
@@ -237,8 +237,10 @@ class BIACase:
             for i in clean_sent.split():
                 temp = i.split('/')
                 if len(temp) == 3:
-                    if temp[0] != 2:
+                    if len(temp[0]) < 2:
                         temp[0] = '0' + temp[0]
+                    if len(temp[1]) < 2:
+                        temp[1] = '0' + temp[1]
                     result_date = temp[2] + '-' + temp[0] + '-' + temp[1]
                     return result_date
 
@@ -264,7 +266,7 @@ class BIACase:
             matches.add(' '.join(span.text.split(", ")[-1::-1]))
         return sorted(list(matches))
 
-    def get_gender(self):
+    def get_gender(self) -> str:
         """
         Searches through a given document and counts the TOTAL number of
         "male" pronoun uses and "female" pronoun uses. Whichever
@@ -389,7 +391,7 @@ class BIACase:
                         outcome.add(k)
         return "; ".join(list(outcome))
 
-    def get_decision_type(self):
+    def get_decision_type(self) -> str:
         return "Appellate" if len(self.get_panel()) > 1 else "Initial"
         # It seems decision_type is looking for appellate decision or else
         # intial decision, not immigration court decision.
@@ -418,7 +420,7 @@ class BIACase:
                     if result in outcome:
                         return result.title()
 
-    def get_state(self):
+    def get_state(self) -> str:
         """
         get_state: Get the state of the original hearing location
         Find the "File:" pattern in the document and after that
@@ -452,7 +454,7 @@ class BIACase:
             return state
         return "Unknown"
 
-    def get_city(self):
+    def get_city(self) -> str:
         """
         get_city: Get the state of the original hearing location
         Find the "File:" pattern in the document and after that
@@ -525,7 +527,7 @@ class BIACase:
             terms_list.append('Gang')
         return terms_list
 
-    def get_credibility(self) -> str:
+    def get_credibility(self) -> bool:
         """
         Returns the judge's decision on whether the applicant is a credible witness.
         The process starts by adding rules/phrases to SpaCy's Matcher, they were obtained by manually 
@@ -535,7 +537,7 @@ class BIACase:
         All instances of a match are returned by Matcher, so checking whether these objects are empty 
         or not dictates the output of this function.
         """
-        # Speciifying phrase patterns / rules to use in SpaCy's Matcher
+        # # Speciifying phrase patterns / rules to use in SpaCy's Matcher
         # narrow_scope = [[{"LOWER": "court"}, {"LOWER": "finds"},
         #                  {"LOWER": "respondent"}, {"LOWER": "generally"},
         #                  {"LOWER": "credible"}],
@@ -553,26 +555,17 @@ class BIACase:
         #                 [{"LOWER": "testimony"}, {"LOWER": "credible"}],
         #                 [{"LOWER": "testimony"}, {"LOWER": "consistent"}]]
 
-        # wide_scope = [{"LEMMA": {"IN": ["coherent", 
+        # wide_scope = [[{"LEMMA": {"IN": ["coherent", 
         #                                 "possible", 
         #                                 "credible", 
-        #                                 "consistent"]}}]
-        
-        # # instantiating Matcher
-        # matcher = Matcher(nlp.vocab)
-        
-        # # adding each rule to Matcher, then using global function similar() to find 
-        # # and store matches in similar_****** variables
-        # matcher.add('narrow_cred', narrow_scope)
-        # similar_narrow = similar(target_phrases=narrow_scope, file=self.doc)
+        #                                 "consistent"]}}]]
 
-        # matcher.add('medium_cred', medium_scope)
-        # similar_medium = similar(target_phrases=medium_scope, file=self.doc)
+        # similar_narrow = similar(self.doc, narrow_scope)
+        # similar_medium = similar(self.doc, medium_scope)
+        # similar_wide = similar(self.doc, wide_scope)
 
-        # matcher.add('wide_cred', wide_scope)
-        # similar_wide = similar(target_phrases=wide_scope, file=self.doc)
-        
         # # output logic checks wheteher similar_***** variables are empty or not
+        # # output logic checks whether similar size variables are empty or not
         # if similar_narrow:
         #     return True
 
@@ -581,15 +574,15 @@ class BIACase:
 
         # else:
         #     return False
-        return "Unkown"
-        
+        return "Unknown"
+
     def check_for_one_year(self) -> bool:
         """
         Checks whether or not the asylum-seeker argued to be exempt from the
         one-year guideline.
 
         Returns true if the phrases "within one-year", "untimely application",
-        "extraordinary circumstances" or "changed circumstances" appeaer in the
+        "extraordinary circumstances" or "changed circumstances" appear in the
         same sentence as a time-based word. Otherwise returns False.
         """
         time_terms = {'year', 'delay', 'time', 'period', 'deadline'}
