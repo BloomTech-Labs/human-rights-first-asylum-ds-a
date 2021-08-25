@@ -532,52 +532,53 @@ class BIACase:
         or not dictates the output of this function.
         """
         # Speciifying phrase patterns / rules to use in SpaCy's Matcher
-        narrow_scope = [[{"LOWER": "court"}, {"LOWER": "finds"},
-                         {"LOWER": "respondent"}, {"LOWER": "generally"},
-                         {"LOWER": "credible"}],
-                        [{"LOWER": "court"}, {"LOWER": "finds"},
-                         {"LOWER": "respondent"}, {"LOWER": "testimony"},
-                         {"LOWER": "credible"}],
-                        [{"LOWER": "court"}, {"LOWER": "finds"}, 
-                         {"LOWER": "respondent"}, {"LOWER": "credible"}]]
+        #narrow_scope = [[{"LOWER": "court"}, {"LOWER": "finds"},
+        #                 {"LOWER": "respondent"}, {"LOWER": "generally"},
+        #                 {"LOWER": "credible"}],
+        #                [{"LOWER": "court"}, {"LOWER": "finds"},
+        #                 {"LOWER": "respondent"}, {"LOWER": "testimony"},
+        #                {"LOWER": "credible"}],
+        #                [{"LOWER": "court"}, {"LOWER": "finds"}, 
+        #                {"LOWER": "respondent"}, {"LOWER": "credible"}]]
 
-        medium_scope = [[{"LOWER": "credible"}, {"LOWER": "witness"}],
-                        [{"LOWER": "generally"}, {"LOWER": "consistent"}],
-                        [{"LOWER": "internally"}, {"LOWER": "consistent"}],
-                        [{"LOWER": "sufficiently"}, {"LOWER": "consistent"}],
-                        [{"LOWER": "testified"}, {"LOWER": "credibly"}],
-                        [{"LOWER": "testimony"}, {"LOWER": "credible"}],
-                        [{"LOWER": "testimony"}, {"LOWER": "consistent"}]]
+        #medium_scope = [[{"LOWER": "credible"}, {"LOWER": "witness"}],
+        #                [{"LOWER": "generally"}, {"LOWER": "consistent"}],
+        #               [{"LOWER": "internally"}, {"LOWER": "consistent"}],
+        #                [{"LOWER": "sufficiently"}, {"LOWER": "consistent"}],
+        #               [{"LOWER": "testified"}, {"LOWER": "credibly"}],
+        #                [{"LOWER": "testimony"}, {"LOWER": "credible"}],
+        #                [{"LOWER": "testimony"}, {"LOWER": "consistent"}]]
 
-        wide_scope = [{"LEMMA": {"IN": ["coherent", 
-                                        "possible", 
-                                        "credible", 
-                                        "consistent"]}}]
+        #wide_scope = [{"LEMMA": {"IN": ["coherent", 
+        #                                "possible", 
+        #                                "credible", 
+        #                                "consistent"]}}]
         
         # instantiating Matcher
-        matcher = Matcher(nlp.vocab)
+        #matcher = Matcher(nlp.vocab)
         
         # adding each rule to Matcher, then using global function similar() to find 
         # and store matches in similar_****** variables
-        matcher.add('narrow_cred', narrow_scope)
-        similar_narrow = similar(narrow_scope, self.doc)
+        #matcher.add('narrow_cred', narrow_scope)
+        #similar_narrow = similar(narrow_scope, self.doc)
 
-        matcher.add('medium_cred', medium_scope)
-        similar_medium = similar(medium_scope, self.doc)
+        #matcher.add('medium_cred', medium_scope)
+        #similar_medium = similar(medium_scope, self.doc)
 
-        matcher.add('wide_cred', wide_scope)
-        similar_wide = similar(wide_scope, self.doc)
+        #matcher.add('wide_cred', wide_scope)
+        #similar_wide = similar(wide_scope, self.doc)
         
         # output logic checks whether similar_***** variables are empty or not
-        if similar_narrow:
-            return "True"
+        #if similar_narrow:
+        #    return "True"
 
-        elif similar_medium and similar_wide:
-            return "True"
+        #elif similar_medium and similar_wide:
+        #    return "True"
 
-        else:
-            return "False"
-
+        #else:
+        #    return "False"
+        return "Unknown"
+    
     def check_for_one_year(self) -> bool:
         """
         Checks whether or not the asylum-seeker argued to be exempt from the
