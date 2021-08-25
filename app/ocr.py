@@ -141,7 +141,7 @@ class BIACase:
             'case_origin_state': self.get_state() or 'Unknown',
             'case_origin_city': self.get_city() or "Unknown",
             'protected_grounds': ', '.join(self.get_protected_grounds()) or 'Unknown',
-            'type_of_persecution': ', '.join(self.get_based_violence()) or 'Unknown',
+            'type_of_violence': ', '.join(self.get_based_violence()) or 'Unknown',
             'gender': self.get_gender() or 'Unknown',
             'credibility': str(self.get_credibility()) or 'Unknown',
             'check_for_one_year': str(self.check_for_one_year()) or 'Unknown',
