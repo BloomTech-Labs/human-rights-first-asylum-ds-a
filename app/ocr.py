@@ -560,23 +560,23 @@ class BIACase:
         # adding each rule to Matcher, then using global function similar() to find 
         # and store matches in similar_****** variables
         matcher.add('narrow_cred', narrow_scope)
-        similar_narrow = similar(target_phrases=narrow_scope, file=self.doc)
+        similar_narrow = similar(narrow_scope, self.doc)
 
         matcher.add('medium_cred', medium_scope)
-        similar_medium = similar(target_phrases=medium_scope, file=self.doc)
+        similar_medium = similar(medium_scope, self.doc)
 
         matcher.add('wide_cred', wide_scope)
-        similar_wide = similar(target_phrases=wide_scope, file=self.doc)
+        similar_wide = similar(wide_scope, self.doc)
         
-        # output logic checks wheteher similar_***** variables are empty or not
+        # output logic checks whether similar_***** variables are empty or not
         if similar_narrow:
-            return True
+            return "True"
 
         elif similar_medium and similar_wide:
-            return True
+            return "True"
 
         else:
-            return False
+            return "False"
 
     def check_for_one_year(self) -> bool:
         """
