@@ -113,9 +113,6 @@ class BIACase:
     we use this to extract info for the desired fields/info
     that are scraped from the text of the court docs.
     """
-    with open('./app/court_locations.json') as f:
-        court_locs = json.load(f)
-
     with open('./app/judge_names.pkl', 'rb') as j:
         appellate_panel_members = pickle.load(j)
 
