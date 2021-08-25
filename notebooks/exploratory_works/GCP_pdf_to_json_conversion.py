@@ -1,5 +1,7 @@
 """Performs OCR on PDF/TIFF where the source files are located within a GCS bucket- runtime is a little under 1 minute per file"""
 # Requires GCP suite to be installed and have a ServiceAccount.json file containing your GCP account details
+# Watch this video & read the docs to get these keys set up for your Google account: https://www.youtube.com/watch?v=wfyDiLMGqDM
+# https://cloud.google.com/iam/docs/creating-managing-service-account-keys
 import json
 import re
 from google.cloud import vision

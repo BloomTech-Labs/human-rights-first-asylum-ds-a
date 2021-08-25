@@ -44,7 +44,7 @@ app.add_middleware(
 async def pdf_ocr(uuid: str):
     """
     Endpoint for uploading cases and passing scraped data to the ds_case 
-    table. Also passes uuid to the case table
+    table. Also passes uuid to the case table that front-end and back-end use
     """
     try:
         s3 = Session(

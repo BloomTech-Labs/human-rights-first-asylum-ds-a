@@ -2,6 +2,21 @@
 *  Text classification
 *  Represent text in meaningful way
 
+# Labs37 - DS
+## Tools
+* **get_aws.ipynb** get files from AWS S3 buckets
+* **scrapper_accuracy.ipynb** use the manually_scrapped.csv and compare to the data scrapped by ocr
+## Tasks not done
+* Get the correct dicision date not the date of notice
+* Get_Credibility function accuracy is very low. Almost always return False
+* Improve the accuracy of protected grounds which is the most important field stakeholders want.
+* Panel_members function sometimes cannot get the full members. Need to improve accuracy
+* Country of origins sometimes miss the correct country.
+* Keep improving accuracy all functions
+
+### *** Exploratory_works are previous work from other cohorts. Some are used in the main app, some are not.
+### *** Read further down to get domain knowledge on how aylum case work
+
 # Labs30 - DS
 # Asylum Decision  -- Human Rights First
 An application to assist immigration advocates in winning asylum cases
@@ -41,7 +56,7 @@ The reason of inaccuracy could be because of the spacy model tself, but another 
 ## Installation
 Initial work of Lab30 is using Google colab and the important module to install are:
 
-!python3 -m spacy download en_core_web_lg  
+!python3 -m spacy download en_core_web_sm  
 !pip3 install Pillow # Python Image Library  
 !pip3 install pytesseract  # text recognition (OCR) Engine  
 !pip3 install pdf2image  
