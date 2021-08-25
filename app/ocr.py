@@ -532,44 +532,43 @@ class BIACase:
         or not dictates the output of this function.
         """
         # Speciifying phrase patterns / rules to use in SpaCy's Matcher
-        #narrow_scope = [[{"LOWER": "court"}, {"LOWER": "finds"},
-        #                 {"LOWER": "respondent"}, {"LOWER": "generally"},
-        #                 {"LOWER": "credible"}],
-        #                [{"LOWER": "court"}, {"LOWER": "finds"},
-        #                 {"LOWER": "respondent"}, {"LOWER": "testimony"},
-        #                {"LOWER": "credible"}],
-        #                [{"LOWER": "court"}, {"LOWER": "finds"}, 
-        #                {"LOWER": "respondent"}, {"LOWER": "credible"}]]
+        narrow_scope = [[{"LOWER": "court"}, {"LOWER": "finds"},
+                         {"LOWER": "respondent"}, {"LOWER": "generally"},
+                         {"LOWER": "credible"}],
+                        [{"LOWER": "court"}, {"LOWER": "finds"},
+                         {"LOWER": "respondent"}, {"LOWER": "testimony"},
+                        {"LOWER": "credible"}],
+                        [{"LOWER": "court"}, {"LOWER": "finds"}, 
+                        {"LOWER": "respondent"}, {"LOWER": "credible"}]]
 
-        #medium_scope = [[{"LOWER": "credible"}, {"LOWER": "witness"}],
-        #                [{"LOWER": "generally"}, {"LOWER": "consistent"}],
-        #               [{"LOWER": "internally"}, {"LOWER": "consistent"}],
-        #                [{"LOWER": "sufficiently"}, {"LOWER": "consistent"}],
-        #               [{"LOWER": "testified"}, {"LOWER": "credibly"}],
-        #                [{"LOWER": "testimony"}, {"LOWER": "credible"}],
-        #                [{"LOWER": "testimony"}, {"LOWER": "consistent"}]]
+        medium_scope = [[{"LOWER": "credible"}, {"LOWER": "witness"}],
+                        [{"LOWER": "generally"}, {"LOWER": "consistent"}],
+                       [{"LOWER": "internally"}, {"LOWER": "consistent"}],
+                        [{"LOWER": "sufficiently"}, {"LOWER": "consistent"}],
+                       [{"LOWER": "testified"}, {"LOWER": "credibly"}],
+                        [{"LOWER": "testimony"}, {"LOWER": "credible"}],
+                        [{"LOWER": "testimony"}, {"LOWER": "consistent"}]]
 
-        #wide_scope = [{"LEMMA": {"IN": ["coherent", 
-        #                                "possible", 
-        #                                "credible", 
-        #                                "consistent"]}}]
+        wide_scope = [{"LEMMA": {"IN": ["coherent", 
+                                        "possible", 
+                                        "credible", 
+                                        "consistent"]}}]
         
-        #similar_narrow = similar(self.doc, narrow_scope)
+        similar_narrow = similar(self.doc, narrow_scope)
 
-        #similar_medium = similar(self.doc, medium_scope)
+        similar_medium = similar(self.doc, medium_scope)
 
-        #similar_wide = similar(self.doc, wide_scope)
+        similar_wide = similar(self.doc, wide_scope)
         
-        # output logic checks whether similar_***** variables are empty or not
-        #if similar_narrow:
-        #    return "True"
+        # output logic checks whether similar size variables are empty or not
+        if similar_narrow:
+            return "True"
 
-        #elif similar_medium and similar_wide:
-        #    return "True"
+        elif similar_medium and similar_wide:
+            return "True"
 
-        #else:
-        #    return "False"
-        return "Unknown"
+        else:
+            return "False"
     
     def check_for_one_year(self) -> bool:
         """
