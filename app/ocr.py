@@ -450,8 +450,12 @@ class BIACase:
             sentence = str(spans[0].sent)
             # remove line breaks, edge case
             clean_sent = sentence.replace("\n", " ")
-            state = clean_sent.split(',')[1].split()[0].strip()
-            return state
+            try:
+                state = clean_sent.split(',')[1].split()[0].strip()
+                return state
+            except:
+                return "Unknown"
+            
         return "Unknown"
 
     def get_city(self) -> str:
@@ -474,8 +478,12 @@ class BIACase:
             sentence = str(spans[0].sent)
             # remove line breaks, edge case
             clean_sent = sentence.replace("\n", " ")
-            city = clean_sent.split(',')[0].split()[-1].strip()
-            return city
+            try:
+                city = clean_sent.split(',')[0].split()[-1].strip()
+                return city
+            except:
+                return "Unknown"
+                
         return "Unknown"
 
     def get_based_violence(self) -> List[str]:
