@@ -235,8 +235,12 @@ class BIACase:
             # iterate through the list of tokens in sentence
             # pick out the date in format xxxx/xx/xx
             for i in clean_sent.split():
-                if len(i.split('/')) == 3:
-                    return i
+                temp = i.split('/')
+                if len(temp) == 3:
+                    if temp[0] != 2:
+                        temp[0] = '0' + temp[0]
+                    result_date = temp[2] + '-' + temp[0] + '-' + temp[1]
+                    return result_date
 
     def get_panel(self):
         """
