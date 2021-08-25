@@ -10,8 +10,6 @@
 * Get the correct dicision date not the date of notice
 * Get_Credibility function accuracy is very low. Almost always return False
 * Improve the accuracy of protected grounds which is the most important field stakeholders want.
-* Panel_members function sometimes cannot get the full members. Need to improve accuracy
-* Country of origins sometimes miss the correct country.
 * Keep improving accuracy all functions
 
 ### *** Exploratory_works are previous work from other cohorts. Some are used in the main app, some are not.
