@@ -141,7 +141,7 @@ class BIACase:
             'case_origin_state': self.get_state() or 'Unknown',
             'case_origin_city': self.get_city() or "Unknown",
             'protected_grounds': ', '.join(self.get_protected_grounds()) or 'Unknown',
-            'type_of_violence': ', '.join(self.get_based_violence()) or 'Unknown',
+            'type_of_persecution': ', '.join(self.get_based_violence()) or 'Unknown',
             'gender': self.get_gender() or 'Unknown',
             'credibility': str(self.get_credibility()) or 'Unknown',
             'check_for_one_year': str(self.check_for_one_year()) or 'Unknown',
@@ -537,45 +537,43 @@ class BIACase:
         All instances of a match are returned by Matcher, so checking whether these objects are empty 
         or not dictates the output of this function.
         """
-        fix_credibility
-        # Speciifying phrase patterns / rules to use in SpaCy's Matcher
+        # # Speciifying phrase patterns / rules to use in SpaCy's Matcher
         narrow_scope = [[{"LOWER": "court"}, {"LOWER": "finds"},
                          {"LOWER": "respondent"}, {"LOWER": "generally"},
                          {"LOWER": "credible"}],
                         [{"LOWER": "court"}, {"LOWER": "finds"},
                          {"LOWER": "respondent"}, {"LOWER": "testimony"},
-                        {"LOWER": "credible"}],
+                         {"LOWER": "credible"}],
                         [{"LOWER": "court"}, {"LOWER": "finds"}, 
-                        {"LOWER": "respondent"}, {"LOWER": "credible"}]]
+                         {"LOWER": "respondent"}, {"LOWER": "credible"}]]
 
         medium_scope = [[{"LOWER": "credible"}, {"LOWER": "witness"}],
                         [{"LOWER": "generally"}, {"LOWER": "consistent"}],
-                       [{"LOWER": "internally"}, {"LOWER": "consistent"}],
+                        [{"LOWER": "internally"}, {"LOWER": "consistent"}],
                         [{"LOWER": "sufficiently"}, {"LOWER": "consistent"}],
-                       [{"LOWER": "testified"}, {"LOWER": "credibly"}],
+                        [{"LOWER": "testified"}, {"LOWER": "credibly"}],
                         [{"LOWER": "testimony"}, {"LOWER": "credible"}],
                         [{"LOWER": "testimony"}, {"LOWER": "consistent"}]]
 
-        wide_scope = [{"LEMMA": {"IN": ["coherent", 
+        wide_scope = [[{"LEMMA": {"IN": ["coherent", 
                                         "possible", 
                                         "credible", 
-                                        "consistent"]}}]
-        
+                                        "consistent"]}}]]
+
         similar_narrow = similar(self.doc, narrow_scope)
-
         similar_medium = similar(self.doc, medium_scope)
-
         similar_wide = similar(self.doc, wide_scope)
-        
+
+        # output logic checks wheteher similar_***** variables are empty or not
         # output logic checks whether similar size variables are empty or not
         if similar_narrow:
-            return "True"
+            return True
 
         elif similar_medium and similar_wide:
-            return "True"
+            return True
 
         else:
-            return "False"
+            return False
 
     def check_for_one_year(self) -> bool:
         """
