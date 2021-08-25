@@ -554,19 +554,11 @@ class BIACase:
         #                                "credible", 
         #                                "consistent"]}}]
         
-        # instantiating Matcher
-        #matcher = Matcher(nlp.vocab)
-        
-        # adding each rule to Matcher, then using global function similar() to find 
-        # and store matches in similar_****** variables
-        #matcher.add('narrow_cred', narrow_scope)
-        #similar_narrow = similar(narrow_scope, self.doc)
+        #similar_narrow = similar(self.doc, narrow_scope)
 
-        #matcher.add('medium_cred', medium_scope)
-        #similar_medium = similar(medium_scope, self.doc)
+        #similar_medium = similar(self.doc, medium_scope)
 
-        #matcher.add('wide_cred', wide_scope)
-        #similar_wide = similar(wide_scope, self.doc)
+        #similar_wide = similar(self.doc, wide_scope)
         
         # output logic checks whether similar_***** variables are empty or not
         #if similar_narrow:
