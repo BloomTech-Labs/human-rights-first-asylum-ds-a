@@ -3,17 +3,12 @@ Known Defects:
 1. ocr.py file
     - Some methods in ocr.py return a list and they don’t need to be a list, requires
       unnecessary step of using .join()
-    - get_city() function in ocr.py is broken and needs to be fixed
-    - We are no longer using the precendents nor statutes field, this has been commented out in the make_fields() so the
-      get_precedents function is no longer being used
-    - the current version of the DS API is deployed from the db_refactor branch, this needs to be merged with main
+    - <strike>get_city() function in ocr.py is broken and needs to be fixed</strike>
     - the backend team needs to make sure to change the table they are using to db_cases for uploading case files
 
 1. Fields
     - All fields should be validated and fine-tuned for accuracy
     - Field `get_credibility` could be improved, because the field's output is dependent on occurrence of specific tokens in the document
-    - Field `get_applicant_language` needs to be further refined to capture language names that are both one- and two-words long
-    - Field `get_indigenous_status` needs to be further refined to properly capture names of indigneous groups/nations that are longer and shorter than two words.
     - Field `get_credibility` needs to have a wider search breadth, as to include the following search terms:
         - Consistent
         - Inconsistent/inconsistencies
@@ -56,4 +51,4 @@ Known Defects:
         - https://pymupdf.readthedocs.io/en/latest/app1.html PyMuPDF compared to other PDF readers
         - https://mupdf.com/docs/ MuPDF Documentation
         - https://pymupdf.readthedocs.io/en/latest/intro.html# PyMuPDF Documentation *IMPORTANT* Check whether use case is covered under AGPL Open Source Licensing.</strike>
-    - Since this project may fall out of compliance with an AGPL license in the future, it has been determined that PyMuPDF is not a suitable package.
+    - <strike>Since this project may fall out of compliance with an AGPL license in the future, it has been determined that PyMuPDF is not a suitable package.</strike>
