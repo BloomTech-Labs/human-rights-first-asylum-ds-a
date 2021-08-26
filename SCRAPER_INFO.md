@@ -82,9 +82,8 @@
 - **Details:** Returns the judge's decision on whether the applicant is a credible witness.
 - **Returns:** Bool
 - **Current Status:** Currently getting super low accuracy
-### If Applicant Met Filing Deadline
+### If Applicant Met Filing Deadline 
 - **Function name: **`check_for_one_year()`
 - **Details:** An applicant for asylum is required to file their request for asylum within one year of arriving in the US, unless there are extraordinary or changed circumstances that justify the delay. This method determines whether the issue of this filing deadline is discussed in the case.
 - **Returns:** Bool
 - **Current Status:** Currently getting 100% accuracy on the trainign data. Contact River Bellamy with any questions.
-### Statutes
