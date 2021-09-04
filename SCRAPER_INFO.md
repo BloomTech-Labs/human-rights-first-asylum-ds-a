@@ -10,7 +10,7 @@
 	4. Other
 - **Current Status:** Currently is pulled correctly by scraper.
 
-### Date
+### Decision Date
 - **Function name: ** `get_date()`
 - **Details:** Returns date of case in format M-DD-YYYY. Specified as ‘date of notice’ within page 1 of an appeal
 - **Returns:** String in format 'YYYY-DD-M'
@@ -67,7 +67,7 @@
 - **Current Status:** Unknown. Contact Alex Krieger
 
 ### Based Violence
-- **Function name: **`get_protected_grounds()`
+- **Function name: **`get_based_violence()`
 - **Details:** Returns type of violence the applicant experienced if they experienced violence. Looks for words like *'abduct', 'abuse', 'assassinate', 'assault', 'coerce', 'exploit', 'fear', 'harm', 'hurt', 'kidnap', 'kill', 'murder', 'persecute', 'rape', 'scare', 'shoot', 'suffer', 'threat', 'torture'* and returns them if they exist with the document
 - **Returns:** String
 - **Current Status:** Unknown
@@ -78,10 +78,12 @@
 - **Returns:** String example 'Male'
 - **Current Status:** Updates were made 4/30/21 Labs 33. 
 ### Credibility
-
-### If Applicant Met Filing Deadline
+- **Function name: **`get_credibility()`
+- **Details:** Returns the judge's decision on whether the applicant is a credible witness.
+- **Returns:** Bool
+- **Current Status:** Currently getting super low accuracy
+### If Applicant Met Filing Deadline 
 - **Function name: **`check_for_one_year()`
 - **Details:** An applicant for asylum is required to file their request for asylum within one year of arriving in the US, unless there are extraordinary or changed circumstances that justify the delay. This method determines whether the issue of this filing deadline is discussed in the case.
 - **Returns:** Bool
 - **Current Status:** Currently getting 100% accuracy on the trainign data. Contact River Bellamy with any questions.
-### Statutes

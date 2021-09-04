@@ -1,13 +1,12 @@
 import json
 import geonamescache
 import pytesseract
+import pickle
 from pdf2image import convert_from_bytes
 from spacy import load
 from spacy.tokens import Doc, Span
 from spacy.matcher import Matcher, PhraseMatcher
 from typing import List, Iterator
-
-from app.state_lookup import StateLookup
 
 
 nlp = load("en_core_web_sm")
@@ -114,57 +113,8 @@ class BIACase:
     we use this to extract info for the desired fields/info
     that are scraped from the text of the court docs.
     """
-    with open('./app/court_locations.json') as f:
-        court_locs = json.load(f)
-
-    appellate_panel_members = [
-        "Adkins-Blanch, Charles K.",
-        "Michael P. Baird",
-        "Cassidy, William A.",
-        "Cole, Patricia A.",
-        "Couch, V. Stuart",
-        "Creppy, Michael J.",
-        "Crossett, John P.",
-        "Donovan, Teresa L.",
-        "Foote, Megan E.",
-        "Geller, Joan B.",
-        "Gemoets, Marcos",
-        "Gonzalez, Gabriel",
-        "Goodwin, Deborah K.",
-        "Gorman, Stephanie E.",
-        "Grant, Edward R.",
-        "Greer, Anne J.",
-        "Guendelsberger, John",
-        "Hunsucker, Keith E.",
-        "Kelly, Edward F.",
-        "Kendall Clark, Molly",
-        "Liebmann, Beth S.",
-        "Liebowitz, Ellen C.",
-        "Mahtabfar, Sunita B.",
-        "Malphrus, Garry D.",
-        "Mann, Ana",
-        "Miller, Neil P.",
-        "Monsky, Megan Foote",
-        "Montante Jr., Phillip J.",
-        "Morris, Daniel",
-        "Mullane, Hugh G.",
-        "Neal, David L.",
-        "Noferi, Mark",
-        "O'Connor, Blair",
-        "O'Herron, Margaret M.",
-        "O'Leary, Brian M.",
-        "Owen, Sirce E.",
-        "Pauley, Roger",
-        "Petty, Aaron R.",
-        "Pepper, S. Kathleen",
-        "RILEY, KEVIN W.",
-        "Rosen, Scott",
-        "Snow, Thomas G.",
-        "Swanwick, Daniel L.",
-        "Wendtland, Linda S.",
-        "Wetmore, David H.",
-        "Wilson, Earle B."
-    ]
+    with open('./app/judge_names.pkl', 'rb') as j:
+        appellate_panel_members = pickle.load(j)
 
     def __init__(self, uuid: str, text: str):
         """
@@ -180,17 +130,17 @@ class BIACase:
         return {
             'uuid': self.uuid,
             'panel_members': ', '.join(self.get_panel()) or 'Unknown',
-            'hearing_type': self.get_hearing_type() or 'Unknown',
+            'decision_type': self.get_decision_type() or 'Unknown',
             'application_type': self.get_application() or "Unknown",
-            'date': self.get_date() or 'Unknown',
+            'decision_date': self.get_date() or 'Unknown',
             'country_of_origin': self.get_country_of_origin() or 'Unknown',
             'outcome': self.get_outcome() or 'Unknown',
-            'case_origin_state': self.get_state(),
-            'case_origin_city': "Unknown",
+            'case_origin_state': self.get_state() or 'Unknown',
+            'case_origin_city': self.get_city() or "Unknown",
             'protected_grounds': ', '.join(self.get_protected_grounds()) or 'Unknown',
-            'type_of_violence': ', '.join(self.get_based_violence()) or 'Unknown',
+            'type_of_persecution': ', '.join(self.get_based_violence()) or 'Unknown',
             'gender': self.get_gender() or 'Unknown',
-            'credibility': self.get_credibility() or 'Unknown',
+            'credibility': str(self.get_credibility()) or 'Unknown',
             'check_for_one_year': str(self.check_for_one_year()) or 'Unknown',
         }
 
@@ -201,7 +151,7 @@ class BIACase:
         """
         return (ent for ent in self.doc.ents if ent.label_ in labels)
 
-    def get_country_of_origin(self):
+    def get_country_of_origin(self) -> str:
         """
         RETURNS the respondent's or respondents' country of origin:
         """
@@ -256,12 +206,40 @@ class BIACase:
 
     def get_date(self) -> str:
         """
-        • Returns date of the document.
-        """
+        • Returns decision date of the document.
+
+        This is the code to return hearing date 
+        # get_ents function only use in this function
+        # can be deleted from BIA class if not use 
+
         dates = map(str, self.get_ents(['DATE']))
         for s in dates:
             if len(s.split()) == 3:
                 return s
+        """
+        primary_pattern = [
+            [{"LOWER": "date"}, {"LOWER": "of"}, 
+            {"LOWER": "this"}, {"LOWER": "notice"}]
+        ]
+        # instantiate a list of pattern matches
+        spans = similar(self.doc, primary_pattern)
+        # if there are matches
+        if spans:
+            # grab the surrounding sentence and turn it into a string
+            sentence = str(spans[0].sent)
+            # remove line breaks, edge case
+            clean_sent = sentence.replace("\n", " ")
+            # iterate through the list of tokens in sentence
+            # pick out the date in format xxxx/xx/xx
+            for i in clean_sent.split():
+                temp = i.split('/')
+                if len(temp) == 3:
+                    if len(temp[0]) < 2:
+                        temp[0] = '0' + temp[0]
+                    if len(temp[1]) < 2:
+                        temp[1] = '0' + temp[1]
+                    result_date = temp[2] + '-' + temp[0] + '-' + temp[1]
+                    return result_date
 
     def get_panel(self):
         """
@@ -285,7 +263,7 @@ class BIACase:
             matches.add(' '.join(span.text.split(", ")[-1::-1]))
         return sorted(list(matches))
 
-    def get_gender(self):
+    def get_gender(self) -> str:
         """
         Searches through a given document and counts the TOTAL number of
         "male" pronoun uses and "female" pronoun uses. Whichever
@@ -410,8 +388,10 @@ class BIACase:
                         outcome.add(k)
         return "; ".join(list(outcome))
 
-    def get_hearing_type(self):
+    def get_decision_type(self) -> str:
         return "Appellate" if len(self.get_panel()) > 1 else "Initial"
+        # It seems decision_type is looking for appellate decision or else
+        # intial decision, not immigration court decision.
 
     def get_outcome(self) -> str:
         """
@@ -437,7 +417,16 @@ class BIACase:
                     if result in outcome:
                         return result.title()
 
-    def get_state(self):
+    def get_state(self) -> str:
+        """
+        get_state: Get the state of the original hearing location
+        Find the "File:" pattern in the document and after that
+        pattern is the State 
+
+        Returns: The name of the state
+        """
+        """
+        Previous code to find state defeciency
         for place in self.doc:
             place = place.text
             if place in StateLookup.states.keys():
@@ -445,8 +434,53 @@ class BIACase:
             elif place in StateLookup.states.values():
                 return StateLookup.abbrev_lookup(place)
         return "Unknown"
+        """
+        primary_pattern = [
+            [{"LOWER": "file"}, {"LOWER": ":"}],
+            [{"LOWER": "files"}, {"LOWER": ":"}]
+        ]
+        # instantiate a list of pattern matches
+        spans = similar(self.doc, primary_pattern)
+        # if there are matches
+        if spans:
+            # grab the surrounding sentence and turn it into a string
+            sentence = str(spans[0].sent)
+            # remove line breaks, edge case
+            clean_sent = sentence.replace("\n", " ")
+            try:
+                state = clean_sent.split(',')[1].split()[0].strip()
+                return state
+            except:
+                return "Unknown"
+            
+        return "Unknown"
 
-    def get_city(self):
+    def get_city(self) -> str:
+        """
+        get_city: Get the state of the original hearing location
+        Find the "File:" pattern in the document and after that
+        pattern is the City 
+
+        Returns: The name of the city
+        """
+        primary_pattern = [
+            [{"LOWER": "file"}, {"LOWER": ":"}],
+            [{"LOWER": "files"}, {"LOWER": ":"}]
+        ]
+        # instantiate a list of pattern matches
+        spans = similar(self.doc, primary_pattern)
+        # if there are matches
+        if spans:
+            # grab the surrounding sentence and turn it into a string
+            sentence = str(spans[0].sent)
+            # remove line breaks, edge case
+            clean_sent = sentence.replace("\n", " ")
+            try:
+                city = clean_sent.split(',')[0].split()[-1].strip()
+                return city
+            except:
+                return "Unknown"
+                
         return "Unknown"
 
     def get_based_violence(self) -> List[str]:
@@ -498,13 +532,53 @@ class BIACase:
             terms_list.append('Gang')
         return terms_list
 
-    def get_credibility(self) -> str:
+    def get_credibility(self) -> bool:
         """
-        • Returns the judge's decision on whether the applicant is a credible witness.
-        Curently, the field's output is dependent on occurance of specific tokens
-        in the document; this method needs to be fine-tuned and validated.
+        Returns the judge's decision on whether the applicant is a credible witness.
+        The process starts by adding rules/phrases to SpaCy's Matcher, they were obtained by manually 
+        parsing through case files and finding all sentences related to credibility. 
+        There are three separate rules, narrow, medium and wide, which decrease in the phrasing
+        specificity, this allows for some wiggle room as opposed to searching for exact matches. 
+        All instances of a match are returned by Matcher, so checking whether these objects are empty 
+        or not dictates the output of this function.
         """
-        return "Unknown"
+        # # Speciifying phrase patterns / rules to use in SpaCy's Matcher
+        narrow_scope = [[{"LOWER": "court"}, {"LOWER": "finds"},
+                         {"LOWER": "respondent"}, {"LOWER": "generally"},
+                         {"LOWER": "credible"}],
+                        [{"LOWER": "court"}, {"LOWER": "finds"},
+                         {"LOWER": "respondent"}, {"LOWER": "testimony"},
+                         {"LOWER": "credible"}],
+                        [{"LOWER": "court"}, {"LOWER": "finds"}, 
+                         {"LOWER": "respondent"}, {"LOWER": "credible"}]]
+
+        medium_scope = [[{"LOWER": "credible"}, {"LOWER": "witness"}],
+                        [{"LOWER": "generally"}, {"LOWER": "consistent"}],
+                        [{"LOWER": "internally"}, {"LOWER": "consistent"}],
+                        [{"LOWER": "sufficiently"}, {"LOWER": "consistent"}],
+                        [{"LOWER": "testified"}, {"LOWER": "credibly"}],
+                        [{"LOWER": "testimony"}, {"LOWER": "credible"}],
+                        [{"LOWER": "testimony"}, {"LOWER": "consistent"}]]
+
+        wide_scope = [[{"LEMMA": {"IN": ["coherent", 
+                                        "possible", 
+                                        "credible", 
+                                        "consistent"]}}]]
+
+        similar_narrow = similar(self.doc, narrow_scope)
+        similar_medium = similar(self.doc, medium_scope)
+        similar_wide = similar(self.doc, wide_scope)
+
+        # output logic checks wheteher similar_***** variables are empty or not
+        # output logic checks whether similar size variables are empty or not
+        if similar_narrow:
+            return True
+
+        elif similar_medium and similar_wide:
+            return True
+
+        else:
+            return False
 
     def check_for_one_year(self) -> bool:
         """
@@ -512,7 +586,7 @@ class BIACase:
         one-year guideline.
 
         Returns true if the phrases "within one-year", "untimely application",
-        "extraordinary circumstances" or "changed circumstances" appeaer in the
+        "extraordinary circumstances" or "changed circumstances" appear in the
         same sentence as a time-based word. Otherwise returns False.
         """
         time_terms = {'year', 'delay', 'time', 'period', 'deadline'}

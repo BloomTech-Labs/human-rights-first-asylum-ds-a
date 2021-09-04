@@ -31,8 +31,9 @@ The **app** folder contains the FastAPI application which creates an endpoint fo
 
 ### Additional Readmes
 - [SCRAPER_INFO](SCRAPER_INFO.md) contains important information about the status of each function used to extract fields from documents.
+- [READMEdev](READMEdev.md) contains AWS CLI2 installation instruction
 - [KnownDefects](KnownDefects.md) contains information about potential issues to be aware of.
-- [NOTEBOOKS](notebooks/NOTEBOOKS.md) contains helpful information about the notebooks and scripts used to explore solutions.
+- [NOTEBOOKS](notebooks/NOTEBOOKS.md) contains helpful information about the notebooks and scripts used to explore solutions for scrapper.
 - [visualizations/README](visualizations/README.md) contains helpful information about notebooks, scripts, and data used to explore visualizations.
 
 ## Tools
@@ -51,12 +52,21 @@ docker build . -t <name>
 docker run -it -p 5000:5000 <name> uvicorn app.main:app --host=0.0.0.0 --port=5000
 
 NOTE: An error may be thrown when trying to run the app if you have not added the .env file with aws credentials
+NOTE: env file should have 4 env variables namely ACCESS_KEY,SECRET_KEY, BUCKET_NAME, DB_URL
+NOTE: Uncomment COPY .env .env in dockerfile before run docker locally
 ```
 
 Then open http://0.0.0.0:5000 in your browser. The application should be running.   
 *If `0.0.0.0` does not work, try `http://localhost:5000`*
   
 ## Contributors
+  
+###### Labs 37
+[Minh Nguyen](https://github.com/minh14496)   
+[Waqas Khwaja](https://github.com/WaqasKhwaja)   
+[Jason Young](https://github.com/yaobviously)   
+[Andrew Lee](https://github.com/andrewlee977)   
+[Michael Carrier](https://github.com/mikecarrier4)   
 
 ###### Labs 35
 [Dylan Sivori](https://github.com/Dylan-Sivori)  
