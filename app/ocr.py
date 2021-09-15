@@ -266,7 +266,7 @@ class BIACase:
 
     def get_gender(self) -> str:
         """
-        Searches through a given document and counts the TOTAL number of
+        Searches through  a given document and counts the TOTAL number of
         "male" pronoun uses and "female" pronoun uses. Whichever
         count("M" or "F") is higher, that gender is returned.
         In the event of a tie; currently returns "Unknown"; may be able to
