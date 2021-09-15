@@ -1,0 +1,27 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+boto3 = "~=1.17.45"
+dnspython = "~=2.1.0"
+fastapi = "~=0.65.2"
+geonamescache = "~=1.2.0"
+pandas = "~=1.1.5"
+pdf2image = "~=1.14.0"
+plotly = "~=4.4.1"
+psycopg2-binary = "~=2.9"
+pydantic = "~=1.7.3"
+python-dotenv = "~=0.15.0"
+pytesseract = "~=0.3.7"
+python-multipart = "~=0.0.5"
+requests = "~=2.25.1"
+spacy = "~=3.0.6"
+uvicorn = {version = "~=0.13.4", extras = ["standard"]}
+en-core-web-sm = {file = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.0.0/en_core_web_sm-3.0.0.tar.gz"}
+
+[dev-packages]
+
+[requires]
+python_version = "3.9"

@@ -129,7 +129,7 @@ class BIACase:
     def to_dict(self):
         return {
             'uuid': self.uuid,
-            'panel_members': ', '.join(self.get_panel()) or 'Unknown',
+            'panel_members': self.get_panel() or 'Unknown',
             'decision_type': self.get_decision_type() or 'Unknown',
             'application_type': self.get_application() or "Unknown",
             'decision_date': self.get_date() or 'Unknown',
@@ -245,8 +245,8 @@ class BIACase:
         """
         Uses the appellate_panel_members list and spacy PhraseMatcher to check a
         document for members in the appellate_panel_member list.
-        !!! Currently only works for this static list of judges. If not appelate
-            or the list of apppelate judges changes, or there's an appelate
+        !!! Currently only works for this static list of judges. If not appellate
+            or the list of appellate judges changes, or there's an appellate
             judge not in the list.
             May want to generate an updatable list.
             May want to generate a non-appellate judge list
@@ -261,7 +261,8 @@ class BIACase:
         for match_id, start, end in matcher(self.doc):
             span = self.doc[start:end]
             matches.add(' '.join(span.text.split(", ")[-1::-1]))
-        return sorted(list(matches))
+        result = list(matches).pop(0) if matches else "None"
+        return result
 
     def get_gender(self) -> str:
         """
@@ -391,7 +392,7 @@ class BIACase:
     def get_decision_type(self) -> str:
         return "Appellate" if len(self.get_panel()) > 1 else "Initial"
         # It seems decision_type is looking for appellate decision or else
-        # intial decision, not immigration court decision.
+        # initial decision, not immigration court decision.
 
     def get_outcome(self) -> str:
         """
@@ -542,7 +543,7 @@ class BIACase:
         All instances of a match are returned by Matcher, so checking whether these objects are empty 
         or not dictates the output of this function.
         """
-        # # Speciifying phrase patterns / rules to use in SpaCy's Matcher
+        # # Specifying phrase patterns / rules to use in SpaCy's Matcher
         narrow_scope = [[{"LOWER": "court"}, {"LOWER": "finds"},
                          {"LOWER": "respondent"}, {"LOWER": "generally"},
                          {"LOWER": "credible"}],
@@ -569,7 +570,7 @@ class BIACase:
         similar_medium = similar(self.doc, medium_scope)
         similar_wide = similar(self.doc, wide_scope)
 
-        # output logic checks wheteher similar_***** variables are empty or not
+        # output logic checks whether similar_***** variables are empty or not
         # output logic checks whether similar size variables are empty or not
         if similar_narrow:
             return True
