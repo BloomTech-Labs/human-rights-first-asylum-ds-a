@@ -507,13 +507,20 @@ class BIACase:
         violent_list = ['abduct', 'abuse', 'assassinate', 'assault', 'coerce',
                         'exploit', 'fear', 'harm', 'hurt', 'kidnap', 'kill',
                         'murder', 'persecute', 'rape', 'scare', 'shoot',
-                        'suffer', 'threat', 'torture']
+                        'suffer', 'threat', 'torture', 'attack', 'displace',
+                        'massacre', 'genocide']
+
         family_list = ['child', 'daughter', 'family', 'husband', 'parent',
-                       'partner', 'son', 'wife', 'woman']
+                       'partner', 'son', 'wife', 'woman', 'spouse', 'father',
+                       'aunt', 'uncle']
+
         gender_list = ['fgm', 'gay', 'gender', 'homosexual', 'homosexuality',
-                       'lesbian', 'lgbt', 'lgbtq', 'lgbtqia',
-                       'queer', 'sexuality', 'transgender']
-        gang_list = ['cartel', 'gang', 'militia']
+                       'lesbian', 'lgbt', 'lgbtq', 'lgbtqia', 'queer',
+                       'sexuality', 'transgender', 'bisexual', 'lesbian']
+
+        gang_list = ['cartel', 'gang', 'militia', 'isis', 'taliban', 'al-qaeda',
+                     'al qaeda', 'daesh', 'shia', 'sunni', 'isil', 'boko haram', 'jihadists',
+                     'uighyers', 'kulunas', 'mara salvatrucha 13', 'ms 13']
 
         # Outputs a list of PhraseMatch occurrences for a given list of keywords
         violence_match = get_matches(violent_list, 'Violent', self.doc)
@@ -523,6 +530,7 @@ class BIACase:
 
         # Printing full_text[judge_match2[0][1]:judge_match2[0][2]] gives word
         # it matches on, can put in the [0] a for loop to see all matches
+        terms_list = []
         if len(violence_match) != 0:
             terms_list.append('Violent')
         if len(family_match) != 0:
