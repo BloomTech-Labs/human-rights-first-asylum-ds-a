@@ -130,7 +130,6 @@ class BIACase:
         return {
             'uuid': self.uuid,
             'panel_members': ', '.join(self.get_panel()) or 'Unknown',
-            'decision_type': self.get_decision_type() or 'Unknown',
             'application_type': self.get_application() or "Unknown",
             'decision_date': self.get_date() or 'Unknown',
             'country_of_origin': self.get_country_of_origin() or 'Unknown',
@@ -388,11 +387,6 @@ class BIACase:
                         outcome.add(k)
         return "; ".join(list(outcome))
 
-    def get_decision_type(self) -> str:
-        return "Appellate" if len(self.get_panel()) > 1 else "Initial"
-        # It seems decision_type is looking for appellate decision or else
-        # intial decision, not immigration court decision.
-
     def get_outcome(self) -> str:
         """
         • Returns the outcome of the case. This will appear after 'ORDER'
@@ -521,7 +515,7 @@ class BIACase:
         gang_match = get_matches(gang_list, 'Gang', self.doc)
 
         # Printing full_text[judge_match2[0][1]:judge_match2[0][2]] gives word
-        # it matches on, can put in the [0] a for loop to see all matches
+        # it matches on, can put in the [0] a for loop to see all matche78s
         if len(violence_match) != 0:
             terms_list.append('Violent')
         if len(family_match) != 0:
