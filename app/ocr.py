@@ -515,7 +515,7 @@ class BIACase:
         gang_match = get_matches(gang_list, 'Gang', self.doc)
 
         # Printing full_text[judge_match2[0][1]:judge_match2[0][2]] gives word
-        # it matches on, can put in the [0] a for loop to see all matche78s
+        # it matches on, can put in the [0] a for loop to see all matches
         if len(violence_match) != 0:
             terms_list.append('Violent')
         if len(family_match) != 0:
