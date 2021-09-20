@@ -130,7 +130,6 @@ class BIACase:
         return {
             'uuid': self.uuid,
             'panel_members': self.get_panel() or 'Unknown',
-            'decision_type': self.get_decision_type() or 'Unknown',
             'application_type': self.get_application() or "Unknown",
             'decision_date': self.get_date() or 'Unknown',
             'country_of_origin': self.get_country_of_origin() or 'Unknown',
