@@ -91,3 +91,14 @@ def get_judge_df(judge_name: str) -> pd.DataFrame:
     curs.close()
     conn.close()
     return df
+
+def get_df() -> pd.DataFrame:
+    conn = psycopg2.connect(db_url)
+    curs = conn.cursor()
+    curs.execute("SELECT * FROM cases;")
+    cols = [k[0] for k in curs.description]
+    rows = curs.fetchall()
+    df = pd.DataFrame(rows, columns=cols)
+    curs.close()
+    conn.close()
+    return df
