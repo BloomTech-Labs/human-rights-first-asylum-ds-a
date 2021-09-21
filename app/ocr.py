@@ -130,7 +130,6 @@ class BIACase:
         return {
             'uuid': self.uuid,
             'panel_members': self.get_panel() or 'Unknown',
-            'decision_type': self.get_decision_type() or 'Unknown',
             'application_type': self.get_application() or "Unknown",
             'decision_date': self.get_date() or 'Unknown',
             'country_of_origin': self.get_country_of_origin() or 'Unknown',
@@ -388,11 +387,6 @@ class BIACase:
                     else:
                         outcome.add(k)
         return "; ".join(list(outcome))
-
-    def get_decision_type(self) -> str:
-        return "Appellate" if len(self.get_panel()) > 1 else "Initial"
-        # It seems decision_type is looking for appellate decision or else
-        # initial decision, not immigration court decision.
 
     def get_outcome(self) -> str:
         """
