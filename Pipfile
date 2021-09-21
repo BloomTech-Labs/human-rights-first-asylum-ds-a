@@ -19,6 +19,7 @@ python-multipart = "~=0.0.5"
 requests = "~=2.25.1"
 spacy = "~=3.0.6"
 uvicorn = {version = "~=0.13.4", extras = ["standard"]}
+websockets = ">=9.1"
 en-core-web-sm = {file = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.0.0/en_core_web_sm-3.0.0.tar.gz"}
 
 [dev-packages]
