@@ -10,6 +10,10 @@ An application to assist immigration attorneys and refugee representatives in ad
 ![image](https://github.com/Lambda-School-Labs/human-rights-first-asylum-be-a/blob/main/reference/architecture.png?raw=true)  
 This diagram shows the current state of the architecture.
 
+![Screen Shot 2021-09-22 at 11 58 06 AM](https://user-images.githubusercontent.com/71359375/134405305-c5c5b2de-f8df-4dea-b05b-7059c9aec093.png)
+This diagram shows the flow of data between frontend, backend, data science, and the database. 
+
+
 ## Codebases
 [Front-End](https://github.com/Lambda-School-Labs/human-rights-first-asylum-fe-a/blob/main/README.md)  
 Uses NodeJS to create the web-based user interface for uploading case documents, managing users, and viewing data in the form of tables and visualizations. 
