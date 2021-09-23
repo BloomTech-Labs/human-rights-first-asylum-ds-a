@@ -1,7 +1,6 @@
 """Converts local JSON Response into a .txt file"""
 import json
 import io
-from bs4 import BeautifulSoup
 
 # Make json list from bloblist
 json_list = []

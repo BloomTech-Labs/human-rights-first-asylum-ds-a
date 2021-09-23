@@ -1,8 +1,7 @@
 
 from plotly.graph_objects import Figure
 import plotly.graph_objects as go
-import plotly.express as px
-from app.db_ops import get_judge_df, get_table, get_df
+from app.db_ops import get_df
 import pandas as pd
 
 # def get_judge_side_bar(judge_name: str) -> go.Figure:
