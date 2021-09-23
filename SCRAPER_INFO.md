@@ -38,7 +38,8 @@
 - **Function name: **`get_panel()`
 - **Details:** Returns judge presiding over the original decision- this is located at the bottom of an original decision, if one exists in the document. Judges are not mentioned in appeals cases so those cases will return 'Null'
 - **Returns:** String like ‘Clarease Rankin Yates’
-- **Current Status:** WIP returning the first member in the panel as the judge This should be the primary judge making the deciusion.
+- **Current Status:** Work In Progress returning the first member in the panel as the judge This should be the primary judge making the decision.
+  
 ### Outcomes
 - **Function name: **`get_outcome()`
 - **Details:** Returns outcome of case
