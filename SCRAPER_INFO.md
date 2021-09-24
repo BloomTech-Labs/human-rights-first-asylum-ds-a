@@ -34,18 +34,12 @@
 - **Returns:** String like 'Tunisia'
 - **Current Status:** While SpaCy's Matcher functionality was experimented with, nothing has been produced to show whether the current implementation is better or worse.
 
-### Panel Members
+### Judge
 - **Function name: **`get_panel()`
-- **Details:** Returns list of panel members from an appeal. Panel members are judges, but they also have seats on the board of immigration appeals so they specifically have the last say on appeal cases. At this level, sometimes you will have as many as 7 panel members hear the same appeal. On cases that are not appeals, this field will return a null value. Panel members 
-- **Returns:** A list of panel members as strings -> ["Guendelsberger, John","O'Leary, Brian M.","Grant, Edward"]
-- **Current Status:** Merged and current.
-
-### Judges
-- **Function name: **`get_judges()`
 - **Details:** Returns judge presiding over the original decision- this is located at the bottom of an original decision, if one exists in the document. Judges are not mentioned in appeals cases so those cases will return 'Null'
 - **Returns:** String like ‘Clarease Rankin Yates’
-- **Current Status:** There has been ongoing discussion about how to best pull out this field and the get_pannel field. When we inherited this code, every time the function was run it was scraping data about the judges from a Wikipedia page. As of 4/27, the conclusion was that we needed to create a database or some sort of storage in the backend to hold a static list of these judges. This has not been started yet. A basic implementation can be found in [this notebook](https://github.com/Lambda-School-Labs/human-rights-first-asylum-ds-a/blob/main/notebooks/get_judge_implementation.ipynb).
-
+- **Current Status:** Work In Progress returning the first member in the panel as the judge This should be the primary judge making the decision.
+  
 ### Outcomes
 - **Function name: **`get_outcome()`
 - **Details:** Returns outcome of case
