@@ -33,9 +33,12 @@ See this team's history [here](ProjectHistory.md).
 
 The **app** folder contains the FastAPI application which creates an endpoint for processing a single `.pdf` file stored in the AWS S3 bucket. 
 
-### Additional Readmes
+### Valuable Readmes
+- [VISUALIZATION_INFO](VISUALIZATION_INFO.md) contains information pertaining to the visualizations.py as well as the main.py file and how they interact with each other.
 - [SCRAPER_INFO](SCRAPER_INFO.md) contains important information about the status of each function used to extract fields from documents.
 - [READMEdev](READMEdev.md) contains AWS CLI2 installation instruction
+
+### Additional Readmes
 - [KnownDefects](KnownDefects.md) contains information about potential issues to be aware of.
 - [NOTEBOOKS](notebooks/NOTEBOOKS.md) contains helpful information about the notebooks and scripts used to explore solutions for scrapper.
 - [visualizations/README](visualizations/README.md) contains helpful information about notebooks, scripts, and data used to explore visualizations.
@@ -64,6 +67,16 @@ Then open http://0.0.0.0:5000 in your browser. The application should be running
 *If `0.0.0.0` does not work, try `http://localhost:5000`*
   
 ## Contributors
+
+###### Labs 37
+
+[Lucas Chatham](https://github.com/lucaschatham)   
+[Trevor Dewalt](https://github.com/trevordewalt)
+[Azamatkhuja Jalilov](https://github.com/AZICO)
+[Matthew Blackburn](https://github.com/matthewblackbu)
+[Zunera Bokhari](https://github.com/zunerabokhari)
+[Joel Hoover](https://github.com/jihoover77)
+[Lee Rowe](https://github.com/leecrowe)
   
 ###### Labs 37
 [Minh Nguyen](https://github.com/minh14496)   
