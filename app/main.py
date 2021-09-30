@@ -13,7 +13,6 @@ winpty docker run -it -p 5000:5000 asylum uvicorn app.main:app --host=0.0.0.0 --
 import os
 import requests as re 
 import json 
-import pandas as pd
 
 from boto3.session import Session
 from botocore.exceptions import ClientError, ConnectionError
@@ -23,7 +22,6 @@ from dotenv import load_dotenv
 
 from app.db_ops import insert_case
 from app.ocr import make_fields
-from app.visualizations import get_judge_vis
 from app.visualizations import get_judge_vis, get_judge_feature_vis
 
 app = FastAPI(
