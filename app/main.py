@@ -82,16 +82,3 @@ async def outcome_by_judge_and_feature(judge_id: int, feature: str):
     Endpoint for visualizations on outcome by protected grounds by judge using plotly
     """
     return json.loads(get_judge_feature_vis(judge_id, feature).to_json())
-
-
-'''
-
-# This is the old endpoint that was used, it was replaced by the ones above. 
-
-@app.get("/vis/outcome-by-judge/{judge_name}")
-async def outcome_by_judge(judge_name: str):
-    """
-    Endpoint for visualizations on outcome by judge using plotly
-    """
-    return get_judge_side_bar(judge_name).to_json()
-'''
