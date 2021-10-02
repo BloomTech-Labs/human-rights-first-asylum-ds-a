@@ -129,8 +129,7 @@ class BIACase:
     def to_dict(self):
         return {
             'uuid': self.uuid,
-            'panel_members': ', '.join(self.get_panel()) or 'Unknown',
-            'decision_type': self.get_decision_type() or 'Unknown',
+            'panel_members': self.get_panel() or 'Unknown',
             'application_type': self.get_application() or "Unknown",
             'decision_date': self.get_date() or 'Unknown',
             'country_of_origin': self.get_country_of_origin() or 'Unknown',
@@ -245,8 +244,8 @@ class BIACase:
         """
         Uses the appellate_panel_members list and spacy PhraseMatcher to check a
         document for members in the appellate_panel_member list.
-        !!! Currently only works for this static list of judges. If not appelate
-            or the list of apppelate judges changes, or there's an appelate
+        !!! Currently only works for this static list of judges. If not appellate
+            or the list of appellate judges changes, or there's an appellate
             judge not in the list.
             May want to generate an updatable list.
             May want to generate a non-appellate judge list
@@ -261,11 +260,12 @@ class BIACase:
         for match_id, start, end in matcher(self.doc):
             span = self.doc[start:end]
             matches.add(' '.join(span.text.split(", ")[-1::-1]))
-        return sorted(list(matches))
+        result = list(matches).pop(0) if matches else "None"
+        return result
 
     def get_gender(self) -> str:
         """
-        Searches through a given document and counts the TOTAL number of
+        Searches through  a given document and counts the TOTAL number of
         "male" pronoun uses and "female" pronoun uses. Whichever
         count("M" or "F") is higher, that gender is returned.
         In the event of a tie; currently returns "Unknown"; may be able to
@@ -388,11 +388,6 @@ class BIACase:
                         outcome.add(k)
         return "; ".join(list(outcome))
 
-    def get_decision_type(self) -> str:
-        return "Appellate" if len(self.get_panel()) > 1 else "Initial"
-        # It seems decision_type is looking for appellate decision or else
-        # intial decision, not immigration court decision.
-
     def get_outcome(self) -> str:
         """
         • Returns the outcome of the case. This will appear after 'ORDER'
@@ -506,13 +501,20 @@ class BIACase:
         violent_list = ['abduct', 'abuse', 'assassinate', 'assault', 'coerce',
                         'exploit', 'fear', 'harm', 'hurt', 'kidnap', 'kill',
                         'murder', 'persecute', 'rape', 'scare', 'shoot',
-                        'suffer', 'threat', 'torture']
+                        'suffer', 'threat', 'torture', 'attack', 'displace',
+                        'massacre', 'genocide']
+
         family_list = ['child', 'daughter', 'family', 'husband', 'parent',
-                       'partner', 'son', 'wife', 'woman']
+                       'partner', 'son', 'wife', 'woman', 'spouse', 'father',
+                       'aunt', 'uncle']
+
         gender_list = ['fgm', 'gay', 'gender', 'homosexual', 'homosexuality',
-                       'lesbian', 'lgbt', 'lgbtq', 'lgbtqia',
-                       'queer', 'sexuality', 'transgender']
-        gang_list = ['cartel', 'gang', 'militia']
+                       'lesbian', 'lgbt', 'lgbtq', 'lgbtqia', 'queer',
+                       'sexuality', 'transgender', 'bisexual', 'lesbian']
+
+        gang_list = ['cartel', 'gang', 'militia', 'isis', 'taliban', 'al-qaeda',
+                     'al qaeda', 'daesh', 'shia', 'sunni', 'isil', 'boko haram', 'jihadists',
+                     'uighyers', 'kulunas', 'mara salvatrucha 13', 'ms 13']
 
         # Outputs a list of PhraseMatch occurrences for a given list of keywords
         violence_match = get_matches(violent_list, 'Violent', self.doc)
@@ -522,6 +524,7 @@ class BIACase:
 
         # Printing full_text[judge_match2[0][1]:judge_match2[0][2]] gives word
         # it matches on, can put in the [0] a for loop to see all matches
+        terms_list = []
         if len(violence_match) != 0:
             terms_list.append('Violent')
         if len(family_match) != 0:
@@ -542,7 +545,7 @@ class BIACase:
         All instances of a match are returned by Matcher, so checking whether these objects are empty 
         or not dictates the output of this function.
         """
-        # # Speciifying phrase patterns / rules to use in SpaCy's Matcher
+        # # Specifying phrase patterns / rules to use in SpaCy's Matcher
         narrow_scope = [[{"LOWER": "court"}, {"LOWER": "finds"},
                          {"LOWER": "respondent"}, {"LOWER": "generally"},
                          {"LOWER": "credible"}],
@@ -569,7 +572,7 @@ class BIACase:
         similar_medium = similar(self.doc, medium_scope)
         similar_wide = similar(self.doc, wide_scope)
 
-        # output logic checks wheteher similar_***** variables are empty or not
+        # output logic checks whether similar_***** variables are empty or not
         # output logic checks whether similar size variables are empty or not
         if similar_narrow:
             return True
