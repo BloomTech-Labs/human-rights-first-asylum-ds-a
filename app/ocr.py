@@ -1,4 +1,3 @@
-import json
 import geonamescache
 import pytesseract
 import pickle
