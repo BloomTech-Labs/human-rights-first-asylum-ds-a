@@ -42,7 +42,7 @@ Labs 33 chose to work collaboratively and accomplished:
   * reorganization of documentation
 
 Labs 34 chose to work collaboratively, split into scraper and visualization teams, to:
-  ### Visualization
+### Visualization
   * create an API endpoint for taking in case data and responding with Plotly schema JSON so the front-end can recreate charts and get stakeholder and user feedback
 
 ### Scraper
@@ -54,3 +54,16 @@ Labs 34 chose to work collaboratively, split into scraper and visualization team
   * rewrote some methods to consistently use SpaCy matcher rather than matchers used in the past
   * restructure `BIACase` class to facilitate interactions with different scraping methods 
   
+Labs 38 chose to do what the team above did and split into scraper and visualization teams, to:
+[VISUALIZATION_INFO](VISUALIZATION_INFO.md)
+  * implemented `get_judge_vis` and it's endpoint to successfully display judge results
+  * started work `on get_judge_feature_vis`, please look at VISUALIZATION_INFO
+  * refactored old functions that weren't working perfectly. Please look at VISUALIZATION_INFO again
+
+[SCRAPER_INFO](SCRAPER_INFO.md)
+  * implemented a wider vocabulary
+  * worked to improve the accuracy in other manners than just key words.
+  * redesigned the SCRAPER_INFO file to be much more accurate and descriptive please read SCRAPER_INFO 
+
+
+
