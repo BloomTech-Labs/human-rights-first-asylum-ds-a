@@ -13,7 +13,6 @@ winpty docker run -it -p 5000:5000 asylum uvicorn app.main:app --host=0.0.0.0 --
 import os
 import requests as re 
 import json 
-import pandas as pd
 
 from boto3.session import Session
 from botocore.exceptions import ClientError, ConnectionError
@@ -23,7 +22,6 @@ from dotenv import load_dotenv
 
 from app.db_ops import insert_case
 from app.ocr import make_fields
-from app.visualizations import get_judge_vis
 from app.visualizations import get_judge_vis, get_judge_feature_vis
 
 app = FastAPI(
@@ -84,16 +82,3 @@ async def outcome_by_judge_and_feature(judge_id: int, feature: str):
     Endpoint for visualizations on outcome by protected grounds by judge using plotly
     """
     return json.loads(get_judge_feature_vis(judge_id, feature).to_json())
-
-
-'''
-
-# This is the old endpoint that was used, it was replaced by the ones above. 
-
-@app.get("/vis/outcome-by-judge/{judge_name}")
-async def outcome_by_judge(judge_name: str):
-    """
-    Endpoint for visualizations on outcome by judge using plotly
-    """
-    return get_judge_side_bar(judge_name).to_json()
-'''
