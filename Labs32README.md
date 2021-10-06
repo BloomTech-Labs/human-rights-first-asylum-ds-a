@@ -1,4 +1,4 @@
-docker # Human Rights First - Asylum
+# Human Rights First - Asylum
 An application to assist immigration attorneys and refugee representatives in advocating for clients in asylum cases by identifying patterns in judicial decisions and predicting possible outcomes based on those patterns.
 
 ## Description
