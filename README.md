@@ -34,7 +34,7 @@ See this team's history [here](ProjectHistory.md).
 The **app** folder contains the FastAPI application which creates an endpoint for processing a single `.pdf` file stored in the AWS S3 bucket. 
 
 ### Valuable Readmes
-- [VISUALIZATION_INFO](VISUALIZATION_INFO.md) contains information pertaining to the visualizations.py as well as the main.py file and how they interact with each other.
+- [VISUALIZATIONS_INFO](VISUALIZATIONS_INFO.md) contains information pertaining to the visualizations.py as well as the main.py file and how they interact with each other.
 - [SCRAPER_INFO](SCRAPER_INFO.md) contains important information about the status of each function used to extract fields from documents.
 - [READMEdev](READMEdev.md) contains AWS CLI2 installation instruction
 
