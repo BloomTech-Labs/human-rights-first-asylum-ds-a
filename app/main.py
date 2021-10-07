@@ -10,15 +10,17 @@ docker run -it -p 5000:5000 asylum uvicorn app.main:app --host=0.0.0.0 --port=50
 Run Locally using Windows:
 winpty docker run -it -p 5000:5000 asylum uvicorn app.main:app --host=0.0.0.0 --port=5000
 """
+import json
 import os
-import requests as re 
-import json 
+import re
 
+import pytesseract
 from boto3.session import Session
 from botocore.exceptions import ClientError, ConnectionError
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+from pdf2image import convert_from_bytes
 
 from app.db_ops import insert_case
 from app.ocr import make_fields
@@ -28,7 +30,7 @@ app = FastAPI(
     title="DS API for HRF Asylum",
     description="PDF OCR",
     docs_url="/",
-    version="0.36.0",
+    version="0.39.0",
 )
 
 load_dotenv()
@@ -59,8 +61,6 @@ async def pdf_ocr(uuid: str):
         )
         fields = make_fields(uuid, response['Body'].read())
         insert_case(fields)
-        get_text_url = f"https://asylum-a-api.herokuapp.com/upload/scrape/{uuid}"
-        re.get(get_text_url)
         return {"status": "Success"}
     except ConnectionError:
         return {"status": "Connection refused!"}
@@ -82,3 +82,18 @@ async def outcome_by_judge_and_feature(judge_id: int, feature: str):
     Endpoint for visualizations on outcome by protected grounds by judge using plotly
     """
     return json.loads(get_judge_feature_vis(judge_id, feature).to_json())
+
+
+@app.get("/ocr/{uuid}")
+async def ocr(uuid):
+    s3 = Session(
+        aws_access_key_id=os.getenv("ACCESS_KEY"),
+        aws_secret_access_key=os.getenv("SECRET_KEY"),
+    ).client("s3")
+    response = s3.get_object(
+        Bucket=os.getenv("BUCKET_NAME"),
+        Key=f"{uuid}.pdf",
+    )
+    pages = convert_from_bytes(response["Body"].read(), dpi=90)
+    text = " ".join(map(pytesseract.image_to_string, pages))
+    return {"result": re.sub(r"\s+", " ", text)}
