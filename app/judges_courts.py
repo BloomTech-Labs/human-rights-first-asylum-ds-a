@@ -4,11 +4,16 @@ import numpy as np
 def update_judges_table():
     """
     This function pulls information from multiple url's to create a 
+<<<<<<< Updated upstream
     table pupulated with information on all immigration judges. This 
     table is saved in the current directory as 'jedges_courts.csv'. 
+=======
+    table populated with information on all immigration judges. This 
+    table is saved in the current directory as 'judges_courts.csv'. 
+>>>>>>> Stashed changes
     """
     def get_courts(data):
-        """This is inly a helper function"""
+        """This is only a helper function"""
         courts = {i:str(j).split(' ')[-2] for i, j in 
                     zip(data[3]['State'], data[3]['Circuit assignment(s)']) 
                     if type(j) == str and i != 'District of Columbia'}
@@ -198,10 +203,6 @@ def update_judges_table():
     url2 = 'https://www.justice.gov/eoir/eoir-immigration-court-listing#MP'
     tables = pd.read_html(url2)
     judges_courts = get_judges(tables)
-    
-    # Following code saves the table to the current directory as a csv. 
-    # Will need to be updated as USDJ's site layout changes. 
-    # judges_courts.to_csv('judges_courts.csv', index=False)
 
     return judges_courts
 
@@ -232,10 +233,5 @@ def update_laws():
 
     laws = set(n for n in [cleanit(i) for i in laws[1][law] if type(i) == str] 
                if ' v. ' not in n)
-
-    # Following code saves laws to current directory as plain text. 
-    # Needs to be updated as wiki's site layout changes.
-    # with open('immigration_laws.txt', 'w') as f:
-    #     f.write(f'{laws}')
 
     return laws
