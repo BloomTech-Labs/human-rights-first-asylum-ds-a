@@ -11,7 +11,6 @@ Run Locally using Windows:
 winpty docker run -it -p 5000:5000 asylum uvicorn app.main:app --host=0.0.0.0 --port=5000
 """
 import os
-import requests as re 
 import json 
 
 from boto3.session import Session
@@ -59,8 +58,6 @@ async def pdf_ocr(uuid: str):
         )
         fields = make_fields(uuid, response['Body'].read())
         insert_case(fields)
-        get_text_url = f"https://asylum-a-api.herokuapp.com/upload/scrape/{uuid}"
-        re.get(get_text_url)
         return {"status": "Success"}
     except ConnectionError:
         return {"status": "Connection refused!"}

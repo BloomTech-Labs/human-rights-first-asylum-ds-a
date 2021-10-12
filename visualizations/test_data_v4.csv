@@ -1,47 +1,47 @@
-,0,Case ID,Hearing Date,Type of Hearing,Hearing Location,Decision Date,Judge's Name,Outcome,Protected Ground,"If Social Group, Type",Country,Latitude,Longitude,Iso
-0,1,17-0043108,11/20/2018,"IH Scheduled, IJ not specified",Arlington Immigration Court,,Thomas G. Snow,Granted,Social Group,Domestic Violence,Honduras,15.2,-86.242,HND
-1,2,17-0043495,10/09/2020,Individual Hearing,Baltimore Immigration Court,,,Pending,Social Group,Family or Kinship Ties,Honduras,15.2,-86.242,HND
-2,3,14-0027984,09/14/2020,Individual Hearing,Arlington Immigration Court,,Thomas M. O'Leary,Pending,Political Opinion,,Eritrea,15.179,39.782,ERI
-3,4,16-0027174,03/06/2020,Individual Hearing,Arlington Immigration Court,,,,"Nationality, Social Group",,El Salvador,13.794,-88.897,SLV
-4,5,16-0027162,01/13/2020,Individual Hearing,Arlington Immigration Court,01/13/2020,Elise  Manuel,Granted,"Nationality, Political Opinion, Social Group",,El Salvador,13.794,-88.897,SLV
-5,6,16-0028537,09/10/2019,Individual Hearing,Arlington Immigration Court,,Jungyoun  Hong,Pending,Social Group,,El Salvador,13.794,-88.897,SLV
-6,7,13-0030778,06/14/2019,Individual Hearing,Arlington Immigration Court,02/03/2020,Emmett D. Soper,Granted,Political Opinion,,"Congo, Democratic Republic of (Congo-Kinshasa)",4.038,21.759,COD
-7,8,15-0028748,06/06/2019,Individual Hearing,Arlington Immigration Court,06/06/2019,Quynh Vu Bain,Granted,Social Group,Domestic Violence,El Salvador,13.794,-88.897,SLV
-8,9,12-0026846,02/13/2019,Individual Hearing,Arlington Immigration Court,,,,"Nationality, Political Opinion, Race, Religion",,China,35.862,104.195,CHN
-9,10,15-0030122,01/15/2019,Individual Hearing,Baltimore Immigration Court,06/04/2019,Denise N. Slavin,Granted,Religion,,Eritrea,15.179,39.782,ERI
-10,11,15-0027098,12/03/2018,Individual Hearing,Arlington Immigration Court,06/18/2019,Thomas G. Snow,Granted,Social Group,,El Salvador,13.794,-88.897,SLV
-11,12,15-0028766,10/24/2018,Individual Hearing,Arlington Immigration Court,12/03/2018,Paul W. Schmidt,Granted,Social Group,"Domestic Violence, Family or Kinship Ties",Honduras,15.2,-86.242,HND
-12,13,15-0030122,06/04/2019,"Individual Hearing (06/04), IJ Williams",Baltimore Immigration Court,06/04/2019,Denise N. Slavin,Granted,Religion,,Eritrea,15.179,39.782,ERI
-13,14,16-0029372,02/13/2020,Individual Hearing - 1pm - IJ Choi (Rescheduled from 2/7/20),Arlington Immigration Court,02/13/2020,Quynh Vu Bain,Granted,Social Group,Domestic Violence,Honduras,15.2,-86.242,HND
-14,15,69-0041036,09/25/2019,Individual Hearing 9/25/2019 @ 1 pm,Baltimore Immigration Court,01/20/2020,Phillip T. Williams,Appealed,Social Group,Other,Honduras,15.2,-86.242,HND
-15,16,17-0043794,08/18/2020,Individual Hearing - CANCELED Client COVID tested day before,Baltimore Immigration Court,,,Pending,Social Group,Sexual Orientation,El Salvador,13.794,-88.897,SLV
-16,17,16-0030069,11/28/2018,Individual Hearing - IJ Bain,Arlington Immigration Court,,Quynh Vu Bain,Pending,"Nationality, Social Group","Domestic Violence, Family or Kinship Ties",Honduras,15.2,-86.242,HND
-17,18,16-0028551,12/30/2019,"Individual Hearing, IJ Bryant",Arlington Immigration Court,,,,Social Group,,El Salvador,13.794,-88.897,SLV
-18,19,16-0026989,12/30/2019,"Individual Hearing, IJ Bryant",Arlington Immigration Court,,,,"Nationality, Social Group",,El Salvador,13.794,-88.897,SLV
-19,20,17-0043522,12/20/2019,"Individual Hearing, IJ Burman",Arlington Immigration Court,01/19/2020,Lawrence  Burman,Granted,Religion,,Egypt,26.821,30.803,EGY
-20,21,18-0044835,08/20/2020,"Individual Hearing, IJ Crosland",Baltimore Immigration Court,,,Pending,Social Group,,El Salvador,13.794,-88.897,SLV
-21,22,12-0027842,12/19/2019,"Individual Hearing, IJ Crosland - Change of Venue Granted",Baltimore Immigration Court,,David W. Crosland,Pending,Social Group,,El Salvador,13.794,-88.897,SLV
-22,23,15-0029304,01/09/2019,"Individual Hearing, IJ Dornell",Baltimore Immigration Court,,,,"Religion, Social Group",,El Salvador,13.794,-88.897,SLV
-23,24,15-0028141,02/07/2019,"Individual Hearing, IJ Hong",Arlington Immigration Court,,,Pending,Social Group,,El Salvador,13.794,-88.897,SLV
-24,25,16-0027995,06/24/2019,"Individual Hearing, IJ Mahasa",Baltimore Immigration Court,10/31/2019,Denise N. Slavin,Granted,"Nationality, Social Group","Domestic Violence, Family or Kinship Ties",El Salvador,13.794,-88.897,SLV
-25,26,18-0044545,12/09/2019,"Individual Hearing, IJ Nelson Padilla",Baltimore Immigration Court,,,Pending,Social Group,Domestic Violence,Nicaragua,12.806,-85.207,NIC
-26,27,15-0029100,03/20/2019,"Individual Hearing, IJ not specified",Baltimore Immigration Court,,Lisa  Dornell (Williams),Pending,Social Group,,Honduras,15.2,-86.242,HND
-27,28,16-0030845,03/08/2019,"Individual Hearing, IJ not specified",Baltimore Immigration Court,03/08/2019,Lawrence  Burman,Granted,"Nationality, Political Opinion, Social Group",,El Salvador,13.794,-88.897,SLV
-28,29,12-0026846,04/22/2019,Individual Hearing (IJ Perlman),Arlington Immigration Court,,,,"Nationality, Political Opinion, Race, Religion",,China,35.862,104.195,CHN
-29,30,17-0043828,04/12/2019,"Individual Hearing, IJ Slavin",Baltimore Immigration Court,09/10/2019,Denise N. Slavin,Granted,Social Group,Domestic Violence,Guatemala,15.784,-90.231,GTM
-30,31,14-0028410,07/09/2019,"Individual Hearing, IJ Williams",Baltimore Immigration Court,,John Milo Bryant,Pending,Social Group,,Ethiopia,9.145,40.49,ETH
-31,32,17-0043757,04/20/2020,Individual Hearing - POSTPONED - COVID-19,Baltimore Immigration Court,,David W. Crosland,Pending,"Nationality, Political Opinion",,Cameroon,7.37,12.355,CMR
-32,33,17-0042789,03/25/2020,Individual Hearing - POSTPONED (COVID-19),Arlington Immigration Court,,Thomas G. Snow,Pending,"Nationality, Social Group",,El Salvador,13.794,-88.897,SLV
-33,34,14-0027984,10/20/2020,Individual Hearing (Rescheduled),Arlington Immigration Court,,Thomas M. O'Leary,Pending,Political Opinion,,Eritrea,15.179,39.782,ERI
-34,35,14-0028382,01/17/2019,Individual Hearing - rescheduled (Judge Hong),Arlington Immigration Court,,,,Political Opinion,,Ethiopia,9.145,40.49,ETH 
-35,36,13-0030127,03/18/2019,Individual Hearing - Visiting Judge #3,Arlington Immigration Court,03/28/2019,Thomas G. Snow,Granted,Social Group,,Honduras,15.2,-86.242,HND
-36,37,15-0029734,07/31/2019,"Individual, IJ Hong",Arlington Immigration Court,,,,"Nationality, Political Opinion, Social Group",,Belarus,53.71,27.953,BLR
-37,38,15-0027261,10/24/2018,Immigration Court Individual Hearing,Arlington Immigration Court,12/03/2018,Paul W. Schmidt,Granted,Social Group,,Honduras,15.2,-86.242,HND
-38,39,17-0043659,06/03/2020,(POSTPONED COVID-19) Individual Hearing,Baltimore Immigration Court,,,Pending,Social Group,Domestic Violence,Honduras,15.2,-86.242,HND
-39,40,14-0030314,04/06/2020,"(POSTPONED COVID-19) Individual Hearing, IJ Bryant",Arlington Immigration Court,,John Milo Bryant,Pending,None,,Honduras,15.2,-86.242,HND
-40,41,16-0042109,05/15/2020,"(POSTPONED-COVID-19) Individual Hearing, IJ Koelsch",Baltimore Immigration Court,,,Pending,"Nationality, Social Group","Gender, Sexual Orientation, Transgendered",El Salvador,13.794,-88.897,SLV
-41,42,14-0027380,08/16/2019,POSTPONED Individual Hearing,Arlington Immigration Court,,,Pending,Social Group,,Honduras,15.2,-86.242,HND
-42,43,17-0042734,10/21/2019,"RESCHEDULED - Individual Hearing, IJ Koelsch",Baltimore Immigration Court,,Quynh Vu Bain,Pending,Social Group,Domestic Violence,El Salvador,13.794,-88.897,SLV
-43,44,16-0030069,12/23/2019,RESCHEDULED TO 2021 - IH - IJ Bain (2nd IH),Arlington Immigration Court,,Quynh Vu Bain,Pending,"Nationality, Social Group","Domestic Violence, Family or Kinship Ties",Honduras,15.2,-86.242,HND
-44,45,14-0027612,01/28/2020,RESET to 2022 - IH - rescheduled (Judge Snow),Arlington Immigration Court,,Thomas G. Snow,Pending,Political Opinion,,Cameroon,7.37,12.355,CMR
-45,46,16-0028224,11/04/2019,Individual Hearing,Baltimore Immigration Court,11/04/2019,David W. Crosland,Granted,"Nationality, Political Opinion, Social Group",,Honduras,15.2,-86.242,HND
+Case ID,Hearing Date,Type of Hearing,Hearing Location,Decision Date,Judge's Name,Outcome,Protected Ground,"If Social Group, Type",Country,Latitude,Longitude,ISO
+17-0043108,11/20/2018,"IH Scheduled, IJ not specified",Arlington Immigration Court,,Thomas G. Snow,Granted,Social Group,Domestic Violence,Honduras,15.2,-86.242,HND
+17-0043495,10/09/2020,Individual Hearing,Baltimore Immigration Court,,,Pending,Social Group,Family or Kinship Ties,Honduras,15.2,-86.242,HND
+14-0027984,09/14/2020,Individual Hearing,Arlington Immigration Court,,Thomas M. O'Leary,Pending,Political Opinion,,Eritrea,15.179,39.782,ERI
+16-0027174,03/06/2020,Individual Hearing,Arlington Immigration Court,,,,"Nationality, Social Group",,El Salvador,13.794,-88.897,SLV
+16-0027162,01/13/2020,Individual Hearing,Arlington Immigration Court,01/13/2020,Elise  Manuel,Granted,"Nationality, Political Opinion, Social Group",,El Salvador,13.794,-88.897,SLV
+16-0028537,09/10/2019,Individual Hearing,Arlington Immigration Court,,Jungyoun  Hong,Pending,Social Group,,El Salvador,13.794,-88.897,SLV
+13-0030778,06/14/2019,Individual Hearing,Arlington Immigration Court,02/03/2020,Emmett D. Soper,Granted,Political Opinion,,"Congo, Democratic Republic of (Congo-Kinshasa)",4.038,21.759,COD
+15-0028748,06/06/2019,Individual Hearing,Arlington Immigration Court,06/06/2019,Quynh Vu Bain,Granted,Social Group,Domestic Violence,El Salvador,13.794,-88.897,SLV
+12-0026846,02/13/2019,Individual Hearing,Arlington Immigration Court,,,,"Nationality, Political Opinion, Race, Religion",,China,35.862,104.195,CHN
+15-0030122,01/15/2019,Individual Hearing,Baltimore Immigration Court,06/04/2019,Denise N. Slavin,Granted,Religion,,Eritrea,15.179,39.782,ERI
+15-0027098,12/03/2018,Individual Hearing,Arlington Immigration Court,06/18/2019,Thomas G. Snow,Granted,Social Group,,El Salvador,13.794,-88.897,SLV
+15-0028766,10/24/2018,Individual Hearing,Arlington Immigration Court,12/03/2018,Paul W. Schmidt,Granted,Social Group,"Domestic Violence, Family or Kinship Ties",Honduras,15.2,-86.242,HND
+15-0030122,06/04/2019,"Individual Hearing (06/04), IJ Williams",Baltimore Immigration Court,06/04/2019,Denise N. Slavin,Granted,Religion,,Eritrea,15.179,39.782,ERI
+16-0029372,02/13/2020,Individual Hearing - 1pm - IJ Choi (Rescheduled from 2/7/20),Arlington Immigration Court,02/13/2020,Quynh Vu Bain,Granted,Social Group,Domestic Violence,Honduras,15.2,-86.242,HND
+69-0041036,09/25/2019,Individual Hearing 9/25/2019 @ 1 pm,Baltimore Immigration Court,01/20/2020,Phillip T. Williams,Appealed,Social Group,Other,Honduras,15.2,-86.242,HND
+17-0043794,08/18/2020,Individual Hearing - CANCELED Client COVID tested day before,Baltimore Immigration Court,,,Pending,Social Group,Sexual Orientation,El Salvador,13.794,-88.897,SLV
+16-0030069,11/28/2018,Individual Hearing - IJ Bain,Arlington Immigration Court,,Quynh Vu Bain,Pending,"Nationality, Social Group","Domestic Violence, Family or Kinship Ties",Honduras,15.2,-86.242,HND
+16-0028551,12/30/2019,"Individual Hearing, IJ Bryant",Arlington Immigration Court,,,,Social Group,,El Salvador,13.794,-88.897,SLV
+16-0026989,12/30/2019,"Individual Hearing, IJ Bryant",Arlington Immigration Court,,,,"Nationality, Social Group",,El Salvador,13.794,-88.897,SLV
+17-0043522,12/20/2019,"Individual Hearing, IJ Burman",Arlington Immigration Court,01/19/2020,Lawrence  Burman,Granted,Religion,,Egypt,26.821,30.803,EGY
+18-0044835,08/20/2020,"Individual Hearing, IJ Crosland",Baltimore Immigration Court,,,Pending,Social Group,,El Salvador,13.794,-88.897,SLV
+12-0027842,12/19/2019,"Individual Hearing, IJ Crosland - Change of Venue Granted",Baltimore Immigration Court,,David W. Crosland,Pending,Social Group,,El Salvador,13.794,-88.897,SLV
+15-0029304,01/09/2019,"Individual Hearing, IJ Dornell",Baltimore Immigration Court,,,,"Religion, Social Group",,El Salvador,13.794,-88.897,SLV
+15-0028141,02/07/2019,"Individual Hearing, IJ Hong",Arlington Immigration Court,,,Pending,Social Group,,El Salvador,13.794,-88.897,SLV
+16-0027995,06/24/2019,"Individual Hearing, IJ Mahasa",Baltimore Immigration Court,10/31/2019,Denise N. Slavin,Granted,"Nationality, Social Group","Domestic Violence, Family or Kinship Ties",El Salvador,13.794,-88.897,SLV
+18-0044545,12/09/2019,"Individual Hearing, IJ Nelson Padilla",Baltimore Immigration Court,,,Pending,Social Group,Domestic Violence,Nicaragua,12.806,-85.207,NIC
+15-0029100,03/20/2019,"Individual Hearing, IJ not specified",Baltimore Immigration Court,,Lisa  Dornell (Williams),Pending,Social Group,,Honduras,15.2,-86.242,HND
+16-0030845,03/08/2019,"Individual Hearing, IJ not specified",Baltimore Immigration Court,03/08/2019,Lawrence  Burman,Granted,"Nationality, Political Opinion, Social Group",,El Salvador,13.794,-88.897,SLV
+12-0026846,04/22/2019,Individual Hearing (IJ Perlman),Arlington Immigration Court,,,,"Nationality, Political Opinion, Race, Religion",,China,35.862,104.195,CHN
+17-0043828,04/12/2019,"Individual Hearing, IJ Slavin",Baltimore Immigration Court,09/10/2019,Denise N. Slavin,Granted,Social Group,Domestic Violence,Guatemala,15.784,-90.231,GTM
+14-0028410,07/09/2019,"Individual Hearing, IJ Williams",Baltimore Immigration Court,,John Milo Bryant,Pending,Social Group,,Ethiopia,9.145,40.49,ETH
+17-0043757,04/20/2020,Individual Hearing - POSTPONED - COVID-19,Baltimore Immigration Court,,David W. Crosland,Pending,"Nationality, Political Opinion",,Cameroon,7.37,12.355,CMR
+17-0042789,03/25/2020,Individual Hearing - POSTPONED (COVID-19),Arlington Immigration Court,,Thomas G. Snow,Pending,"Nationality, Social Group",,El Salvador,13.794,-88.897,SLV
+14-0027984,10/20/2020,Individual Hearing (Rescheduled),Arlington Immigration Court,,Thomas M. O'Leary,Pending,Political Opinion,,Eritrea,15.179,39.782,ERI
+14-0028382,01/17/2019,Individual Hearing - rescheduled (Judge Hong),Arlington Immigration Court,,,,Political Opinion,,Ethiopia,9.145,40.49,ETH 
+13-0030127,03/18/2019,Individual Hearing - Visiting Judge #3,Arlington Immigration Court,03/28/2019,Thomas G. Snow,Granted,Social Group,,Honduras,15.2,-86.242,HND
+15-0029734,07/31/2019,"Individual, IJ Hong",Arlington Immigration Court,,,,"Nationality, Political Opinion, Social Group",,Belarus,53.71,27.953,BLR
+15-0027261,10/24/2018,Immigration Court Individual Hearing,Arlington Immigration Court,12/03/2018,Paul W. Schmidt,Granted,Social Group,,Honduras,15.2,-86.242,HND
+17-0043659,06/03/2020,(POSTPONED COVID-19) Individual Hearing,Baltimore Immigration Court,,,Pending,Social Group,Domestic Violence,Honduras,15.2,-86.242,HND
+14-0030314,04/06/2020,"(POSTPONED COVID-19) Individual Hearing, IJ Bryant",Arlington Immigration Court,,John Milo Bryant,Pending,None,,Honduras,15.2,-86.242,HND
+16-0042109,05/15/2020,"(POSTPONED-COVID-19) Individual Hearing, IJ Koelsch",Baltimore Immigration Court,,,Pending,"Nationality, Social Group","Gender, Sexual Orientation, Transgendered",El Salvador,13.794,-88.897,SLV
+14-0027380,08/16/2019,POSTPONED Individual Hearing,Arlington Immigration Court,,,Pending,Social Group,,Honduras,15.2,-86.242,HND
+17-0042734,10/21/2019,"RESCHEDULED - Individual Hearing, IJ Koelsch",Baltimore Immigration Court,,Quynh Vu Bain,Pending,Social Group,Domestic Violence,El Salvador,13.794,-88.897,SLV
+16-0030069,12/23/2019,RESCHEDULED TO 2021 - IH - IJ Bain (2nd IH),Arlington Immigration Court,,Quynh Vu Bain,Pending,"Nationality, Social Group","Domestic Violence, Family or Kinship Ties",Honduras,15.2,-86.242,HND
+14-0027612,01/28/2020,RESET to 2022 - IH - rescheduled (Judge Snow),Arlington Immigration Court,,Thomas G. Snow,Pending,Political Opinion,,Cameroon,7.37,12.355,CMR
+16-0028224,11/04/2019,Individual Hearing,Baltimore Immigration Court,11/04/2019,David W. Crosland,Granted,"Nationality, Political Opinion, Social Group",,Honduras,15.2,-86.242,HND
