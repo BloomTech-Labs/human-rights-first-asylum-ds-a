@@ -149,4 +149,4 @@ cython_debug/
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
 
-scratch.py
+full_text_ocr.py
