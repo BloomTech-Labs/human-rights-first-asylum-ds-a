@@ -4,13 +4,8 @@ import numpy as np
 def update_judges_table():
     """
     This function pulls information from multiple url's to create a 
-<<<<<<< Updated upstream
-    table pupulated with information on all immigration judges. This 
-    table is saved in the current directory as 'jedges_courts.csv'. 
-=======
     table populated with information on all immigration judges. This 
     table is saved in the current directory as 'judges_courts.csv'. 
->>>>>>> Stashed changes
     """
     def get_courts(data):
         """This is only a helper function"""
