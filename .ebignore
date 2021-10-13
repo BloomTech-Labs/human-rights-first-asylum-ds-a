@@ -1,13 +1,7 @@
-/assets/
-/aws/
-/data_parsing/
-/notebooks/
-/streamlit/
-/visualisations/
-/EOIR data/
-KnownDefects.md
-Labs32README.md
+/assets
+/EOIR_data
+/notebooks
+/text
+/visualizations
 LICENSE
-ProjectHistory.md
-README.md
-SCRAPER_INFO.md
+*.md
