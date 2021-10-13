@@ -258,7 +258,7 @@ class BIACase:
         matches = set()
         for match_id, start, end in matcher(self.doc):
             span = self.doc[start:end]
-            matches.add(' '.join(span.text.split(", ")[-1::-1]))
+            matches.add(' '.join(span.text.split(", ")))
         result = list(matches).pop(0) if matches else "None"
         return result
 

@@ -21,7 +21,8 @@ from dotenv import load_dotenv
 
 from app.db_ops import insert_case
 from app.ocr import make_fields
-from app.visualizations import get_judge_vis, get_judge_feature_vis
+from app.visualizations import get_judge_vis, get_judge_feature_vis, \
+    get_feature_vis
 
 app = FastAPI(
     title="DS API for HRF Asylum",
@@ -78,3 +79,11 @@ async def outcome_by_judge_and_feature(judge_id: int, feature: str):
     Endpoint for visualizations on Outcome by {feature} by Judge using plotly
     """
     return json.loads(get_judge_feature_vis(judge_id, feature).to_json())
+
+
+@app.get("/vis/{feature}")
+async def outcome_by_feature(feature: str):
+    """
+    Endpoint for visualizations for home page
+    """
+    return json.loads(get_feature_vis(feature).to_json())

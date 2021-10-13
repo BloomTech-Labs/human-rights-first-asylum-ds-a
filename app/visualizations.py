@@ -39,3 +39,21 @@ def get_judge_feature_vis(judge_id: int, feature: str) -> Figure:
         barmode="group",
     )
     return go.Figure(data, layout)
+
+
+def get_feature_vis(feature: str) -> Figure:
+    feature_name = feature.title().replace('_', ' ')
+    judge_df = get_df()
+    cross_tab = pd.crosstab(
+        judge_df[feature],
+        judge_df["outcome"],
+    )
+    data = [
+        go.Bar(name=col, x=cross_tab.index, y=cross_tab[col])
+        for col in cross_tab.columns
+    ]
+    layout = go.Layout(
+        title=f"Outcome by {feature_name}",
+        barmode="group",
+    )
+    return go.Figure(data, layout)
