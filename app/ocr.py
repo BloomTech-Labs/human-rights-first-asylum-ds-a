@@ -18,7 +18,7 @@ def make_fields(uuid, file) -> dict:
     pages = convert_from_bytes(file, dpi=90)
     text = map(pytesseract.image_to_string, pages)
     string = " ".join(text)
-    case_data = BIACase(uuid, string).to_dict()
+    case_data = IJCase(uuid, string).to_dict()
     return case_data
 
 
@@ -106,7 +106,7 @@ def in_parenthetical(match):
     return False
 
 
-class BIACase:
+class IJCase:
     """
     The following defines the BIACase Class. When receiving a court doc,
     we use this to extract info for the desired fields/info
