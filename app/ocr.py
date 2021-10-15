@@ -7,7 +7,6 @@ from spacy.tokens import Doc, Span
 from spacy.matcher import Matcher, PhraseMatcher
 from typing import List, Iterator
 
-
 nlp = load("en_core_web_sm")
 
 
@@ -158,7 +157,7 @@ class IJCase:
         countries = sorted(gc.get_countries_by_names().keys())
         # remove U.S. and its territories from countries
         countries = set(countries)
-        non_matches = {"American Samoa", "Guam", "Northern Mariana Islands", "Puerto Rico", 
+        non_matches = {"American Samoa", "Guam", "Northern Mariana Islands", "Puerto Rico",
                        "United States", "United States Minor Outlying Islands", "U.S. Virgin Islands"}
         countries = countries.difference(non_matches)
 
@@ -216,8 +215,8 @@ class IJCase:
                 return s
         """
         primary_pattern = [
-            [{"LOWER": "date"}, {"LOWER": "of"}, 
-            {"LOWER": "this"}, {"LOWER": "notice"}]
+            [{"LOWER": "date"}, {"LOWER": "of"},
+             {"LOWER": "this"}, {"LOWER": "notice"}]
         ]
         # instantiate a list of pattern matches
         spans = similar(self.doc, primary_pattern)
@@ -394,17 +393,13 @@ class IJCase:
         at the end of the document.
         """
         outcomes = {
-            'remanded',
-            'reversal',
             'dismissed',
-            'sustained',
             'terminated',
             'granted',
             'denied',
-            'returned',
         }
         for token in self.doc:
-            if token.text in {"ORDER", 'ORDERED'}:
+            if token.text in {"ORDER", 'ORDERED', 'ORDERS'}:
                 start, stop = token.sent.start, token.sent.end + 280
                 outcome = self.doc[start:stop].text.strip().replace("\n", " ")
                 outcome = outcome.split('.')[0].lower()
@@ -447,7 +442,7 @@ class IJCase:
                 return state
             except:
                 return "Unknown"
-            
+
         return "Unknown"
 
     def get_city(self) -> str:
@@ -475,7 +470,7 @@ class IJCase:
                 return city
             except:
                 return "Unknown"
-                
+
         return "Unknown"
 
     def get_based_violence(self) -> List[str]:
@@ -552,7 +547,7 @@ class IJCase:
                         [{"LOWER": "court"}, {"LOWER": "finds"},
                          {"LOWER": "respondent"}, {"LOWER": "testimony"},
                          {"LOWER": "credible"}],
-                        [{"LOWER": "court"}, {"LOWER": "finds"}, 
+                        [{"LOWER": "court"}, {"LOWER": "finds"},
                          {"LOWER": "respondent"}, {"LOWER": "credible"}]]
 
         medium_scope = [[{"LOWER": "credible"}, {"LOWER": "witness"}],
@@ -563,10 +558,10 @@ class IJCase:
                         [{"LOWER": "testimony"}, {"LOWER": "credible"}],
                         [{"LOWER": "testimony"}, {"LOWER": "consistent"}]]
 
-        wide_scope = [[{"LEMMA": {"IN": ["coherent", 
-                                        "possible", 
-                                        "credible", 
-                                        "consistent"]}}]]
+        wide_scope = [[{"LEMMA": {"IN": ["coherent",
+                                         "possible",
+                                         "credible",
+                                         "consistent"]}}]]
 
         similar_narrow = similar(self.doc, narrow_scope)
         similar_medium = similar(self.doc, medium_scope)
