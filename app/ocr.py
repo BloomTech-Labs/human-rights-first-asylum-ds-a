@@ -215,8 +215,7 @@ class IJCase:
                 return s
         """
         primary_pattern = [
-            [{"LOWER": "date"}, {"LOWER": "of"},
-             {"LOWER": "this"}, {"LOWER": "notice"}]
+            [{"LOWER": "date"}, {"LOWER": ":"}]
         ]
         # instantiate a list of pattern matches
         spans = similar(self.doc, primary_pattern)
@@ -331,7 +330,6 @@ class IJCase:
         for match in potential_grounds:
             # remove 'nationality act' from potential_grounds
             if not in_parenthetical(match):
-
                 if match.text.lower() == 'nationality' \
                         and 'act' not in match.sent.text.lower() \
                         and 'nationality' not in confirmed_matches:
