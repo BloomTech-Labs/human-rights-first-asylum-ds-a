@@ -195,7 +195,7 @@ def update_judges_table():
         return df
 
 
-    url2 = 'https://www.justice.gov/eoir/eoir-immigration-court-listing#MP'
+    url2 = 'https://www.justice.gov/eoir/eoir-immigration-court-listing'
     tables = pd.read_html(url2)
     judges_courts = get_judges(tables)
 
