@@ -152,6 +152,3 @@ cython_debug/
 # Temp files
 scratch.py
 /text/
-
-# Readme & Docs
-*.md
