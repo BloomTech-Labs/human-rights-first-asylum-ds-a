@@ -7,7 +7,7 @@ docker run -it -p 3000:3000 asylum uvicorn app.main:app --host=0.0.0.0 --port=30
 
 docker run -it -p 5000:5000 asylum uvicorn app.main:app --host=0.0.0.0 --port=5000
 
-Run Locally using Windows:
+Run Locally using Windows with GitBash may require this:
 winpty docker run -it -p 5000:5000 asylum uvicorn app.main:app --host=0.0.0.0 --port=5000
 """
 import os
@@ -21,13 +21,14 @@ from dotenv import load_dotenv
 
 from app.db_ops import insert_case
 from app.ocr import make_fields
-from app.visualizations import get_judge_vis, get_judge_feature_vis
+from app.visualizations import get_judge_vis, get_judge_feature_vis, \
+    get_feature_vis
 
 app = FastAPI(
     title="DS API for HRF Asylum",
     description="PDF OCR",
     docs_url="/",
-    version="0.39.3",
+    version="0.39.1",
 )
 
 load_dotenv()
@@ -44,8 +45,7 @@ app.add_middleware(
 @app.get("/pdf-ocr/{uuid}")
 async def pdf_ocr(uuid: str):
     """
-    Endpoint for uploading cases and passing scraped data to the ds_case 
-    table. Also passes uuid to the case table that front-end and back-end use
+    Endpoint for uploading cases and passing scraped data to the ds_case table
     """
     try:
         s3 = Session(
@@ -76,6 +76,14 @@ async def outcome_by_judge(judge_id: int):
 @app.get("/vis/judge/{judge_id}/{feature}")
 async def outcome_by_judge_and_feature(judge_id: int, feature: str):
     """
-    Endpoint for visualizations on outcome by protected grounds by judge using plotly
+    Endpoint for visualizations on Outcome by {feature} by Judge using plotly
     """
     return json.loads(get_judge_feature_vis(judge_id, feature).to_json())
+
+
+@app.get("/vis/{feature}")
+async def outcome_by_feature(feature: str):
+    """
+    Endpoint for visualizations for home page
+    """
+    return json.loads(get_feature_vis(feature).to_json())

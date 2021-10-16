@@ -3,7 +3,6 @@ import pandas as pd
 import psycopg2
 from dotenv import load_dotenv
 
-
 load_dotenv()
 db_url = os.getenv('DB_URL')
 
@@ -43,20 +42,20 @@ def initialize_db():
     """ Database table initialization - only required once """
     db_action(f"""CREATE TABLE IF NOT EXISTS ds_cases (
     id SERIAL PRIMARY KEY NOT NULL,
-    uuid TEXT,
-    panel_members TEXT,
-    decision_type TEXT,
-    application_type TEXT,
-    decision_date TEXT,
-    country_of_origin TEXT,
-    outcome TEXT,
-    case_origin_state TEXT,
-    case_origin_city TEXT,
-    protected_grounds TEXT,
-    type_of_persecution TEXT,
-    gender TEXT,
-    credibility TEXT,
-    check_for_one_year TEXT);""")
+    uuid VARCHAR(256),
+    panel_members VARCHAR(256),
+    decision_type VARCHAR(256),
+    application_type VARCHAR(256),
+    decision_date VARCHAR(256),
+    country_of_origin VARCHAR(256),
+    outcome VARCHAR(256),
+    case_origin_state VARCHAR(256),
+    case_origin_city VARCHAR(256),
+    protected_grounds VARCHAR(256),
+    type_of_persecution VARCHAR(256),
+    gender VARCHAR(256),
+    credibility VARCHAR(256),
+    check_for_one_year VARCHAR(256));""")
 
 
 def get_table():
@@ -71,24 +70,6 @@ def reset_table():
 def delete_by_id(_id):
     db_action(f"""DELETE FROM ds_cases WHERE id = {_id};""")
 
-
-def get_judge_df(judge_name: str) -> pd.DataFrame:
-    """
-    Returns judge case data from ds_cases table based on judge
-    name as a filter.
-    """
-    judge_name = "%" + judge_name + "%"
-    conn = psycopg2.connect(db_url)
-    curs = conn.cursor()
-    curs.execute(f"""SELECT * FROM ds_cases
-                 WHERE panel_members LIKE {fix_str(judge_name)}
-                 AND decision_type = 'Initial';""")
-    cols = [k[0] for k in curs.description]
-    rows = curs.fetchall()
-    df = pd.DataFrame(rows, columns = cols)
-    curs.close()
-    conn.close()
-    return df
 
 def get_df() -> pd.DataFrame:
     conn = psycopg2.connect(db_url)
