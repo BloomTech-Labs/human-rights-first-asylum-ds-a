@@ -104,6 +104,18 @@ def in_parenthetical(match):
                 return True
     return False
 
+def multi_prot_grounds_fix(match):
+    """
+    Checks whether all protected grounds are listed together (when judge quotes law),
+    and removes any returned protected grounds if all protected grounds are part of the judge quoting the law
+    used in protected grounds in order to improve accuracy
+    """
+    prohibited_str = 'race, religion, nationality, membership in a particular social group, or political opinion'
+    sent_match = match.sent
+
+    if prohibited_str in sent_match:
+        return True
+    return False
 
 class IJCase:
     """
@@ -314,7 +326,7 @@ class IJCase:
         ]
 
         religions = ['christianity', 'christian', 'islam', 'atheist',
-                     'hinduism', 'buddihism', 'jewish', 'judaism', 'islamist',
+                     'hinduism', 'buddhism', 'jewish', 'judaism', 'islamist',
                      'sunni', 'shia', 'muslim', 'buddhist', 'atheists', 'jew',
                      'hindu', 'atheism']
 
@@ -329,7 +341,7 @@ class IJCase:
 
         for match in potential_grounds:
             # remove 'nationality act' from potential_grounds
-            if not in_parenthetical(match):
+            if not in_parenthetical(match) and not multi_prot_grounds_fix(match):
                 if match.text.lower() == 'nationality' \
                         and 'act' not in match.sent.text.lower() \
                         and 'nationality' not in confirmed_matches:
@@ -349,6 +361,7 @@ class IJCase:
                         confirmed_matches.append(match.text.lower())
             # skip matches that appear in parenthesis, the opinion is probably
             # just quoting a list of all the protected grounds in the statute
+            # skip matches where match appears in a string of all 5 protected grounds
 
         return confirmed_matches
 
