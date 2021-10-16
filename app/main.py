@@ -27,7 +27,7 @@ app = FastAPI(
     title="DS API for HRF Asylum",
     description="PDF OCR",
     docs_url="/",
-    version="0.36.0",
+    version="0.39.3",
 )
 
 load_dotenv()
