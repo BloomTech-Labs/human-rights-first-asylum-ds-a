@@ -104,6 +104,7 @@ def in_parenthetical(match):
                 return True
     return False
 
+
 def multi_prot_grounds_fix(match):
     """
     Checks whether all protected grounds are listed together (when judge quotes law),
@@ -116,6 +117,7 @@ def multi_prot_grounds_fix(match):
     if prohibited_str in sent_match:
         return True
     return False
+
 
 class IJCase:
     """
@@ -341,7 +343,7 @@ class IJCase:
 
         for match in potential_grounds:
             # remove 'nationality act' from potential_grounds
-            if not in_parenthetical(match) and not multi_prot_grounds_fix(match):
+            if (not in_parenthetical(match)) and (multi_prot_grounds_fix(match) is False):
                 if match.text.lower() == 'nationality' \
                         and 'act' not in match.sent.text.lower() \
                         and 'nationality' not in confirmed_matches:
@@ -427,7 +429,7 @@ class IJCase:
         Returns: The name of the state
         """
         """
-        Previous code to find state defeciency
+        Previous code to find state deficiency
         for place in self.doc:
             place = place.text
             if place in StateLookup.states.keys():
@@ -530,7 +532,7 @@ class IJCase:
 
         # Printing full_text[judge_match2[0][1]:judge_match2[0][2]] gives word
         # it matches on, can put in the [0] a for loop to see all matches
-        terms_list = []
+
         if len(violence_match) != 0:
             terms_list.append('Violent')
         if len(family_match) != 0:
