@@ -344,7 +344,7 @@ class IJCase:
         for match in potential_grounds:
             # remove 'nationality act' from potential_grounds
             match_lower = match.text.lower()
-            if (not in_parenthetical(match)) and (multi_prot_grounds_fix(match) is False):
+            if not in_parenthetical(match) and not multi_prot_grounds_fix(match):
                 if match_lower == 'nationality' \
                         and 'act' not in match.sent.text.lower() \
                         and 'nationality' not in confirmed_matches:
