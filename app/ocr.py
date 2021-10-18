@@ -112,7 +112,7 @@ def multi_prot_grounds_fix(match):
     used in protected grounds in order to improve accuracy
     """
     prohibited_str = 'race, religion, nationality, membership in a particular social group, or political opinion'
-    sent_match = match.sent
+    sent_match = str(match.sent)
 
     if prohibited_str in sent_match:
         return True
@@ -343,24 +343,25 @@ class IJCase:
 
         for match in potential_grounds:
             # remove 'nationality act' from potential_grounds
+            match_lower = match.text.lower()
             if (not in_parenthetical(match)) and (multi_prot_grounds_fix(match) is False):
-                if match.text.lower() == 'nationality' \
+                if match_lower == 'nationality' \
                         and 'act' not in match.sent.text.lower() \
                         and 'nationality' not in confirmed_matches:
                     confirmed_matches.append('nationality')
 
                 # check for specified religion, replace with 'religion'
-                elif match.text.lower() in religions:
+                elif match_lower in religions:
                     if 'religion' not in confirmed_matches:
                         confirmed_matches.append('religion')
 
-                elif match.text.lower() in politicals:
+                elif match_lower in politicals:
                     if 'political' not in confirmed_matches:
                         confirmed_matches.append('political')
 
                 else:
-                    if match.text.lower() not in confirmed_matches:
-                        confirmed_matches.append(match.text.lower())
+                    if match_lower not in confirmed_matches:
+                        confirmed_matches.append(match_lower)
             # skip matches that appear in parenthesis, the opinion is probably
             # just quoting a list of all the protected grounds in the statute
             # skip matches where match appears in a string of all 5 protected grounds
