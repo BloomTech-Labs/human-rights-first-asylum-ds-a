@@ -105,6 +105,20 @@ def in_parenthetical(match):
     return False
 
 
+def multi_prot_grounds_fix(match):
+    """
+    Checks whether all protected grounds are listed together (when judge quotes law),
+    and removes any returned protected grounds if all protected grounds are part of the judge quoting the law
+    used in protected grounds in order to improve accuracy
+    """
+    prohibited_str = 'race, religion, nationality, membership in a particular social group, or political opinion'
+    sent_match = str(match.sent)
+
+    if prohibited_str in sent_match:
+        return True
+    return False
+
+
 class IJCase:
     """
     The following defines the IJCase Class. When receiving a court doc,
@@ -314,7 +328,7 @@ class IJCase:
         ]
 
         religions = ['christianity', 'christian', 'islam', 'atheist',
-                     'hinduism', 'buddihism', 'jewish', 'judaism', 'islamist',
+                     'hinduism', 'buddhism', 'jewish', 'judaism', 'islamist',
                      'sunni', 'shia', 'muslim', 'buddhist', 'atheists', 'jew',
                      'hindu', 'atheism']
 
@@ -329,26 +343,28 @@ class IJCase:
 
         for match in potential_grounds:
             # remove 'nationality act' from potential_grounds
-            if not in_parenthetical(match):
-                if match.text.lower() == 'nationality' \
+            match_lower = match.text.lower()
+            if not in_parenthetical(match) and not multi_prot_grounds_fix(match):
+                if match_lower == 'nationality' \
                         and 'act' not in match.sent.text.lower() \
                         and 'nationality' not in confirmed_matches:
                     confirmed_matches.append('nationality')
 
                 # check for specified religion, replace with 'religion'
-                elif match.text.lower() in religions:
+                elif match_lower in religions:
                     if 'religion' not in confirmed_matches:
                         confirmed_matches.append('religion')
 
-                elif match.text.lower() in politicals:
+                elif match_lower in politicals:
                     if 'political' not in confirmed_matches:
                         confirmed_matches.append('political')
 
                 else:
-                    if match.text.lower() not in confirmed_matches:
-                        confirmed_matches.append(match.text.lower())
+                    if match_lower not in confirmed_matches:
+                        confirmed_matches.append(match_lower)
             # skip matches that appear in parenthesis, the opinion is probably
             # just quoting a list of all the protected grounds in the statute
+            # skip matches where match appears in a string of all 5 protected grounds
 
         return confirmed_matches
 
@@ -414,7 +430,7 @@ class IJCase:
         Returns: The name of the state
         """
         """
-        Previous code to find state defeciency
+        Previous code to find state deficiency
         for place in self.doc:
             place = place.text
             if place in StateLookup.states.keys():
@@ -517,7 +533,7 @@ class IJCase:
 
         # Printing full_text[judge_match2[0][1]:judge_match2[0][2]] gives word
         # it matches on, can put in the [0] a for loop to see all matches
-        terms_list = []
+
         if len(violence_match) != 0:
             terms_list.append('Violent')
         if len(family_match) != 0:
