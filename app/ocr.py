@@ -111,12 +111,10 @@ def multi_prot_grounds_fix(match):
     and removes any returned protected grounds if all protected grounds are part of the judge quoting the law
     used in protected grounds in order to improve accuracy
     """
-    prohibited_str = 'race, religion, nationality, membership in a particular social group, or political opinion'
-    sent_match = str(match.sent)
+    prohibited_str = 'race, religion, nationality, membership in a particular social group, or political opinion.'
+    sent_match = match.sent.text
 
-    if prohibited_str in sent_match:
-        return True
-    return False
+    return prohibited_str in sent_match
 
 
 class IJCase:
@@ -440,8 +438,7 @@ class IJCase:
         return "Unknown"
         """
         primary_pattern = [
-            [{"LOWER": "file"}, {"LOWER": ":"}],
-            [{"LOWER": "files"}, {"LOWER": ":"}]
+            [{"LOWER": "immigration"}, {"LOWER": "court"}]
         ]
         # instantiate a list of pattern matches
         spans = similar(self.doc, primary_pattern)
@@ -468,8 +465,7 @@ class IJCase:
         Returns: The name of the city
         """
         primary_pattern = [
-            [{"LOWER": "file"}, {"LOWER": ":"}],
-            [{"LOWER": "files"}, {"LOWER": ":"}]
+            [{"LOWER": "immigration"}, {"LOWER": "court"}]
         ]
         # instantiate a list of pattern matches
         spans = similar(self.doc, primary_pattern)
