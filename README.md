@@ -34,14 +34,14 @@ See this team's history [here](ProjectHistory.md).
 The **app** folder contains the FastAPI application which creates an endpoint for processing a single `.pdf` file stored in the AWS S3 bucket. 
 
 ### Valuable Readmes
-- [VISUALIZATIONS_INFO](VISUALIZATIONS_INFO.md) contains information pertaining to the visualizations.py as well as the main.py file and how they interact with each other.
-- [SCRAPER_INFO](SCRAPER_INFO.md) contains important information about the status of each function used to extract fields from documents.
-- [READMEdev](READMEdev.md) contains AWS CLI2 installation instruction
+- [VISUALIZATIONS_INFO](README_VISUALS.md) contains information pertaining to the visualizations.py as well as the main.py file and how they interact with each other.
+- [SCRAPER_INFO](README_SCRAPER.md) contains important information about the status of each function used to extract fields from documents.
+- [READMEdev](README_DEV.md) contains AWS CLI2 installation instruction
 
 ### Additional Readmes
-- [KnownDefects](KnownDefects.md) contains information about potential issues to be aware of.
-- [NOTEBOOKS](notebooks/NOTEBOOKS.md) contains helpful information about the notebooks and scripts used to explore solutions for scrapper.
-- [visualizations/README](visualizations/README.md) contains helpful information about notebooks, scripts, and data used to explore visualizations.
+- [KnownDefects](README_KNOWN_DEFECTS.md) contains information about potential issues to be aware of.
+- [NOTEBOOKS](notebooks/) contains helpful information about the notebooks and scripts used to explore solutions for scrapper.
+- [visualizations/README](visualizations/) contains helpful information about notebooks, scripts, and data used to explore visualizations.
 
 ## Tools
 
@@ -68,14 +68,20 @@ Then open http://0.0.0.0:5000 in your browser. The application should be running
   
 ## Contributors
 
+###### Labs 39
+[Ivan Mihailov](https://github.com/ivan-mihailov)  
+[Emily A. Frener](https://github.com/EmilyAFlener)  
+[Mathew Mahoney](https://github.com/mathewmahoneyds20)  
+[Azamatkhuja Jalilov](https://github.com/AZICO)  
+
 ###### Labs 37
 
 [Lucas Chatham](https://github.com/lucaschatham)   
-[Trevor Dewalt](https://github.com/trevordewalt)
-[Azamatkhuja Jalilov](https://github.com/AZICO)
-[Matthew Blackburn](https://github.com/matthewblackbu)
-[Zunera Bokhari](https://github.com/zunerabokhari)
-[Joel Hoover](https://github.com/jihoover77)
+[Trevor Dewalt](https://github.com/trevordewalt)  
+[Azamatkhuja Jalilov](https://github.com/AZICO)  
+[Matthew Blackburn](https://github.com/matthewblackbu)  
+[Zunera Bokhari](https://github.com/zunerabokhari)  
+[Joel Hoover](https://github.com/jihoover77)  
 [Lee Rowe](https://github.com/leecrowe)
   
 ###### Labs 37

@@ -1,6 +1,5 @@
 import geonamescache
 import pytesseract
-import pickle
 from pdf2image import convert_from_bytes
 from spacy import load
 from spacy.tokens import Doc, Span
@@ -105,16 +104,21 @@ def in_parenthetical(match):
     return False
 
 
-def multi_prot_grounds_fix(match):
-    """
-    Checks whether all protected grounds are listed together (when judge quotes law),
-    and removes any returned protected grounds if all protected grounds are part of the judge quoting the law
-    used in protected grounds in order to improve accuracy
-    """
-    prohibited_str = 'race, religion, nationality, membership in a particular social group, or political opinion.'
-    sent_match = match.sent.text
-
-    return prohibited_str in sent_match
+# def multi_prot_grounds_fix(match):
+#     """
+#     Checks whether all protected grounds are listed together (when judge quotes law),
+#     and removes any returned protected grounds if all protected grounds are part of the judge quoting the law
+#     used in protected grounds in order to improve accuracy
+#
+#     This function was written to solve bug in get_protected_grounds method but it does not work.
+#
+#     Current solution: function is commented out and get_protected_grounds method returns "Unknown";
+#     Frontend will implement a drop-down menu for user to manually enter the protected ground.
+#     """
+#     prohibited_str = 'race, religion, nationality, membership in a particular social group, or political opinion.'
+#     sent_match = match.sent.text
+#
+#     return prohibited_str in sent_match
 
 
 class IJCase:
@@ -123,9 +127,6 @@ class IJCase:
     we use this to extract info for the desired fields/info
     that are scraped from the text of the court docs.
     """
-    with open('./app/judge_names.pkl', 'rb') as j:
-        appellate_panel_members = pickle.load(j)
-
     def __init__(self, uuid: str, text: str):
         """
         • Input will be text from a IJ (immigration judge) case pdf file, after the pdf has
@@ -152,13 +153,6 @@ class IJCase:
             'credibility': str(self.get_credibility()) or 'Unknown',
             'check_for_one_year': str(self.check_for_one_year()) or 'Unknown',
         }
-
-    def get_ents(self, labels: List[str]) -> Iterator[Span]:
-        """
-        • Retrieves entities of a specified label(s) in the document,
-        if no label is specified, returns all entities
-        """
-        return (ent for ent in self.doc.ents if ent.label_ in labels)
 
     def get_country_of_origin(self) -> str:
         """
@@ -217,9 +211,8 @@ class IJCase:
         """
         • Returns decision date of the document.
 
-        This is the code to return hearing date 
-        # get_ents function only use in this function
-        # can be deleted from IJCase class if not use
+        This is the code to return hearing date
+        Note: will only work on printed dates; handwritten dates will return Unknown
 
         dates = map(str, self.get_ents(['DATE']))
         for s in dates:
@@ -251,26 +244,11 @@ class IJCase:
 
     def get_panel(self):
         """
-        Uses the appellate_panel_members list and spacy PhraseMatcher to check a
-        document for members in the appellate_panel_member list.
-        !!! Currently only works for this static list of judges. If not appellate
-            or the list of appellate judges changes, or there's an appellate
-            judge not in the list.
-            May want to generate an updatable list.
-            May want to generate a non-appellate judge list
-            This has important interactions with "is_appellate()" function. If
-                this function returns a judge, it IS from the appellate list,
-                and is therefore an appellate case.
+        Returns Unknown due to switch from appellate BIA cases to immigration court cases
+        Note: in immigration court cases, name of the judge is usually at the bottom below a handwritten
+        signature; often the signature crosses the name, which makes it nearly impossible to OCR correctly
         """
-        matcher = PhraseMatcher(nlp.vocab, attr="LOWER")
-        patterns = [nlp.make_doc(text) for text in self.appellate_panel_members]
-        matcher.add("panel_names", patterns)
-        matches = set()
-        for match_id, start, end in matcher(self.doc):
-            span = self.doc[start:end]
-            matches.add(' '.join(span.text.split(", ")[-1::-1]))
-        result = list(matches).pop(0) if matches else "None"
-        return result
+        return "Unknown"
 
     def get_gender(self) -> str:
         """
@@ -314,57 +292,70 @@ class IJCase:
         checks are needed. Checking for keywords is not enough, as sometimes
         documents label laws that describe each protected ground. Examples
         are 'Purely Political Offense' and 'Real Id Act'.
+
+        The method as written returns all 5 protected grounds for each case because there is a sentence in nearly
+        every document which lists all 5 protected grounds when it explains the bases upon which asylum can be
+        granted (e.g. "To satisfy the “refugee” definition, an applicant must demonstrate that she is unable or
+        unwilling to return to her country of origin because of a “well-founded fear” of future persecution on
+        account of one of the five statutory grounds: race, religion, nationality, membership in a particular social
+        group, or political opinion.")
+
+        The function multi_prot_grounds_fix was written to solve this bug but it does not work.
+
+        Current solution: method is commented out and returns "Unknown".
+        Frontend will implement a drop-down menu for user to manually enter the protected ground.
         """
-        pattern = [
-            [{"LOWER": "race"}],
-            [{"LOWER": "religion"}],  # expand to check for list of religions
-            [{"LOWER": "nationality"}],  # phrase is pulled but out of context
-            [{"LOWER": "social"}, {"LOWER": "group"}],
-            [{"LOWER": "political"}, {"LOWER": "opinion"}],
-            [{"LOWER": "political"}, {"LOWER": "offense"}],
-            [{"LOWER": "political"}],
-        ]
-
-        religions = ['christianity', 'christian', 'islam', 'atheist',
-                     'hinduism', 'buddhism', 'jewish', 'judaism', 'islamist',
-                     'sunni', 'shia', 'muslim', 'buddhist', 'atheists', 'jew',
-                     'hindu', 'atheism']
-
-        politicals = ['political opinion', 'political offense']
-
-        confirmed_matches = []
-        # create pattern for specified religions
-        for religion in religions:
-            pattern.append([{"LOWER": religion}])
-
-        potential_grounds = similar(self.doc, pattern)
-
-        for match in potential_grounds:
-            # remove 'nationality act' from potential_grounds
-            match_lower = match.text.lower()
-            if not in_parenthetical(match) and not multi_prot_grounds_fix(match):
-                if match_lower == 'nationality' \
-                        and 'act' not in match.sent.text.lower() \
-                        and 'nationality' not in confirmed_matches:
-                    confirmed_matches.append('nationality')
-
-                # check for specified religion, replace with 'religion'
-                elif match_lower in religions:
-                    if 'religion' not in confirmed_matches:
-                        confirmed_matches.append('religion')
-
-                elif match_lower in politicals:
-                    if 'political' not in confirmed_matches:
-                        confirmed_matches.append('political')
-
-                else:
-                    if match_lower not in confirmed_matches:
-                        confirmed_matches.append(match_lower)
-            # skip matches that appear in parenthesis, the opinion is probably
-            # just quoting a list of all the protected grounds in the statute
-            # skip matches where match appears in a string of all 5 protected grounds
-
-        return confirmed_matches
+        # pattern = [
+        #     [{"LOWER": "race"}],
+        #     [{"LOWER": "religion"}],  # expand to check for list of religions
+        #     [{"LOWER": "nationality"}],  # phrase is pulled but out of context
+        #     [{"LOWER": "social"}, {"LOWER": "group"}],
+        #     [{"LOWER": "political"}, {"LOWER": "opinion"}],
+        #     [{"LOWER": "political"}, {"LOWER": "offense"}],
+        #     [{"LOWER": "political"}],
+        # ]
+        #
+        # religions = ['christianity', 'christian', 'islam', 'atheist',
+        #              'hinduism', 'buddhism', 'jewish', 'judaism', 'islamist',
+        #              'sunni', 'shia', 'muslim', 'buddhist', 'atheists', 'jew',
+        #              'hindu', 'atheism']
+        #
+        # politicals = ['political opinion', 'political offense']
+        #
+        # confirmed_matches = []
+        # # create pattern for specified religions
+        # for religion in religions:
+        #     pattern.append([{"LOWER": religion}])
+        #
+        # potential_grounds = similar(self.doc, pattern)
+        #
+        # for match in potential_grounds:
+        #     # remove 'nationality act' from potential_grounds
+        #     match_lower = match.text.lower()
+        #     if not in_parenthetical(match) and not multi_prot_grounds_fix(match):
+        #         if match_lower == 'nationality' \
+        #                 and 'act' not in match.sent.text.lower() \
+        #                 and 'nationality' not in confirmed_matches:
+        #             confirmed_matches.append('nationality')
+        #
+        #         # check for specified religion, replace with 'religion'
+        #         elif match_lower in religions:
+        #             if 'religion' not in confirmed_matches:
+        #                 confirmed_matches.append('religion')
+        #
+        #         elif match_lower in politicals:
+        #             if 'political' not in confirmed_matches:
+        #                 confirmed_matches.append('political')
+        #
+        #         else:
+        #             if match_lower not in confirmed_matches:
+        #                 confirmed_matches.append(match_lower)
+        #     # skip matches that appear in parenthesis, the opinion is probably
+        #     # just quoting a list of all the protected grounds in the statute
+        #     # skip matches where match appears in a string of all 5 protected grounds
+        #
+        # return confirmed_matches
+        return "Unknown"
 
     def get_application(self) -> str:
         """
@@ -385,7 +376,7 @@ class IJCase:
         start = 0
 
         for token in self.doc:
-            if token.text == 'APPLICATIONS':
+            if token.text == 'APPLICATION' or 'APPLICATIONS':
                 start += token.idx
                 break
 
@@ -401,7 +392,7 @@ class IJCase:
 
     def get_outcome(self) -> str:
         """
-        • Returns the outcome of the case. This will appear after 'ORDER'
+        Returns the outcome of the case. This will appear after 'ORDER'
         at the end of the document.
         """
         outcomes = {
@@ -423,10 +414,14 @@ class IJCase:
         """
         get_state: Get the state of the original hearing location
         Find the "Immigration Court" pattern in the document and after that
-        pattern is split by "," the State is the second element (after a split by " ") in either
+        pattern is split by "," the State is the second element (after another split by " ") in either
         the second or third element of the list (depending on how many commas are grabbed by the spaCy matcher)
 
         Returns: The name of the state
+
+        Known Bug: this method as written will not work if the state is fully spelled out and has two words in the
+        state name (e.g. New York, New Mexico, etc.). In addition, it will likely return the incorrect state if there
+        is more than 1 comma in the state_clean_sent variable.
         """
         primary_pattern = [
             [{"LOWER": "immigration"}, {"LOWER": "court"}]
@@ -445,7 +440,6 @@ class IJCase:
                 return comma_split[1].split(' ')[1]
         return "Unknown"
 
-
     def get_city(self) -> str:
         """
         get_city: Get the state of the original hearing location
@@ -454,6 +448,10 @@ class IJCase:
         the first or second element of the list (depending on how many commas are grabbed by the spaCy matcher)
 
         Returns: The name of the city
+
+        Known Bug: this method as written will not work if the city has two words in the city name (e.g. New York,
+        El Paso, etc.). In addition, it will likely return the incorrect state if there is more than 1 comma in the
+        city_clean_sent variable.
         """
         primary_pattern = [
             [{"LOWER": "immigration"}, {"LOWER": "court"}]
@@ -471,7 +469,6 @@ class IJCase:
             elif len(comma_split) == 2:
                 return comma_split[0].split(' ')[-1]
         return "Unknown"
-
 
     def get_based_violence(self) -> List[str]:
         """
