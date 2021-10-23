@@ -20,14 +20,14 @@
 - **Details:** Searches for the phrase "Immigration Court" which usually appears at the top of the case, then grabs the sentence that contains the searched phrase + 12 tokens after the end the sentence. The span is then cleaned, split on ','. The State is the second element (after another split by " ") in either the second or third element of the list (depending on how many commas are grabbed by the spaCy matcher). Returns state where case was filed.
 - **Returns:** String like 'AL' or 'ALABAMA'
 - **Current Status:** Currently is pulled correctly by scraper.
-- **Known Bug:** This method as written will not work if the state is fully spelled out and has two words in the state name (e.g. New York, New Mexico, etc.). In addition, it will likely return the incorrect state if there is more than 1 comma in the state_clean_sent variable.
+- **Known Bug:** This method as written will likely return the incorrect state if there are more than 2 commas in the state_clean_sent variable.
 
 ### City
 - **Function name: **`get_city()`
 - **Details:** Searches for the phrase "Immigration Court" which usually appears at the top of the case, then grabs the sentence that contains the searched phrase + 12 tokens after the end the sentence. The span is then cleaned, split on ','. The State is the second element (after another split by " ") in either the first or second element of the list (depending on how many commas are grabbed by the spaCy matcher). Returns city where case was filed
 - **Returns:** String like 'Montgomery'
 - **Current Status:** Currently is pulled correctly by scraper.
-- **Known Bug:** This method as written will not work if the city has two words in the city name (e.g. New York, El Paso, etc.). In addition, it will likely return the incorrect state if there is more than 1 comma in the city_clean_sent variable.
+- **Known Bug:** This method as written will likely return the incorrect city if there are more than 2 commas in the city_clean_sent variable.
 
 ### Applicant's Country of Origin
 - **Function name: **`get_country_of_origin()`

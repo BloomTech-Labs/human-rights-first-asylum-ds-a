@@ -147,7 +147,7 @@ class IJCase:
             'outcome': self.get_outcome() or 'Unknown',
             'case_origin_state': self.get_state() or 'Unknown',
             'case_origin_city': self.get_city() or "Unknown",
-            'protected_grounds': ', '.join(self.get_protected_grounds()) or 'Unknown',
+            'protected_grounds': self.get_protected_grounds() or 'Unknown',
             'type_of_persecution': ', '.join(self.get_based_violence()) or 'Unknown',
             'gender': self.get_gender() or 'Unknown',
             'credibility': str(self.get_credibility()) or 'Unknown',
@@ -419,9 +419,8 @@ class IJCase:
 
         Returns: The name of the state
 
-        Known Bug: this method as written will not work if the state is fully spelled out and has two words in the
-        state name (e.g. New York, New Mexico, etc.). In addition, it will likely return the incorrect state if there
-        is more than 1 comma in the state_clean_sent variable.
+        Known Bug: This method as written will likely return the incorrect state if there are more than 2 commas in the
+        state_clean_sent variable.
         """
         primary_pattern = [
             [{"LOWER": "immigration"}, {"LOWER": "court"}]
@@ -435,9 +434,29 @@ class IJCase:
             state_sent_clean = self.doc[start:stop].text.strip().replace("\n", " ")
             comma_split = state_sent_clean.split(',')
             if len(comma_split) > 2:
-                return comma_split[2].split(' ')[1]
+                potential_state = comma_split[2].split(' ')[1]
+                # check if state is New York, North Carolina, or Puerto Rico & return full state name
+                if potential_state in {"New", "North", "Puerto", "NEW", "NORTH", "PUERTO", "new", "north", "puerto"}:
+                    state = " ".join(comma_split[2].split(' ')[1:3])
+                    return state
+                # check if state is Northern Mariana Islands & return full state name
+                elif potential_state in {"Northern", "NORTHERN", "northern"}:
+                    state = " ".join(comma_split[2].split(' ')[1:4])
+                    return state
+                else:
+                    return comma_split[2].split(' ')[1]
             elif len(comma_split) == 2:
-                return comma_split[1].split(' ')[1]
+                potential_state = comma_split[1].split(' ')[1]
+                # check if state is New York, North Carolina, or Puerto Rico & return full state name
+                if potential_state in {"New", "North", "Puerto", "NEW", "NORTH", "PUERTO", "new", "north", "puerto"}:
+                    state = " ".join(comma_split[1].split(' ')[1:3])
+                    return state
+                # check if state is Northern Mariana Islands & return full territory name
+                elif potential_state in {"Northern", "NORTHERN", "northern"}:
+                    state = " ".join(comma_split[1].split(' ')[1:4])
+                    return state
+                else:
+                    return comma_split[1].split(' ')[1]
         return "Unknown"
 
     def get_city(self) -> str:
@@ -449,8 +468,7 @@ class IJCase:
 
         Returns: The name of the city
 
-        Known Bug: this method as written will not work if the city has two words in the city name (e.g. New York,
-        El Paso, etc.). In addition, it will likely return the incorrect state if there is more than 1 comma in the
+        Known Bug: This method as written will likely return the incorrect city if there are more than 2 commas in the
         city_clean_sent variable.
         """
         primary_pattern = [
@@ -459,15 +477,54 @@ class IJCase:
         # instantiate a list of pattern matches
         spans = similar(self.doc, primary_pattern)
         # if there are matches
+        multi_word_city = {"Angeles", "Antonio", "Church", "Diego", "Francisco", "Fresnos", "Isabel", "Juan", "Krome",
+                           "Mesa", "Orleans", "Paso", "Snelling", "Vegas",  "Worth", "York", "ANGELES", "ANTONIO",
+                           "CHURCH", "DIEGO", "FRANCISCO", "FRESNOS", "ISABEL", "JUAN", "KROME", "MESA", "ORLEANS",
+                           "PASO", "SNELLING", "VEGAS",  "WORTH", "YORK", "angeles", "antonio", "church", "diego",
+                           "francisco", "fresnos", "isabel", "juan", "krome", "mesa", "orleans", "paso", "snelling",
+                           "vegas",  "worth", "york"}
+        # City
         if spans:
             # grab the surrounding sentence and turn it into a string
             start, stop = spans[0].sent.start, spans[0].sent.end + 12
             city_sent_clean = self.doc[start:stop].text.strip().replace("\n", " ")
             comma_split = city_sent_clean.split(',')
             if len(comma_split) > 2:
-                return comma_split[1].split(' ')[-1]
+                potential_city = comma_split[1].split(' ')[-1]
+                # Check if city is: Los Angeles, San Antonio, Falls Church, San Diego, San Francisco, Los Fresnos,
+                # Port Isabel, San Juan, Miami Krome, Otay Mesa, New Orleans, El Paso, Fort Snelling, Las Vegas,
+                # Fort Worth, or New York and return the full city name
+                if potential_city in multi_word_city:
+                    city = " ".join(comma_split[1].split(' ')[-2:])
+                    return city
+                # Check if city is: Kansas City or Salt Lake City and return full city name
+                elif potential_city in {"City", "CITY", "city"}:
+                    if comma_split[1].split(' ')[-2] in {"Lake", "LAKE", "lake"}:
+                        city = " ".join(comma_split[1].split(' ')[-3:])
+                        return city
+                    else:
+                        city = " ".join(comma_split[1].split(' ')[-2:])
+                        return city
+                else:
+                    return comma_split[1].split(' ')[-1]
             elif len(comma_split) == 2:
-                return comma_split[0].split(' ')[-1]
+                potential_city = comma_split[0].split(' ')[-1]
+                # Check if city is: Los Angeles, San Antonio, Falls Church, San Diego, San Francisco, Los Fresnos,
+                # Port Isabel, San Juan, Miami Krome, Otay Mesa, New Orleans, El Paso, Fort Snelling, Las Vegas,
+                # Fort Worth, or New York and return the full city name
+                if potential_city in multi_word_city:
+                    city = " ".join(comma_split[0].split(' ')[-2:])
+                    return city
+                # Check if city is: Kansas City or Salt Lake City and return full city name
+                elif potential_city in {"City", "CITY", "city"}:
+                    if comma_split[0].split(' ')[-2] in {"Lake", "LAKE", "lake"}:
+                        city = " ".join(comma_split[0].split(' ')[-3:])
+                        return city
+                    else:
+                        city = " ".join(comma_split[0].split(' ')[-2:])
+                        return city
+                else:
+                    return comma_split[0].split(' ')[-1]
         return "Unknown"
 
     def get_based_violence(self) -> List[str]:
