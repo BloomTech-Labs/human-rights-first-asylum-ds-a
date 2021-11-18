@@ -7,7 +7,7 @@ An application to assist immigration attorneys and refugee representatives in ad
 
 
 ## Architecture
-![image](https://github.com/Lambda-School-Labs/human-rights-first-asylum-be-a/blob/main/reference/architecture.png?raw=true)  
+![image](https://github.com/BloomTech-Labs/human-rights-first-asylum-be-a/blob/main/reference/architecture.png?raw=true)  
 This diagram shows the current state of the architecture.
 
 ![Screen Shot 2021-09-22 at 11 58 06 AM](https://user-images.githubusercontent.com/71359375/134405305-c5c5b2de-f8df-4dea-b05b-7059c9aec093.png)
@@ -15,13 +15,13 @@ This diagram shows the flow of data between frontend, backend, data science, and
 
 
 ## Codebases
-[Front-End](https://github.com/Lambda-School-Labs/human-rights-first-asylum-fe-a/blob/main/README.md)  
+[Front-End](https://github.com/BloomTech-Labs/human-rights-first-asylum-fe-a/blob/main/README.md)  
 Uses NodeJS to create the web-based user interface for uploading case documents, managing users, and viewing data in the form of tables and visualizations. 
 
-[Back-End](https://github.com/Lambda-School-Labs/human-rights-first-asylum-be-a/blob/main/README.md)  
+[Back-End](https://github.com/BloomTech-Labs/human-rights-first-asylum-be-a/blob/main/README.md)  
 Uses Javascript and Postgres to manage databases containing tables for users, judges, and cases.
 
-[Data Science](https://github.com/Lambda-School-Labs/human-rights-first-asylum-ds-a/blob/main/README.md)  
+[Data Science](https://github.com/BloomTech-Labs/human-rights-first-asylum-ds-a/blob/main/README.md)  
 Uses Python and Tesseract for optical character recognition (OCR) to convert pdf images into text data that can be searched via natural language processing (NLP) techniques. Key data, which we refer to as structured fields, are extracted from the text data and sent to the back-end for storage.
 
 ## Our Role
