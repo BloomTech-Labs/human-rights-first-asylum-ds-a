@@ -422,20 +422,11 @@ class IJCase:
     def get_state(self) -> str:
         """
         get_state: Get the state of the original hearing location
-        Find the "File:" pattern in the document and after that
-        pattern is the State 
+        Find the "Immigration Court" pattern in the document and after that
+        pattern is split by "," the State is the second element (after a split by " ") in either
+        the second or third element of the list (depending on how many commas are grabbed by the spaCy matcher)
 
         Returns: The name of the state
-        """
-        """
-        Previous code to find state deficiency
-        for place in self.doc:
-            place = place.text
-            if place in StateLookup.states.keys():
-                return place
-            elif place in StateLookup.states.values():
-                return StateLookup.abbrev_lookup(place)
-        return "Unknown"
         """
         primary_pattern = [
             [{"LOWER": "immigration"}, {"LOWER": "court"}]
@@ -445,22 +436,22 @@ class IJCase:
         # if there are matches
         if spans:
             # grab the surrounding sentence and turn it into a string
-            sentence = str(spans[0].sent)
-            # remove line breaks, edge case
-            clean_sent = sentence.replace("\n", " ")
-            try:
-                state = clean_sent.split(',')[1].split()[0].strip()
-                return state
-            except:
-                return "Unknown"
-
+            start, stop = spans[0].sent.start, spans[0].sent.end + 12
+            state_sent_clean = self.doc[start:stop].text.strip().replace("\n", " ")
+            comma_split = state_sent_clean.split(',')
+            if len(comma_split) > 2:
+                return comma_split[2].split(' ')[1]
+            elif len(comma_split) == 2:
+                return comma_split[1].split(' ')[1]
         return "Unknown"
+
 
     def get_city(self) -> str:
         """
         get_city: Get the state of the original hearing location
-        Find the "File:" pattern in the document and after that
-        pattern is the City 
+        Find the "Immigration Court" pattern in the document and after that
+        pattern is split by "," the City is the last element (after a split by " ") in either
+        the first or second element of the list (depending on how many commas are grabbed by the spaCy matcher)
 
         Returns: The name of the city
         """
@@ -472,16 +463,15 @@ class IJCase:
         # if there are matches
         if spans:
             # grab the surrounding sentence and turn it into a string
-            sentence = str(spans[0].sent)
-            # remove line breaks, edge case
-            clean_sent = sentence.replace("\n", " ")
-            try:
-                city = clean_sent.split(',')[0].split()[-1].strip()
-                return city
-            except:
-                return "Unknown"
-
+            start, stop = spans[0].sent.start, spans[0].sent.end + 12
+            city_sent_clean = self.doc[start:stop].text.strip().replace("\n", " ")
+            comma_split = city_sent_clean.split(',')
+            if len(comma_split) > 2:
+                return comma_split[1].split(' ')[-1]
+            elif len(comma_split) == 2:
+                return comma_split[0].split(' ')[-1]
         return "Unknown"
+
 
     def get_based_violence(self) -> List[str]:
         """
